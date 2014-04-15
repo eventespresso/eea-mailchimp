@@ -1,0 +1,26 @@
+.ee_mailchimp_api_key_setup img.ee_mailchimp_apikey_ok {
+   width: 20px;
+   height: 22px;
+   margin: 0 8px 0 8px;
+}
+
+.ee_mailchimp_api_key_setup img.ee_mailchimp_apikey_error {
+   width: 20px;
+   height: 20px;
+   margin: 0 8px -4px 8px;
+}
+
+.espresso_mailchimp_integration_metabox .ee_mailchimp_dropdowns {
+   margin: 8px 10px 8px 0;
+}
+.espresso_mailchimp_integration_metabox #ee-mailchimp-lists {
+   max-width: 210px;
+}
+
+#ee-mailchimp-groups dd {
+   margin-left: 15px;
+}
+
+#ee-mailchimp-groups dt {
+   margin-bottom: 5px;
+}
