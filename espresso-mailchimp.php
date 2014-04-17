@@ -67,12 +67,15 @@ add_action('init', 'espresso_mailchimp_register_integration_tables');
 // Update notifications
 if ( ! function_exists('ee_mailchimp_load_pue_update') ) {
    function ee_mailchimp_load_pue_update() {
-      if ( file_exists(EE_THIRD_PARTY . 'pue/pue-client.php') ) { //include the file
-         require(EE_THIRD_PARTY . 'pue/pue-client.php');
+      if ( is_readable(EE_THIRD_PARTY . 'pue/pue-client.php') ) {
+         // Include the file
+         require_once(EE_THIRD_PARTY . 'pue/pue-client.php');
+         // EE Settings requirements
+         require_once(EE_CORE . 'EE_Config.core.php');
          require_once(EE_CORE . 'EE_Network_Config.core.php');
 
          $settings = EE_Network_Config::instance()->get_config();
-         $api_key = $settings->core->site_license_key;
+         $api_key = isset($settings->core->site_license_key) ? $settings->core->site_license_key : '';
          $host_server_url = 'http://eventespresso.com';
          $plugin_slug = array(
             'premium' => array('p' => 'espresso-mailchimp'),
@@ -93,8 +96,7 @@ if ( ! function_exists('ee_mailchimp_load_pue_update') ) {
    }
 
    if ( is_admin() ) {
-    //Do not load update notifications for now
-      //$mci_update = ee_mailchimp_load_pue_update();
+      $mci_update = ee_mailchimp_load_pue_update();
    }
 }
 
