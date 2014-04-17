@@ -93,7 +93,8 @@ if ( ! function_exists('ee_mailchimp_load_pue_update') ) {
    }
 
    if ( is_admin() ) {
-      $mci_update = ee_mailchimp_load_pue_update();
+    //Do not load update notifications for now
+      //$mci_update = ee_mailchimp_load_pue_update();
    }
 }
 
