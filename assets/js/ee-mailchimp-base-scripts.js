@@ -1,7 +1,10 @@
 jQuery(document).ready(function($){
    $( '#ee-mailchimp-lists' ).change( function(){
       var list = $(this).val();
-      var eventID = getUrlVars()['post'];
+      var eventID = '';
+      if ( getUrlVars()['post'] !== undefined ) {
+         eventID = getUrlVars()['post'];
+      }
       update_mailchimp_groups(list, eventID);
       update_mailchimp_list_fields(list, eventID);
    } );
