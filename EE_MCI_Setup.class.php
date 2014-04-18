@@ -50,9 +50,10 @@ class EE_MCI_Setup {
       add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array($this, 'espresso_mailchimp_submit_to_mc'), 10, 2 );
       // Add 'Settings' link
       add_filter('plugin_action_links', array($this, 'filter_espresso_mailchimp_plugin_settings'), 10, 2);
-
       // Ajax for MailChimp groups refresh
       add_action('wp_ajax_espresso_mailchimp_upgate_groups', array($this, 'espresso_mailchimp_upgate_groups'));
+      // Ajax for MailChimp list fields refresh
+      add_action('wp_ajax_espresso_mailchimp_upgate_list_fields', array($this, 'espresso_mailchimp_upgate_list_fields'));
    }
 
    /**
@@ -95,8 +96,9 @@ class EE_MCI_Setup {
     * @return void
     */
    function ee_mci_link_scripts_styles() {
-      wp_enqueue_style('espresso_mailchimp_gen_styles', ESPRESSO_MAILCHIMP_URL . "assets/css/ee_mailchimp_styles.css", false);
-      wp_enqueue_script('espresso_mailchimp_base_scripts', ESPRESSO_MAILCHIMP_URL . 'assets/js/ee-mailchimp-base-scripts.js', false);
+      $mci_ver = espresso_mailchimp_version();
+      wp_enqueue_style('espresso_mailchimp_gen_styles', ESPRESSO_MAILCHIMP_URL . "assets/css/ee_mailchimp_styles.css", false, $mci_ver);
+      wp_enqueue_script('espresso_mailchimp_base_scripts', ESPRESSO_MAILCHIMP_URL . 'assets/js/ee-mailchimp-base-scripts.js', false, $mci_ver);
       do_action('AHEE__EE_MCI_Setup__ee_mci_link_scripts_styles__end');
    }
 
@@ -115,8 +117,7 @@ class EE_MCI_Setup {
    /**
     * Select the settings source files
     * 
-    * @access private
-    * @return void
+    * @return EE_MCI_Settings Object
     */
    function ee_mci_admin_page_settings() {
       require_once( ESPRESSO_MAILCHIMP_DIR . 'includes/EE_MCI_Settings.class.php' );
@@ -125,11 +126,32 @@ class EE_MCI_Setup {
       return $settingsObject;
    }
 
+   /**
+    * An ajax to refresh the list of groups of the MailChimp List selected in the event.
+    * 
+    * @return void
+    */
    function espresso_mailchimp_upgate_groups() {
       $mci_controller = new EE_MCI_Controller();
       ob_start();
       $mci_data = $_POST['mci_data'];
       $mci_controller->mci_list_mailchimp_groups($mci_data['event_id'], $mci_data['list_id']);
+      $response = ob_get_contents();
+      ob_end_clean();
+      echo $response;
+      exit;
+   }
+
+   /**
+    * An ajax to refresh the  selected MailChimp List's merge fields.
+    * 
+    * @return void
+    */
+   function espresso_mailchimp_upgate_list_fields() {
+      $mci_controller = new EE_MCI_Controller();
+      ob_start();
+      $mci_data = $_POST['mci_data'];
+      $mci_controller->mci_list_mailchimp_fields($mci_data['event_id'], $mci_data['list_id']);
       $response = ob_get_contents();
       ob_end_clean();
       echo $response;
@@ -157,12 +179,15 @@ class EE_MCI_Setup {
       $mailchimp_attendee_rel = apply_filters('FHEE__EE_MCI_Setup__ee_mci_db_setup__mailchimp_attendee_rel', $mailchimp_attendee_rel);
       dbDelta($mailchimp_attendee_rel);
 
+      if ( $wpdb->get_var("SHOW TABLES LIKE '{$wpdb->ee_mci_mailchimp_event_rel}'" ) == $wpdb->ee_mci_mailchimp_event_rel ) {
+        $wpdb->query("ALTER TABLE {$wpdb->ee_mci_mailchimp_event_rel} MODIFY mailchimp_group_id TEXT;");
+      }
       // MailChimp / Event Relationship Table
       $mailchimp_event_rel = "CREATE TABLE IF NOT EXISTS {$wpdb->ee_mci_mailchimp_event_rel} (
          id int(11) NOT NULL AUTO_INCREMENT,
          event_id INT(11) DEFAULT NULL,
          mailchimp_list_id VARCHAR(75) DEFAULT NULL,
-         mailchimp_group_id VARCHAR(255) DEFAULT NULL,
+         mailchimp_group_id TEXT DEFAULT NULL,
          PRIMARY KEY (id)
       ) $charset_collate;";
       $mailchimp_event_rel = apply_filters('FHEE__EE_MCI_Setup__ee_mci_db_setup__mailchimp_event_rel', $mailchimp_event_rel);
@@ -172,7 +197,7 @@ class EE_MCI_Setup {
       $mailchimp_qfields_rel = "CREATE TABLE IF NOT EXISTS {$wpdb->ee_mci_mailchimp_question_field_rel} (
          id int(11) NOT NULL AUTO_INCREMENT,
          event_id INT(11) DEFAULT NULL,
-         field_question_rel VARCHAR(255) DEFAULT NULL,
+         field_question_rel TEXT DEFAULT NULL,
          PRIMARY KEY (id)
       ) $charset_collate;";
       $mailchimp_qfields_rel = apply_filters('FHEE__EE_MCI_Setup__ee_mci_db_setup__mailchimp_question_field_rel', $mailchimp_qfields_rel);
