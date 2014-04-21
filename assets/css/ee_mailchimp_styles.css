@@ -23,4 +23,36 @@
 
 #ee-mailchimp-groups dt {
    margin-bottom: 5px;
+   color: #295d6a;
+}
+
+div#espresso-mci-list-merge-fields {
+   padding-top: 10px;
+}
+
+.espresso_mci_merge_fields_tb .nci_asterisk {
+   color: #4194aa;
+}
+
+table.espresso_mci_merge_fields_tb {
+   background: #fafafa;
+   margin: 0 auto;
+}
+
+.espresso_mci_merge_fields_tb td {
+   padding: 2px 5px 0 5px;
+}
+
+.espresso_mci_merge_fields_tb th {
+   border-bottom: 1px solid #b9e3ee;
+   padding: 5px 10px 5px 10px;
+   color: #295d6a;
+}
+
+.espresso_mci_merge_fields_tb p.ee_mci_list_fields {
+   margin-right: 10px;
+}
+
+#espresso-mci-list-merge-fields {
+   max-width: 280px;
 }
