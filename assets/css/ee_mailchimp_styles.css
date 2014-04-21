@@ -10,8 +10,12 @@
    margin: 0 8px -4px 8px;
 }
 
+.ee_mailchimp_api_key_setup .ee_mailchimp_api_options {
+   margin: 35px 0 40px 0;
+}
+
 .ee_mailchimp_api_key_setup .ee_mailchimp_double_opt {
-   padding: 15px 0 10px 15px;
+   margin-left: 15px;
 }
 
 .ee_mailchimp_api_key_setup .ee_mailchimp_tips {
