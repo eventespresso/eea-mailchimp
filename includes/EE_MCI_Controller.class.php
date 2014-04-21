@@ -107,7 +107,8 @@ class EE_MCI_Controller {
                   if ( $evt_list != -1 ) {
                      $mcapi_settings = get_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
                      $api_key = $mcapi_settings['api_key'];
-                     $args = array('apikey' => $api_key, 'id' => $evt_list, 'email' => array('email' => $subscriber['email']));
+                     $double_optin = ( isset($mcapi_settings['double_optin']) ) ? $mcapi_settings['double_optin'] : true;
+                     $args = array('apikey' => $api_key, 'id' => $evt_list, 'email' => array('email' => $subscriber['email']), 'double_optin' => $double_optin);
                      if ( ($evt_groups != -1) && ! empty($evt_groups) ) {
                         if ( is_array($evt_groups) ) {
                            foreach ($evt_groups as $grgs) {

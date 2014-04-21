@@ -10,6 +10,14 @@
    margin: 0 8px -4px 8px;
 }
 
+.ee_mailchimp_api_key_setup .ee_mailchimp_double_opt {
+   padding: 15px 0 10px 15px;
+}
+
+.ee_mailchimp_api_key_setup .ee_mailchimp_tips {
+   font-size: 12px;
+}
+
 .espresso_mailchimp_integration_metabox .ee_mailchimp_dropdowns {
    margin: 8px 10px 8px 0;
 }
