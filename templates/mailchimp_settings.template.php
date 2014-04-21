@@ -54,7 +54,7 @@
                               <input type="checkbox" id="ee-mailchimp-double-opt" name="mailchimp_double_opt" <?php echo $mailchimp_double_opt_check; ?> />
                               <label for="ee-mailchimp-double-opt">Skip double opt-in emails.</label>
                               <p class="ee_mailchimp_tips">
-                                 <?php _e("* You can read more about <a href='http://kb.mailchimp.com/article/how-does-confirmed-optin-or-double-optin-work/' target='_blank'>How does double opt-in work, here</a>.", 'event_espresso'); ?>
+                                 <?php _e("* You can read more about How does double opt-in work, <a href='http://kb.mailchimp.com/article/how-does-confirmed-optin-or-double-optin-work/' target='_blank'>here</a>.", 'event_espresso'); ?>
                               </p>
                            </div>
                         </div>
