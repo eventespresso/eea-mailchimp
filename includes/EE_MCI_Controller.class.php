@@ -385,11 +385,14 @@ class EE_MCI_Controller {
             </tr>
             <?php
             foreach ($list_fields as $l_field) {
+              $starred = '*';
+              if ( $l_field['tag'] == 'EMAIL' )
+                $starred = '**';
               ?>
               <tr>
                 <td>
                   <p id="mci-field-<?php echo base64_encode($l_field['name']); ?>" class="ee_mci_list_fields">
-                    <?php echo $l_field['name']; echo ( $l_field['req'] ) ? '<span class="nci_asterisk"> *</span>' : ''; ?>
+                    <?php echo $l_field['name']; echo ( $l_field['req'] ) ? '<span class="nci_asterisk">' . $starred . '</span>' : ''; ?>
                   </p>
                 </td>
                 <td>
@@ -408,7 +411,6 @@ class EE_MCI_Controller {
                       </option>
                     <?php } ?>
                   </select>
-                  <?php if ( $l_field['tag'] == 'EMAIL') echo '<span class="nci_asterisk"> *</span>'; ?>
                 </td>
               </tr>
               <?php
