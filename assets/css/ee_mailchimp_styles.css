@@ -18,6 +18,10 @@
    font-size: 12px;
 }
 
+.espresso_mailchimp_integration_metabox #espresso-mci-groups-list {
+   margin-top: 10px;
+}
+
 .espresso_mailchimp_integration_metabox .ee_mailchimp_dropdowns {
    margin: 8px 10px 8px 0;
 }
