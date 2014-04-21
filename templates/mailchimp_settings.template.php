@@ -36,8 +36,8 @@
                            </p>
                            <p>
                               <input size="45" type="text" id="ee-mailchimp-api-key" name="mailchimp_api_key" value="<?php echo $mailchimp_api_key; ?>" />
-                              <img class="ee_mailchimp_apikey_ok" src="<?php echo ESPRESSO_MAILCHIMP_URL; ?>/assets/img/check.png" style="display: <?php echo ( strlen($mc_api_key_ok) > 0 ) ? $mc_api_key_ok : 'none'; ?>;" />
-                              <img class="ee_mailchimp_apikey_error" src="<?php echo ESPRESSO_MAILCHIMP_URL; ?>/assets/img/error.png" style="display: <?php echo ( strlen($mc_api_key_error) > 0 ) ? $mc_api_key_error : 'none'; ?>;" />
+                              <img class="ee_mailchimp_apikey_ok" src="<?php echo ESPRESSO_MAILCHIMP_URL; ?>assets/img/check.png" style="display: <?php echo ( strlen($mc_api_key_ok) > 0 ) ? $mc_api_key_ok : 'none'; ?>;" />
+                              <img class="ee_mailchimp_apikey_error" src="<?php echo ESPRESSO_MAILCHIMP_URL; ?>assets/img/error.png" style="display: <?php echo ( strlen($mc_api_key_error) > 0 ) ? $mc_api_key_error : 'none'; ?>;" />
                               <?php echo $mailchimp_key_error; ?>
                            </p>
                         </div>
