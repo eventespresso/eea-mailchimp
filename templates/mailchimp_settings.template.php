@@ -42,12 +42,19 @@
                            </p>
                         </div>
                         <div class="padding">
-                           <p>
+                           <p class="ee_mailchimp_tips">
                               <?php _e("* If you do not have a MailChimp API key, please <a href='http://kb.mailchimp.com/article/where-can-i-find-my-api-key/' target='_blank'>click here</a> to learn how to create one.", 'event_espresso'); ?>
                            </p>
                         </div>
+                        <div class="ee_mailchimp_double_opt">
+                           <input type="checkbox" id="ee-mailchimp-double-opt" name="mailchimp_double_opt" <?php echo $mailchimp_double_opt_check; ?> />
+                           <label for="ee-mailchimp-double-opt">Skip double opt-in emails.</label>
+                           <p class="ee_mailchimp_tips">
+                              <?php _e("* You can read more about <a href='http://kb.mailchimp.com/article/how-does-confirmed-optin-or-double-optin-work/' target='_blank'>How does double opt-in work here</a>.", 'event_espresso'); ?>
+                           </p>
+                        </div>
                         <div>
-                           <input type='submit' class='button-primary' value='Save Key' name='save_key_button' />
+                           <input type='submit' class='button-primary' value='Save Settings' name='save_key_button' />
                         </div>
                      </form>
                   </div>

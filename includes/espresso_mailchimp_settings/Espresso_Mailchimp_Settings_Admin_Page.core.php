@@ -53,6 +53,7 @@ class Espresso_Mailchimp_Settings_Admin_Page extends EE_Admin_Page {
       }
       if ( isset($_POST['save_key_button']) ) {
          $mcapi_settings['api_key'] = ( isset($_POST['mailchimp_api_key']) ) ? $_POST['mailchimp_api_key'] : '';
+         $mcapi_settings['double_optin'] = ( isset($_POST['mailchimp_double_opt']) ) ? false : true;
          update_option(ESPRESSO_MAILCHIMP_API_OPTIONS, $mcapi_settings);
       }
       $mcapi_settings = get_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
@@ -69,7 +70,10 @@ class Espresso_Mailchimp_Settings_Admin_Page extends EE_Admin_Page {
             update_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION, 'false');
          }
       }
-
+      $template_data['mailchimp_double_opt_check'] = '';
+      if ( $mcapi_settings && isset($mcapi_settings['double_optin']) && ($mcapi_settings['double_optin'] === false) ) {
+         $template_data['mailchimp_double_opt_check'] = 'checked';
+      }
       $template_data['mailchimp_api_key'] = $mcapi_settings['api_key'];
       $template_path = EE_MAILCHIMP_SETT_TEMPLATE_PATH . 'mailchimp_settings.template.php';
       $this->_template_args['admin_page_content'] = EEH_Template::display_template( $template_path, $template_data, TRUE );

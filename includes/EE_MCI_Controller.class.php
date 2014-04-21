@@ -107,7 +107,8 @@ class EE_MCI_Controller {
                   if ( $evt_list != -1 ) {
                      $mcapi_settings = get_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
                      $api_key = $mcapi_settings['api_key'];
-                     $args = array('apikey' => $api_key, 'id' => $evt_list, 'email' => array('email' => $subscriber['email']));
+                     $double_optin = ( isset($mcapi_settings['double_optin']) ) ? $mcapi_settings['double_optin'] : true;
+                     $args = array('apikey' => $api_key, 'id' => $evt_list, 'email' => array('email' => $subscriber['email']), 'double_optin' => $double_optin);
                      if ( ($evt_groups != -1) && ! empty($evt_groups) ) {
                         if ( is_array($evt_groups) ) {
                            foreach ($evt_groups as $grgs) {
@@ -226,11 +227,14 @@ class EE_MCI_Controller {
          ?>
          <div class="espresso_mailchimp_integration_metabox">
             <div class="espresso_mci_lists_groups">
-               <?php
-               // Lists / Groups section
-               $this->mci_list_mailchimp_lists( $event->ID );
-               $this->mci_list_mailchimp_groups( $event->ID );
-               ?>
+               <div id="espresso-mci-lists">
+                   <?php
+                   // Lists / Groups section
+                   $this->mci_list_mailchimp_lists( $event->ID ); ?>
+               </div>
+               <div id="espresso-mci-groups-list">
+                  <?php $this->mci_list_mailchimp_groups( $event->ID ); ?>
+               </div>
             </div>
             <div id="espresso-mci-list-fields" class="espresso_mci_list_fields">
                <?php
@@ -329,7 +333,6 @@ class EE_MCI_Controller {
       $selected_gorup = $this->mci_event_subscriptions($event_id, 'groups');
       $mc_gorups = $this->mci_get_users_groups($list_id);
       ?>
-      <br /><div id="espresso-mci-groups-list">
       <form id="ee-mailchimp-groups-list" method="post">
          <label for="ee-mailchimp-groups">Please select a Group:</label>
          <dl id="ee-mailchimp-groups" class="ee_mailchimp_dropdowns">
@@ -356,7 +359,6 @@ class EE_MCI_Controller {
             ?>
          </dl>
       </form>
-      </div>
       <?php
    }
 
@@ -383,11 +385,14 @@ class EE_MCI_Controller {
             </tr>
             <?php
             foreach ($list_fields as $l_field) {
+              $starred = '*';
+              if ( $l_field['tag'] == 'EMAIL' )
+                $starred = '**';
               ?>
               <tr>
                 <td>
                   <p id="mci-field-<?php echo base64_encode($l_field['name']); ?>" class="ee_mci_list_fields">
-                    <?php echo $l_field['name']; echo ( $l_field['req'] ) ? '<span class="nci_asterisk"> *</span>' : ''; ?>
+                    <?php echo $l_field['name']; echo ( $l_field['req'] ) ? '<span class="nci_asterisk">' . $starred . '</span>' : ''; ?>
                   </p>
                 </td>
                 <td>
@@ -406,7 +411,6 @@ class EE_MCI_Controller {
                       </option>
                     <?php } ?>
                   </select>
-                  <?php if ( $l_field['tag'] == 'EMAIL') echo '<span class="nci_asterisk"> *</span>'; ?>
                 </td>
               </tr>
               <?php
