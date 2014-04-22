@@ -278,7 +278,7 @@ class EE_MCI_Controller {
       $list_form_rel = array();
       foreach ($qfields_list as $question) {
         // Do not merge Email fields as it has to default to Email question.
-        if ( ($_POST[base64_encode($question)] != '-1') && $question != 'EMAIL' )
+        if ( ($_POST[base64_encode($question)] != '-1') )
           $list_form_rel[$question] = $_POST[base64_encode($question)];
       }
       $qf_exists = $wpdb->get_row( "SELECT * FROM $wpdb->ee_mci_mailchimp_question_field_rel WHERE event_id = '$event_id'" );
@@ -401,7 +401,7 @@ class EE_MCI_Controller {
                         <?php 
                           // Default to main fields if exist:
                           echo ( (@$selected_fields[$l_field['tag']] == $q_field['QST_ID']) 
-                            || (($q_field['QST_ID'] == 'email') && ($l_field['tag'] == 'EMAIL')) 
+                            || (($q_field['QST_ID'] == 'email') && ($l_field['tag'] == 'EMAIL') && ! in_array('email', $selected_fields)) 
                             || (($q_field['QST_ID'] == 'lname') && ($l_field['tag'] == 'LNAME') && ! in_array('lname', $selected_fields)) 
                             || (($q_field['QST_ID'] == 'fname') && ($l_field['tag'] == 'FNAME') && ! in_array('fname', $selected_fields)) ) ? 'selected' : ''; 
                         ?>>
