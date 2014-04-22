@@ -174,11 +174,11 @@ class EE_MCI_Controller {
    }
 
    /**
-    * Retrieve all of the lists defined for your user account.
+    * Get the list of interest groupings for a given list.
     * 
     * @access public
     * @param string $list_id  The ID of the List.
-    * @return array  List of MailChimp lists.
+    * @return array  List of MailChimp groups of selected List.
     */
    public function mci_get_users_groups( $list_id ) {
       do_action('AHEE__EE_MCI_Controller__mci_get_users_groups__start');
@@ -195,11 +195,11 @@ class EE_MCI_Controller {
    }
 
    /**
-    * Retrieve all of the lists defined for your user account.
+    * Get the list of merge tags for a given list.
     * 
     * @access public
     * @param string $list_id  The ID of the List.
-    * @return array   MailChimp List fields.
+    * @return array   MailChimp List of merge tags.
     */
    public function mci_get_list_merge_vars( $list_id ) {
       do_action('AHEE__EE_MCI_Controller__mci_get_list_merge_vars__start');
@@ -216,7 +216,7 @@ class EE_MCI_Controller {
    }
 
    /**
-    * Set 'MailChimp List Integration' meta-box section contents.
+    * Set up 'MailChimp List Integration' meta-box section contents.
     * 
     * @access public
     * @param WP_Post $event  The post object.
@@ -248,7 +248,7 @@ class EE_MCI_Controller {
    }
 
    /**
-    * Set 'MailChimp List Integration' meta-box section contents.
+    * Save the contents of 'MailChimp List Integration' meta-box.
     * 
     * @access public
     * @param int $event_id  An ID on the Event.
@@ -290,7 +290,7 @@ class EE_MCI_Controller {
    }
 
    /**
-    * Get MailChimp user Lists.
+    * Display the MailChimp user Lists for given event.
     * 
     * @access public
     * @param string $event_id  The ID of the Event.
@@ -319,7 +319,7 @@ class EE_MCI_Controller {
    }
 
    /**
-    * Get MailChimp user Groups (depending on the selected list).
+    * Display MailChimp interest Groupings for the given event (depending on the selected List).
     * 
     * @access public
     * @param string $event_id  The ID of the Event.
@@ -363,7 +363,7 @@ class EE_MCI_Controller {
    }
 
    /**
-    * Get MailChimp user list Fields (depending on the selected list).
+    * Display MailChimp merge Fields of the given event (depending on the selected list).
     * 
     * @access public
     * @param string $event_id  The ID of the Event.
