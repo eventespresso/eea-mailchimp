@@ -386,8 +386,6 @@ class EE_MCI_Controller {
             <?php
             foreach ($list_fields as $l_field) {
               $starred = '*';
-              if ( $l_field['tag'] == 'EMAIL' )
-                $starred = '**';
               ?>
               <tr>
                 <td>
