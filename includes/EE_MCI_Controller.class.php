@@ -391,7 +391,7 @@ class EE_MCI_Controller {
                   </p>
                 </td>
                 <td>
-                  <select id="event-question-<?php echo base64_encode($l_field['name']); ?>" name="<?php echo base64_encode($l_field['tag']); ?>" class="ee_event_fields_selects" <?php echo ( $l_field['tag'] == 'EMAIL') ? 'disabled' : ''; ?>>
+                  <select id="event-question-<?php echo base64_encode($l_field['name']); ?>" name="<?php echo base64_encode($l_field['tag']); ?>" class="ee_event_fields_selects" >
                     <option value="-1">none</option>
                     <?php foreach ($evt_questions as $q_field) { ?>
                       <option value="<?php echo $q_field['QST_ID']; ?>" 
