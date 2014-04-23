@@ -401,9 +401,9 @@ class EE_MCI_Controller {
                         <?php 
                           // Default to main fields if exist:
                           echo ( (@$selected_fields[$l_field['tag']] == $q_field['QST_ID']) 
-                            || (($q_field['QST_ID'] == 'email') && ($l_field['tag'] == 'EMAIL') && ! in_array('email', $selected_fields)) 
-                            || (($q_field['QST_ID'] == 'lname') && ($l_field['tag'] == 'LNAME') && ! in_array('lname', $selected_fields)) 
-                            || (($q_field['QST_ID'] == 'fname') && ($l_field['tag'] == 'FNAME') && ! in_array('fname', $selected_fields)) ) ? 'selected' : ''; 
+                            || (($q_field['QST_ID'] == 'email') && ($l_field['tag'] == 'EMAIL') && ! array_key_exists('EMAIL', $selected_fields)) 
+                            || (($q_field['QST_ID'] == 'lname') && ($l_field['tag'] == 'LNAME') && ! array_key_exists('LNAME', $selected_fields)) 
+                            || (($q_field['QST_ID'] == 'fname') && ($l_field['tag'] == 'FNAME') && ! array_key_exists('FNAME', $selected_fields)) ) ? 'selected' : ''; 
                         ?>>
                         <?php echo $q_field['QST_Name']; ?>
                       </option>
