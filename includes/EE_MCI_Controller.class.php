@@ -1,8 +1,27 @@
 <?php
+/*
+ * Event Espresso
+ *
+ * Event Registration and Management Plugin for WordPress
+ *
+ * @ package        Event Espresso
+ * @ author         Event Espresso
+ * @ copyright (c)  2008-2014 Event Espresso  All Rights Reserved.
+ * @ license        http://eventespresso.com/support/terms-conditions/   * see Plugin Licensing *
+ * @ link           http://www.eventespresso.com
+ * @ version        EE4
+ *
+ * ------------------------------------------------------------------------
+ */
 /**
-* Event Espresso MailChimp logic implementing. Intermediary between this integration and the MailChimp API.
-*
-**/
+ * Class  EE_MCI_Controller - Event Espresso MailChimp logic implementing. Intermediary between this integration and the MailChimp API.
+ *
+ * @package         Event Espresso
+ * @subpackage      ee4-mailchimp-integration
+ *
+ * ------------------------------------------------------------------------
+ */
+
 
 class EE_MCI_Controller {
 

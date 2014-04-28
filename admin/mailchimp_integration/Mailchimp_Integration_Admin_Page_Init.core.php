@@ -4,13 +4,16 @@
 *
 **/
 
-class Espresso_Mailchimp_Settings_Admin_Page_Init extends EE_Admin_Page_Init {
+class Mailchimp_Integration_Admin_Page_Init extends EE_Admin_Page_Init {
 
    public function __construct() {
-      define( 'EE_MAILCHIMP_SETT_LABEL', __('MailChimp Settings', 'event_espresso') );
+      do_action('AHEE_log', __FILE__, __FUNCTION__, '');
+
+      define( 'EE_MAILCHIMP_SETT_LABEL', __('Mailchimp Integration', 'event_espresso') );
       define( 'EE_MAILCHIMP_SETT_ADMIN_URL', admin_url( 'admin.php?page=' . ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG ) );
-      define( 'EE_MAILCHIMP_SETT_TEMPLATE_PATH', ESPRESSO_MAILCHIMP_DIR . 'templates/' );
+      define( 'EE_MAILCHIMP_SETT_TEMPLATE_PATH', ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration/templates/' );
       parent::__construct();
+      $this->_folder_path = ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS;
    }
 
    protected function _set_init_properties() {
@@ -23,7 +26,7 @@ class Espresso_Mailchimp_Settings_Admin_Page_Init extends EE_Admin_Page_Init {
    public function get_menu_map() {
       $map = array(
          'group' => 'settings',
-         'menu_order' => 50,
+         'menu_order' => 40,
          'show_on_menu' => TRUE,
          'parent_slug' => 'espresso_events'
          );
