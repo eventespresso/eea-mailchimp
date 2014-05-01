@@ -1,5 +1,5 @@
-<?php if ( ! defined( 'EVENT_ESPRESSO_VERSION' )) { exit('NO direct script access allowed'); }
-/*
+<?php if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) { exit('NO direct script access allowed'); }
+/**
  * Event Espresso
  *
  * Event Registration and Management Plugin for WordPress
@@ -12,8 +12,7 @@
  * @ version        EE4
  *
  * ------------------------------------------------------------------------
- */
-/**
+ *
  * Class  EE_MailChimp_Integration
  *
  * @package         Event Espresso
@@ -37,8 +36,8 @@ class EE_MailChimp_Integration extends EE_Addon {
      */
     public function __construct() {
         // Register the activation/deactivation hooks.
-        register_activation_hook( __FILE__, array($this, 'set_activation_mci_options') );
-        register_deactivation_hook( __FILE__, array($this, 'reset_mci_options') );
+        register_activation_hook( ESPRESSO_MAILCHIMP_MAIN_FILE, array($this, 'set_activation_mci_options') );
+        register_deactivation_hook( ESPRESSO_MAILCHIMP_MAIN_FILE, array($this, 'reset_mci_options') );
     }
 
     /**
@@ -60,6 +59,9 @@ class EE_MailChimp_Integration extends EE_Addon {
         require_once( ESPRESSO_MAILCHIMP_DIR . 'includes/MailChimp.class.php' );
         require_once( ESPRESSO_MAILCHIMP_ADMIN_DIR . 'EE_MCI_Setup.class.php' );
 
+        require_once( ESPRESSO_MAILCHIMP_ADMIN_DIR . 'db/EEM_Event_Mailchimp_List_Group.model.php' );
+        require_once( ESPRESSO_MAILCHIMP_ADMIN_DIR . 'db/EEM_Question_Mailchimp_Field.model.php' );
+
         // Register our add-on via Plugin API.
         EE_Register_Addon::register('MailChimp Integration', array(
             'addon_name' => 'MailChimp Integration',
@@ -75,7 +77,9 @@ class EE_MailChimp_Integration extends EE_Addon {
                 'Mailchimp_Integration_Admin_Page_Init' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS . 'Mailchimp_Integration_Admin_Page_Init.core.php',
             ),
             'dms_paths' => array( ESPRESSO_MAILCHIMP_DMS_PATH ),
-            'module_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EED_MailChimp_Integration.module.php' ),
+            'module_paths' => array(
+                ESPRESSO_MAILCHIMP_DIR . 'EED_MailChimp_Integration.module.php'
+            ),
             'shortcode_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EES_MailChimp_Integration.shortcode.php' ),
             'widget_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EEW_MailChimp_Integration.widget.php' ),
         ));
