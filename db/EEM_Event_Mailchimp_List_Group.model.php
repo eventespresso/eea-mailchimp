@@ -54,7 +54,8 @@ class EEM_Event_Mailchimp_List_Group extends EEM_Base {
         );
         $this->_fields = array(
             'Event_Mailchimp_List_Group' => array(
-                'EVT_ID' => new EE_Primary_Key_Int_Field('EVT_ID', __('Event to Mailchimp List Group Link ID', 'event_espresso')),
+                'EMC_ID' => new EE_Primary_Key_Int_Field('EMC_ID', __('Field ID', 'event_espresso')),
+                'EVT_ID' => new EE_Foreign_Key_Int_Field('EVT_ID', __('Event to Mailchimp List Group Link ID', 'event_espresso'), false, 0, 'Event'),
                 'AMC_mailchimp_list_id' => new EE_Plain_Text_Field('AMC_mailchimp_list_id', __('MailChimp List ID', 'event_espresso'), false, ''),
                 'AMC_mailchimp_group_id' => new EE_Plain_Text_Field('AMC_mailchimp_group_id', __('MailChimp Group ID', 'event_espresso'), false, '')
             )
@@ -63,32 +64,6 @@ class EEM_Event_Mailchimp_List_Group extends EEM_Base {
             'Event' => new EE_Belongs_To_Relation()
         );
         parent::__construct();
-    }
-
-    /**
-     * _get_countries
-     * 
-     * @access private
-     * @return void
-     */  
-    public function get_all_countries() {
-        if ( ! self::$_all_countries ) {
-            self::$_all_countries = $this->get_all( array( 'order_by' => array('CNT_name' => 'ASC'), 'limit' => array( 0,99999 )));
-        }
-        return self::$_all_countries;
-    }
-
-    /**
-     * _get_countries
-     * 
-     * @access private
-     * @return void
-     */  
-    public function get_all_active_countries() {
-        if ( ! self::$_active_countries ) {
-            self::$_active_countries =  $this->get_all( array( array( 'CNT_active' => TRUE ), 'order_by' => array('CNT_name' => 'ASC'), 'limit' => array( 0, 99999 )));
-        }
-        return self::$_active_countries;
     }
     
 }

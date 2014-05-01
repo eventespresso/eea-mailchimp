@@ -28,15 +28,26 @@
  */
 
 
+// Define our plugin version and other base stuff.
+define( 'ESPRESSO_MAILCHIMP_VERION', '1.0' );
+define( 'ESPRESSO_MAILCHIMP_DIR', plugin_dir_path( __FILE__ ) );
+define( 'ESPRESSO_MAILCHIMP_MAIN_FILE', __FILE__ );
+define( 'ESPRESSO_MAILCHIMP_BASE_NAME', plugin_basename(__FILE__) );
+define( 'ESPRESSO_MAILCHIMP_URL', plugin_dir_url( ESPRESSO_MAILCHIMP_MAIN_FILE ) );
+define( 'ESPRESSO_MAILCHIMP_ADMIN_URL', get_admin_url() );
+define( 'ESPRESSO_MAILCHIMP_ADMIN_DIR', ESPRESSO_MAILCHIMP_DIR . 'admin' . DS );
+define( 'ESPRESSO_MAILCHIMP_DB_DIR', ESPRESSO_MAILCHIMP_DIR . 'db' . DS );
+define( 'ESPRESSO_MAILCHIMP_DMS_PATH', ESPRESSO_MAILCHIMP_DB_DIR . 'migration_scripts' . DS );
+define( 'ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG', 'mailchimp_integration' );
+define( 'ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION', 'ee_mailchimp_integration_active' );
+define( 'ESPRESSO_MAILCHIMP_API_OPTIONS', 'ee_mailchimp_integration_user_settings' );
+
+require_once( plugin_dir_path( __FILE__ ) . 'EE_MailChimp_Integration.class.php' );
+register_activation_hook( __FILE__, array('EE_MailChimp_Integration', 'set_activation_mci_options') );
+
 // Register and run MC Integration if EE4 is Active.
 function load_ee4_espresso_mailchimp_integration_class() {
-   // Define our plugin version and other base stuff.
-   define( 'ESPRESSO_MAILCHIMP_VERION', '1.0' );
-   define( 'ESPRESSO_MAILCHIMP_MAIN_FILE', __FILE__ );
-   define( 'ESPRESSO_MAILCHIMP_DMS_PATH', __FILE__ );
-   define( 'ESPRESSO_MAILCHIMP_BASE_NAME', plugin_basename(__FILE__) );
    // ..and register our add-on.
-   require_once( plugin_dir_path( __FILE__ ) . 'EE_MailChimp_Integration.class.php' );
    EE_MailChimp_Integration::register_addon();
 }
 add_action( 'AHEE__EE_System__load_espresso_addons', 'load_ee4_espresso_mailchimp_integration_class', 11 );

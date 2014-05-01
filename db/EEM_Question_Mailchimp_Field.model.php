@@ -54,7 +54,8 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
         );
         $this->_fields = array(
             'Event_Mailchimp_List_Group' => array(
-                'EVT_ID' => new EE_Primary_Key_Int_Field('EVT_ID', __('Event to Question MailChimp Field Link ID', 'event_espresso')),
+                'QMC_ID' => new EE_Primary_Key_Int_Field('QMC_ID', __('Maichimp Q ID', 'event_espresso')),
+                'EVT_ID' => new EE_Foreign_Key_Int_Field('EVT_ID', __('Event to Mailchimp List Group Link ID', 'event_espresso'), false, 0, 'Event'),
                 'QST_ID' => new EE_Plain_Text_Field('QST_ID', __('Question ID', 'event_espresso'), false),
                 'QMC_mailchimp_field_id' => new EE_Plain_Text_Field('QMC_mailchimp_field_id', __('MailChimp Field ID', 'event_espresso'), false)
             )

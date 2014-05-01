@@ -36,7 +36,6 @@ class EE_MailChimp_Integration extends EE_Addon {
      */
     public function __construct() {
         // Register the activation/deactivation hooks.
-        register_activation_hook( ESPRESSO_MAILCHIMP_MAIN_FILE, array($this, 'set_activation_mci_options') );
         register_deactivation_hook( ESPRESSO_MAILCHIMP_MAIN_FILE, array($this, 'reset_mci_options') );
     }
 
@@ -47,20 +46,12 @@ class EE_MailChimp_Integration extends EE_Addon {
      * @return void
      */
     public static function register_addon() {
-        // Define some plugin info/constants
-        define( 'ESPRESSO_MAILCHIMP_DIR', plugin_dir_path(__FILE__) );
-        define( 'ESPRESSO_MAILCHIMP_URL', plugin_dir_url(__FILE__) );
-        define( 'ESPRESSO_MAILCHIMP_ADMIN_URL', get_admin_url() );
-        define( 'ESPRESSO_MAILCHIMP_ADMIN_DIR', ESPRESSO_MAILCHIMP_DIR . 'admin' . DS );
-        define( 'ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG', 'mailchimp_integration' );
-        define( 'ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION', 'ee_mailchimp_integration_active' );
-        define( 'ESPRESSO_MAILCHIMP_API_OPTIONS', 'ee_mailchimp_integration_user_settings' );
         // Load MailChimp API:
         require_once( ESPRESSO_MAILCHIMP_DIR . 'includes/MailChimp.class.php' );
         require_once( ESPRESSO_MAILCHIMP_ADMIN_DIR . 'EE_MCI_Setup.class.php' );
 
-        require_once( ESPRESSO_MAILCHIMP_ADMIN_DIR . 'db/EEM_Event_Mailchimp_List_Group.model.php' );
-        require_once( ESPRESSO_MAILCHIMP_ADMIN_DIR . 'db/EEM_Question_Mailchimp_Field.model.php' );
+        require_once( ESPRESSO_MAILCHIMP_DB_DIR . 'EEM_Event_Mailchimp_List_Group.model.php' );
+        require_once( ESPRESSO_MAILCHIMP_DB_DIR . 'EEM_Question_Mailchimp_Field.model.php' );
 
         // Register our add-on via Plugin API.
         EE_Register_Addon::register('MailChimp Integration', array(
@@ -104,7 +95,7 @@ class EE_MailChimp_Integration extends EE_Addon {
      *
      * @access public
      */
-    public function set_activation_mci_options() {
+    public static function set_activation_mci_options() {
         update_option( EE_MailChimp_Integration::activation_indicator_option_name, TRUE );
         add_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION, 'false', '', 'yes');
         update_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION, 'false');
