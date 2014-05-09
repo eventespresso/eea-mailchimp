@@ -30,7 +30,7 @@ class EE_MailChimp_Integration extends EE_Addon {
 
     /**
      * Class constructor
-     * 
+     *
      * @access public
      * @return void
      */
@@ -41,7 +41,7 @@ class EE_MailChimp_Integration extends EE_Addon {
 
     /**
      * Register our add-on in EE.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -54,26 +54,28 @@ class EE_MailChimp_Integration extends EE_Addon {
         require_once( ESPRESSO_MAILCHIMP_DB_DIR . 'EEM_Question_Mailchimp_Field.model.php' );
 
         // Register our add-on via Plugin API.
-        EE_Register_Addon::register('MailChimp Integration', array(
-            'addon_name' => 'MailChimp Integration',
-            'version' => ESPRESSO_MAILCHIMP_VERION,
-            'min_core_version' => '4.2.0',
-            'base_path' => ESPRESSO_MAILCHIMP_DIR,
-            'admin_path' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS,
-            'admin_callback' => 'additional_mailchimp_admin_hooks',
-            'config_class' => 'EE_MC_Integration_Config',
-            'autoloader_paths' => array(
-                'EE_MCI_Controller' => ESPRESSO_MAILCHIMP_DIR . 'includes/EE_MCI_Controller.class.php',
-                'Mailchimp_Integration_Admin_Page' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS . 'Mailchimp_Integration_Admin_Page.core.php',
-                'Mailchimp_Integration_Admin_Page_Init' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS . 'Mailchimp_Integration_Admin_Page_Init.core.php',
-            ),
-            'dms_paths' => array( ESPRESSO_MAILCHIMP_DMS_PATH ),
-            'module_paths' => array(
-                ESPRESSO_MAILCHIMP_DIR . 'EED_MailChimp_Integration.module.php'
-            ),
-            'shortcode_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EES_MailChimp_Integration.shortcode.php' ),
-            'widget_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EEW_MailChimp_Integration.widget.php' ),
-        ));
+        EE_Register_Addon::register(
+			'MailChimp Integration',
+			array(
+				'version' => ESPRESSO_MAILCHIMP_VERION,
+				'min_core_version' => '4.3.0',
+				'base_path' => ESPRESSO_MAILCHIMP_DIR,
+				'admin_path' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS,
+				'admin_callback' => 'additional_mailchimp_admin_hooks',
+				'config_class' => 'EE_MC_Integration_Config',
+				'autoloader_paths' => array(
+					'EE_MCI_Controller' => ESPRESSO_MAILCHIMP_DIR . 'includes/EE_MCI_Controller.class.php',
+					'Mailchimp_Integration_Admin_Page' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS . 'Mailchimp_Integration_Admin_Page.core.php',
+					'Mailchimp_Integration_Admin_Page_Init' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS . 'Mailchimp_Integration_Admin_Page_Init.core.php',
+				),
+				'dms_paths' => array( ESPRESSO_MAILCHIMP_DMS_PATH ),
+				'module_paths' => array(
+					ESPRESSO_MAILCHIMP_DIR . 'EED_MailChimp_Integration.module.php'
+				),
+				'shortcode_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EES_MailChimp_Integration.shortcode.php' ),
+				'widget_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EEW_MailChimp_Integration.widget.php' ),
+			)
+		);
 
         // Run the integration 'by hand' while it currently does not Yet facilitate adding models.
         $mci_setup = new EE_MCI_Setup();
@@ -213,4 +215,4 @@ class EE_MailChimp_Integration extends EE_Addon {
         return $links;
     }
 
-} 
+}
