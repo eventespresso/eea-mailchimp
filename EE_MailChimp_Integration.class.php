@@ -62,7 +62,7 @@ class EE_MailChimp_Integration extends EE_Addon {
 				'base_path' => ESPRESSO_MAILCHIMP_DIR,
 				'admin_path' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS,
 				'admin_callback' => 'additional_mailchimp_admin_hooks',
-				'config_class' => 'EE_MC_Integration_Config',
+//				'config_class' => 'EE_MC_Integration_Config',
 				'autoloader_paths' => array(
 					'EE_MCI_Controller' => ESPRESSO_MAILCHIMP_DIR . 'includes/EE_MCI_Controller.class.php',
 					'Mailchimp_Integration_Admin_Page' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS . 'Mailchimp_Integration_Admin_Page.core.php',
@@ -72,8 +72,8 @@ class EE_MailChimp_Integration extends EE_Addon {
 				'module_paths' => array(
 					ESPRESSO_MAILCHIMP_DIR . 'EED_MailChimp_Integration.module.php'
 				),
-				'shortcode_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EES_MailChimp_Integration.shortcode.php' ),
-				'widget_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EEW_MailChimp_Integration.widget.php' ),
+//				'shortcode_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EES_MailChimp_Integration.shortcode.php' ),
+//				'widget_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EEW_MailChimp_Integration.widget.php' ),
 			)
 		);
 
