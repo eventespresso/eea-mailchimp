@@ -101,7 +101,7 @@ class EED_MailChimp_Integration extends EED_Module {
 
     /**
      * An ajax to refresh the list of groups of the MailChimp List selected in the event.
-     * 
+     *
      * @return void
      */
     public static function espresso_mailchimp_upgate_groups() {
@@ -117,7 +117,7 @@ class EED_MailChimp_Integration extends EED_Module {
 
     /**
      * An ajax to refresh the  selected MailChimp List's merge fields.
-     * 
+     *
      * @return void
      */
     public static function espresso_mailchimp_upgate_list_fields() {
@@ -155,7 +155,7 @@ class EED_MailChimp_Integration extends EED_Module {
         // Nonce checks.
         $is_ok = EED_MailChimp_Integration::espresso_mailchimp_authorization_checks('espresso_mailchimp_list_integration_box', 'espresso_mailchimp_list_integration_box_nonce');
         // Auto-save? ...do nothing.
-        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
             return $event_id;
         if ( ! $is_ok )
             return $event_id;
@@ -163,10 +163,10 @@ class EED_MailChimp_Integration extends EED_Module {
         $mci_controller = new EE_MCI_Controller();
         $mci_controller->mci_save_metabox_contents($event_id);
     }
-   
+
     /**
      * Add 'MailChimp List Integration' option (metabox) to events admin (add/edit) page (if the API Key is valid).
-     * 
+     *
      * @access public
      * @param string $post_type  Type of the post.
      * @return void
@@ -180,7 +180,7 @@ class EED_MailChimp_Integration extends EED_Module {
 
     /**
      * Get 'MailChimp List Integration' metabox contents.
-     * 
+     *
      * @access public
      * @param WP_Post $event  The post object.
      * @return void
