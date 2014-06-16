@@ -4,7 +4,7 @@
 *
 **/
 
-class Espresso_Mailchimp_Settings_Admin_Page extends EE_Admin_Page {
+class Mailchimp_Integration_Admin_Page extends EE_Admin_Page {
 
    public function __construct( $routing = TRUE ) {
       parent::__construct( $routing );
