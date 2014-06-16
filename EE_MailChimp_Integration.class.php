@@ -22,7 +22,6 @@
  */
 
 define( 'ESPRESSO_MAILCHIMP_DIR', plugin_dir_path( __FILE__ ) );
-define( 'ESPRESSO_MAILCHIMP_MAIN_FILE', __FILE__ );
 define( 'ESPRESSO_MAILCHIMP_BASE_NAME', plugin_basename(__FILE__) );
 define( 'ESPRESSO_MAILCHIMP_URL', plugin_dir_url( ESPRESSO_MAILCHIMP_MAIN_FILE ) );
 define( 'ESPRESSO_MAILCHIMP_ADMIN_URL', get_admin_url() );
@@ -70,7 +69,7 @@ class EE_MailChimp_Integration extends EE_Addon {
 			array(
 				'version' => ESPRESSO_MAILCHIMP_VERION,
 				'min_core_version' => '4.3.0',
-				'base_path' => ESPRESSO_MAILCHIMP_DIR,
+				'main_file_path' => ESPRESSO_MAILCHIMP_MAIN_FILE,
 				'admin_path' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS,
 				'admin_callback' => 'additional_mailchimp_admin_hooks',
 //				'config_class' => 'EE_MC_Integration_Config',

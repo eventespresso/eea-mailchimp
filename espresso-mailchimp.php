@@ -30,7 +30,7 @@
 
 // Define our plugin version and other base stuff.
 define( 'ESPRESSO_MAILCHIMP_VERION', '1.0' );
-
+define( 'ESPRESSO_MAILCHIMP_MAIN_FILE', __FILE__ );
 // Register and run MC Integration if EE4 is Active.
 function load_ee4_espresso_mailchimp_integration_class() {
    // ..and register our add-on.
