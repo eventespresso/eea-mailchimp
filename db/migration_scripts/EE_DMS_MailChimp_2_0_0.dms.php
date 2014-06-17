@@ -9,24 +9,24 @@
  * instead of construction, because it only gets constructed on first page load
  * (all other times it gets resurrected from a wordpress option).
  */
-$stages = glob( ESPRESSO_MAILCHIMP_DIR . 'db/migration_scripts/1_0_0_stages/*' );
+$stages = glob( ESPRESSO_MAILCHIMP_DIR . 'db/migration_scripts/2_0_0_stages/*' );
 $class_to_filepath = array();
 foreach( $stages as $filepath ) {
     $matches = array();
-    preg_match( '~1_0_0_stages/(.*).dmsstage.php~', $filepath, $matches );
+    preg_match( '~2_0_0_stages/(.*).dmsstage.php~', $filepath, $matches );
     $class_to_filepath[$matches[1]] = $filepath;
 }
 //give addons a chance to autoload their stages too
-$class_to_filepath = apply_filters( 'FHEE__EE_DMS_MailChimp_1_0_0_stages__autoloaded_stages', $class_to_filepath );
+$class_to_filepath = apply_filters( 'FHEE__EE_DMS_MailChimp_2_0_0_stages__autoloaded_stages', $class_to_filepath );
 EEH_Autoloader::register_autoloader( $class_to_filepath );
 
 
-class EE_DMS_MailChimp_1_0_0 extends EE_Data_Migration_Script_Base {
+class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base {
 
     public function __construct() {
         $this->_pretty_name = __("Data Migration to EE4 MailChimp Integration.", "event_espresso");
         $this->_migration_stages = array(
-            new EE_DMS_1_0_0_mc_list_group()
+            new EE_DMS_2_0_0_mc_list_group()
         );
         parent::__construct();
     }
@@ -36,7 +36,7 @@ class EE_DMS_MailChimp_1_0_0 extends EE_Data_Migration_Script_Base {
         if ( get_option('ee4_mailchimp_db_update') ) {
             $version_string = get_option('ee4_mailchimp_db_update');
         }
-        if ( $version_string < '1.0' ) {
+        if ( $version_string < '2.0.0' ) {
             // Can be mgirated.
             return true;
         } elseif ( $version_string === '0' ) {
@@ -86,7 +86,7 @@ class EE_DMS_MailChimp_1_0_0 extends EE_Data_Migration_Script_Base {
      */
     public function schema_changes_after_migration() {
         // but still will update the mailchimp db version here.
-        update_option('ee4_mailchimp_db_update', '1.0');
+        update_option('ee4_mailchimp_db_update', '2.0.0');
         return true;
     }
 
