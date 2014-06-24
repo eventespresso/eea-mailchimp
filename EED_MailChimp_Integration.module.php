@@ -53,26 +53,7 @@ class EED_MailChimp_Integration extends EED_Module {
         add_action( 'wp_ajax_espresso_mailchimp_upgate_list_fields', array('EED_MailChimp_Integration', 'espresso_mailchimp_upgate_list_fields') );
     }
 
-    /**
-     * Set config.
-     *
-     * @access protected
-     * @return EE_Calendar_Config
-     */
-    protected static function _set_config(){
-        return EED_MailChimp_Integration::instance()->set_config( 'addons', 'EED_MailChimp_Integration', 'EE_MailChimp_Config' );
-    }
 
-    /**
-     * Get config.
-     *
-     * @access protected
-     * @return EE_Calendar_Config
-     */
-    protected static function _get_config(){
-        $config = EED_MailChimp_Integration::instance()->get_config( 'addons', 'EED_MailChimp_Integration', 'EE_MailChimp_Config' );
-        return $config instanceof EE_MailChimp_Config ? $config : EED_MailChimp_Integration::_set_config();
-    }
 
     /**
      * Run initial module setup.
@@ -82,7 +63,6 @@ class EED_MailChimp_Integration extends EED_Module {
      * @return void
      */
     public function run( $WP ) {
-        EED_MailChimp_Integration::_set_config();
         add_action( 'wp_enqueue_scripts', array( $this, 'mailchimp_link_scripts_styles' ));
     }
 
