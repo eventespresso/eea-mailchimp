@@ -68,7 +68,7 @@ class EE_MailChimp_Integration extends EE_Addon {
 				),
 //				'dms_paths' => array( ESPRESSO_MAILCHIMP_DMS_PATH ),
 				'module_paths' => array(
-					ESPRESSO_MAILCHIMP_DIR . 'EED_MailChimp_Integration.module.php'
+					ESPRESSO_MAILCHIMP_DIR . 'EED_Mailchimp_Integration.module.php'
 				),
 				// if plugin update engine is being used for auto-updates. not needed if PUE is not being used.
 				'pue_options'			=> array(
