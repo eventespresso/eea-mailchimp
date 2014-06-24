@@ -56,7 +56,7 @@ class EE_MailChimp_Integration extends EE_Addon {
         EE_Register_Addon::register(
 			'MailChimp Integration',
 			array(
-				'version' => ESPRESSO_MAILCHIMP_VERION,
+				'version' => ESPRESSO_MAILCHIMP_VERSION,
 				'min_core_version' => '4.3.0',
 				'main_file_path' => ESPRESSO_MAILCHIMP_MAIN_FILE,
 				'admin_path' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS,
