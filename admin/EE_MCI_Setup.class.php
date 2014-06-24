@@ -50,7 +50,7 @@ class EE_MCI_Setup {
 
    /**
     * Class constructor
-    * 
+    *
     * @access private
     * @return void
     */
@@ -77,7 +77,7 @@ class EE_MCI_Setup {
 
    /**
     * Add Settings link in the plugins overview page.
-    * 
+    *
     * @param array $links  List of existing links.
     * @param string $file  Main plugins file name.
     * @return array  Updated Links list
@@ -111,11 +111,11 @@ class EE_MCI_Setup {
 
    /**
     * Link the scripts and styles
-    * 
+    *
     * @return void
     */
    function ee_mci_link_scripts_styles() {
-      $mci_ver = ESPRESSO_MAILCHIMP_VERION;
+      $mci_ver = ESPRESSO_MAILCHIMP_VERSION;
       wp_enqueue_style('espresso_mailchimp_gen_styles', ESPRESSO_MAILCHIMP_URL . "assets/css/ee_mailchimp_styles.css", false, $mci_ver);
       wp_enqueue_script('espresso_mailchimp_base_scripts', ESPRESSO_MAILCHIMP_URL . 'assets/js/ee-mailchimp-base-scripts.js', false, $mci_ver);
       do_action('AHEE__EE_MCI_Setup__ee_mci_link_scripts_styles__end');
@@ -131,7 +131,7 @@ class EE_MCI_Setup {
       // Nonce checks.
       $is_ok = EE_MCI_Setup::espresso_mailchimp_authorization_checks('espresso_mailchimp_list_integration_box', 'espresso_mailchimp_list_integration_box_nonce');
       // Auto-save? ...do nothing.
-      if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
+      if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
          return $event_id;
       if ( ! $is_ok )
          return $event_id;
@@ -139,10 +139,10 @@ class EE_MCI_Setup {
       $mci_controller = new EE_MCI_Controller();
       $mci_controller->mci_save_metabox_contents($event_id);
    }
-   
+
    /**
     * Add 'MailChimp List Integration' option (metabox) to events admin (add/edit) page (if the API Key is valid).
-    * 
+    *
     * @access public
     * @param string $post_type  Type of the post.
     * @return void
@@ -156,7 +156,7 @@ class EE_MCI_Setup {
 
    /**
     * Get 'MailChimp List Integration' metabox contents.
-    * 
+    *
     * @access public
     * @param WP_Post $event  The post object.
     * @return void
@@ -189,7 +189,7 @@ class EE_MCI_Setup {
 
    /**
     * An ajax to refresh the list of groups of the MailChimp List selected in the event.
-    * 
+    *
     * @return void
     */
    function espresso_mailchimp_upgate_groups() {
@@ -205,7 +205,7 @@ class EE_MCI_Setup {
 
    /**
     * An ajax to refresh the  selected MailChimp List's merge fields.
-    * 
+    *
     * @return void
     */
    function espresso_mailchimp_upgate_list_fields() {
@@ -221,7 +221,7 @@ class EE_MCI_Setup {
 
    /**
     * Set Up the tables in database
-    * 
+    *
     * @access private
     * @return void
     */
