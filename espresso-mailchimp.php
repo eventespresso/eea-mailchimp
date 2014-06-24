@@ -29,15 +29,17 @@
 
 
 // Define our plugin version and other base stuff.
-define( 'ESPRESSO_MAILCHIMP_VERION', '1.0' );
+define( 'ESPRESSO_MAILCHIMP_VERSION', '1.0' );
 define( 'ESPRESSO_MAILCHIMP_MAIN_FILE', __FILE__ );
 // Register and run MC Integration if EE4 is Active.
 function load_ee4_espresso_mailchimp_integration_class() {
-   // ..and register our add-on.
-	require_once( plugin_dir_path( __FILE__ ) . 'EE_MailChimp_Integration.class.php' );
-	EE_MailChimp_Integration::register_addon();
+	if ( class_exists( 'EE_Addon' )) {
+		// ...and register our add-on.
+		require_once ( plugin_dir_path( __FILE__ ) . 'EE_MailChimp_Integration.class.php' );
+		EE_MailChimp_Integration::register_addon();
+	}
 }
-add_action( 'AHEE__EE_System__load_espresso_addons', 'load_ee4_espresso_mailchimp_integration_class', 11 );
+add_action( 'AHEE__EE_System__load_espresso_addons', 'load_ee4_espresso_mailchimp_integration_class' );
 
 
 // Store the names of the tables into the $wpdb
