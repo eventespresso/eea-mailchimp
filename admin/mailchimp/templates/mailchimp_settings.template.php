@@ -16,7 +16,7 @@
                            <?php _e("* A <b>MailChimp API Key</b> is required for this plugin.", 'event_espresso'); ?>
                         </p>
                         <p>
-                           <?php _e("Once the API key is configured successfully, a <b>'MailChimp List Integration' box</b> will appear in the right menu of the Event Creation and Event Update dialogs, which will allow you to select which MailChimp List and Group you want to integrate with.", 'event_espresso'); ?>
+                           <?php _e("Once the API key is configured successfully, a <b>'MailChimp List' box</b> will appear in the right menu of the Event Creation and Event Update dialogs, which will allow you to select which MailChimp List and Group you want to integrate with.", 'event_espresso'); ?>
                         </p>
                      </div>
                   </div>

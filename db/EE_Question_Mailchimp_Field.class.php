@@ -16,7 +16,7 @@
  * Class  EE_Question_Mailchimp_Field
  *
  * @package         Event Espresso
- * @subpackage      ee4-mailchimp-integration
+ * @subpackage      ee4-mailchimp
  *
  * ------------------------------------------------------------------------
  */

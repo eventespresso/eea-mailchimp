@@ -1,6 +1,6 @@
 <?php
 /**
- *  Meant to convert DBs between MailChimp Integration for EE3 to MCI for EE4.
+ *  Meant to convert DBs between MailChimp for EE3 to MC for EE4.
  */
 
 /**
@@ -24,7 +24,7 @@ EEH_Autoloader::register_autoloader( $class_to_filepath );
 class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base {
 
     public function __construct() {
-        $this->_pretty_name = __("Data Migration to EE4 MailChimp Integration.", "event_espresso");
+        $this->_pretty_name = __("Data Migration to EE4 MailChimp.", "event_espresso");
         $this->_migration_stages = array(
             new EE_DMS_2_0_0_mc_list_group()
         );
@@ -49,7 +49,7 @@ class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base {
     }
 
     public function pretty_name() {
-        return __("Data Migration to EE4 MailChimp Integration.", "event_espresso");
+        return __("Data Migration to EE4 MailChimp.", "event_espresso");
     }
 
     public function schema_changes_before_migration() {
