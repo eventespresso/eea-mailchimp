@@ -1,12 +1,12 @@
 <?php
 /*
-  Plugin Name: Event Espresso - MailChimp Integration (for EE4+)
+  Plugin Name: Event Espresso - MailChimp (for EE4+)
   Plugin URI: http://www.eventespresso.com/
-  Description: A MailChimp integration addon for Event Espresso. Requires version of Event Espresso 4 and greater.
+  Description: A MailChimp addon for Event Espresso. Requires version of Event Espresso 4 and greater.
 
   Version: 2.0.0.dev.000
 
-  Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp integration. When creating/updating an event, select the Mail Chimp list you would like to integrate with.
+  Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp. When creating/updating an event, select the Mail Chimp list you would like to integrate with.
   Author: Event Espresso
   Author URI: http://www.eventespresso.com
 
@@ -32,19 +32,19 @@
 define( 'ESPRESSO_MAILCHIMP_VERION', '2.0.0.dev.000' );
 define( 'ESPRESSO_MAILCHIMP_MAIN_FILE', __FILE__ );
 // Register and run MC Integration if EE4 is Active.
-function load_ee4_espresso_mailchimp_integration_class() {
+function load_ee4_espresso_mailchimp_class() {
    // ..and register our add-on.
-	require_once( plugin_dir_path( __FILE__ ) . 'EE_MailChimp_Integration.class.php' );
-	EE_MailChimp_Integration::register_addon();
+	require_once( plugin_dir_path( __FILE__ ) . 'EE_MailChimp.class.php' );
+	EE_MailChimp::register_addon();
 }
-add_action( 'AHEE__EE_System__load_espresso_addons', 'load_ee4_espresso_mailchimp_integration_class', 11 );
+add_action( 'AHEE__EE_System__load_espresso_addons', 'load_ee4_espresso_mailchimp_class', 11 );
 
 
 // Store the names of the tables into the $wpdb
-function espresso_mailchimp_register_integration_tables() {
+function espresso_mailchimp_register_tables() {
    global $wpdb;
    $wpdb->ee_mci_mailchimp_attendee_rel = "{$wpdb->prefix}events_mailchimp_attendee_rel";
    $wpdb->ee_mci_mailchimp_event_rel = "{$wpdb->prefix}events_mailchimp_event_rel";
    $wpdb->ee_mci_mailchimp_question_field_rel = "{$wpdb->prefix}events_mailchimp_question_field_rel";
 }
-add_action('init', 'espresso_mailchimp_register_integration_tables');
+add_action('init', 'espresso_mailchimp_register_tables');

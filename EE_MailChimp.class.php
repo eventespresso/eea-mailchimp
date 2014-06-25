@@ -13,10 +13,10 @@
  *
  * ------------------------------------------------------------------------
  *
- * Class  EE_MailChimp_Integration
+ * Class  EE_MailChimp
  *
  * @package         Event Espresso
- * @subpackage      ee4-mailchimp-integration
+ * @subpackage      ee4-mailchimp
  *
  * ------------------------------------------------------------------------
  */
@@ -28,15 +28,16 @@ define( 'ESPRESSO_MAILCHIMP_ADMIN_URL', get_admin_url() );
 define( 'ESPRESSO_MAILCHIMP_ADMIN_DIR', ESPRESSO_MAILCHIMP_DIR . 'admin' . DS );
 define( 'ESPRESSO_MAILCHIMP_DB_DIR', ESPRESSO_MAILCHIMP_DIR . 'db' . DS );
 define( 'ESPRESSO_MAILCHIMP_DMS_PATH', ESPRESSO_MAILCHIMP_DB_DIR . 'migration_scripts' . DS );
-define( 'ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG', 'mailchimp_integration' );
-define( 'ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION', 'ee_mailchimp_integration_active' );
-define( 'ESPRESSO_MAILCHIMP_API_OPTIONS', 'ee_mailchimp_integration_user_settings' );
-class EE_MailChimp_Integration extends EE_Addon {
+define( 'ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG', 'mailchimp' );
+define( 'ESPRESSO_MAILCHIMP_ACTIVE_OPTION', 'ee_mailchimp_active' );
+define( 'ESPRESSO_MAILCHIMP_API_OPTIONS', 'ee_mailchimp_user_settings' );
+
+class EE_MailChimp extends EE_Addon {
 
     /**
      *  For registering the activation hook.
      */
-    const activation_indicator_option_name = 'ee4_mailchimp_integration_activation';
+    const activation_indicator_option_name = 'ee4_mailchimp_activation';
 
     /**
      * Class constructor
@@ -68,26 +69,26 @@ class EE_MailChimp_Integration extends EE_Addon {
 			'MailChimp',
 			array(
 				'version' => ESPRESSO_MAILCHIMP_VERION,
-				'class_name' => 'EE_MailChimp_Integration',
+				'class_name' => 'EE_MailChimp',
 				'min_core_version' => '4.3.0',
 				'main_file_path' => ESPRESSO_MAILCHIMP_MAIN_FILE,
-				'admin_path' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS,
+				'admin_path' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS,
 				'admin_callback' => 'additional_mailchimp_admin_hooks',
-//				'config_class' => 'EE_MC_Integration_Config',
+//				'config_class' => 'EE_MC_Config',
 				'autoloader_paths' => array(
 					'EE_MCI_Controller' => ESPRESSO_MAILCHIMP_DIR . 'includes/EE_MCI_Controller.class.php',
-					'Mailchimp_Integration_Admin_Page' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS . 'Mailchimp_Integration_Admin_Page.core.php',
-					'Mailchimp_Integration_Admin_Page_Init' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp_integration' . DS . 'Mailchimp_Integration_Admin_Page_Init.core.php',
+					'Mailchimp_Admin_Page' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page.core.php',
+					'Mailchimp_Admin_Page_Init' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page_Init.core.php',
 				),
 				'dms_paths' => array( ESPRESSO_MAILCHIMP_DMS_PATH ),
 //				'module_paths' => array(
-//					ESPRESSO_MAILCHIMP_DIR . 'EED_MailChimp_Integration.module.php'
+//					ESPRESSO_MAILCHIMP_DIR . 'EED_MailChimp.module.php'
 //				),
-//				'shortcode_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EES_MailChimp_Integration.shortcode.php' ),
-//				'widget_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EEW_MailChimp_Integration.widget.php' ),
+//				'shortcode_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EES_MailChimp.shortcode.php' ),
+//				'widget_paths' => array( ESPRESSO_MAILCHIMP_DIR . 'EEW_MailChimp.widget.php' ),
 			)
 		);
-		EE_Error::add_attention('FYI Mike removed the module registration from EE_MailChimp_Integration::register_addon because it was throwing errors. Brent or Nazar will better know how to fix it. This warning was generated in EE_Mailchimp_Integration line 90');
+		EE_Error::add_attention('FYI Mike removed the module registration from EE_MailChimp::register_addon because it was throwing errors. Brent or Nazar will better know how to fix it. This warning was generated in EE_Mailchimp line 90');
 
         // Run the integration 'by hand' while it currently does not Yet facilitate adding models.
         $mci_setup = new EE_MCI_Setup();
@@ -101,10 +102,10 @@ class EE_MailChimp_Integration extends EE_Addon {
      * @access public
      */
     public static function set_activation_mci_options() {
-        update_option( EE_MailChimp_Integration::activation_indicator_option_name, TRUE );
-        add_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION, 'false', '', 'yes');
-        update_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION, 'false');
-        do_action('AHEE__EE_MailChimp_Integration__set_activation_mci_options__post_activation');
+        update_option( EE_MailChimp::activation_indicator_option_name, TRUE );
+        add_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION, 'false', '', 'yes');
+        update_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION, 'false');
+        do_action('AHEE__EE_MailChimp__set_activation_mci_options__post_activation');
     }
 
     /**
@@ -114,8 +115,8 @@ class EE_MailChimp_Integration extends EE_Addon {
      */
     public function reset_mci_options() {
         delete_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
-        update_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION, 'flase');
-        do_action('AHEE__EE_MailChimp_Integration__reset_mci_options__post_deactivation');
+        update_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION, 'flase');
+        do_action('AHEE__EE_MailChimp__reset_mci_options__post_deactivation');
     }
 
     /**
@@ -127,7 +128,7 @@ class EE_MailChimp_Integration extends EE_Addon {
     public static function additional_mailchimp_admin_hooks() {
         // Is admin and not in M-Mode ?
         if ( is_admin() && ! EE_Maintenance_Mode::instance()->level() ) {
-            add_filter( 'plugin_action_links', array(EE_Registry::instance()->addons->EE_MailChimp_Integration, 'espresso_mailchimp_plugin_settings'), 10, 2 );
+            add_filter( 'plugin_action_links', array(EE_Registry::instance()->addons->EE_MailChimp, 'espresso_mailchimp_plugin_settings'), 10, 2 );
         }
     }
 
@@ -152,8 +153,8 @@ class EE_MailChimp_Integration extends EE_Addon {
             $api_key = isset($settings->core->site_license_key) ? $settings->core->site_license_key : '';
             $host_server_url = 'http://eventespresso.com';
             $plugin_slug = array(
-                'premium' => array('p' => 'ee4-mailchimp-integration'),
-                'prerelease' => array('b' => 'ee4-mailchimp-integration-pr')
+                'premium' => array('p' => 'ee4-mailchimp'),
+                'prerelease' => array('b' => 'ee4-mailchimp-pr')
             );
             $options = array(
                 'apikey' => $api_key,
@@ -164,7 +165,7 @@ class EE_MailChimp_Integration extends EE_Addon {
                 'plugin_basename' => ESPRESSO_MAILCHIMP_BASE_NAME,
                 'use_wp_update' => FALSE, //if TRUE then you want FREE versions of the plugin to be updated from WP
             );
-            do_action('AHEE__EE_MailChimp_Integration__load_pue_update__pre_update_check');
+            do_action('AHEE__EE_MailChimp__load_pue_update__pre_update_check');
             $check_for_updates = new PluginUpdateEngineChecker($host_server_url, $plugin_slug, $options); //initiate the class and start the plugin update engine!
         }
     }

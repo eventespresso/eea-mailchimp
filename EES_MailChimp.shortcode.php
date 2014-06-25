@@ -14,15 +14,15 @@
  * ------------------------------------------------------------------------
  */
 /**
- * Class  EES_MailChimp_Integration
+ * Class  EES_MailChimp
  *
  * @package         Event Espresso
- * @subpackage      ee4-mailchimp-integration
+ * @subpackage      ee4-mailchimp
  *
  * ------------------------------------------------------------------------
  */
 
-class EES_MailChimp_Integration extends EES_Shortcode {
+class EES_MailChimp extends EES_Shortcode {
 
     /**
      * For hooking into EE Core, modules, etc.
@@ -57,7 +57,7 @@ class EES_MailChimp_Integration extends EES_Shortcode {
      * @return void
      */
     public function run( WP $WP ) {
-        // This will trigger the EED_Espresso_MailChimp_Integration's run() method during the pre_get_posts hook point.
+        // This will trigger the EED_Espresso_MailChimp's run() method during the pre_get_posts hook point.
         // This allows us to initialize things, enqueue assets, etc.
         // As well, this saves an instantiation of the module in an array, using 'mailchimp' as the key, so that we can retrieve it.
         EE_Registry::instance()->REQ->set( 'ee', 'mailchimp' );

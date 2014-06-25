@@ -14,10 +14,10 @@
  * ------------------------------------------------------------------------
  */
 /**
- * Class  EE_MCI_Setup - class that will setup and run the MC Integration.
+ * Class  EE_MCI_Setup - class that will setup and run the MC.
  *
  * @package         Event Espresso
- * @subpackage      ee4-mailchimp-integration
+ * @subpackage      ee4-mailchimp
  *
  * ------------------------------------------------------------------------
  */
@@ -70,8 +70,8 @@ class EE_MCI_Setup {
       // Ajax for MailChimp list fields refresh
       add_action( 'wp_ajax_espresso_mailchimp_upgate_list_fields', array($this, 'espresso_mailchimp_upgate_list_fields') );
 
-      // 'MailChimp List Integration' option
-      add_action( 'add_meta_boxes', array($this, 'ee_mci_list_integration_metabox') );
+      // 'MailChimp List' option
+      add_action( 'add_meta_boxes', array($this, 'ee_mci_list_metabox') );
       add_action( 'save_post', array($this, 'espresso_mailchimp_save_event') );
    }
 
@@ -103,7 +103,7 @@ class EE_MCI_Setup {
     * @return void
     */
    function espresso_mailchimp_submit_to_mc( $spc_obj, $valid_data ) {
-      if ( get_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION) == 'true' ) {
+      if ( get_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION) == 'true' ) {
          $mci_controller = new EE_MCI_Controller();
          $mci_controller->mci_submit_to_mailchimp( $spc_obj, $valid_data );
       }
@@ -129,7 +129,7 @@ class EE_MCI_Setup {
     */
    function espresso_mailchimp_save_event( $event_id ) {
       // Nonce checks.
-      $is_ok = EE_MCI_Setup::espresso_mailchimp_authorization_checks('espresso_mailchimp_list_integration_box', 'espresso_mailchimp_list_integration_box_nonce');
+      $is_ok = EE_MCI_Setup::espresso_mailchimp_authorization_checks('espresso_mailchimp_list_box', 'espresso_mailchimp_list_box_nonce');
       // Auto-save? ...do nothing.
       if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
          return $event_id;
@@ -141,21 +141,21 @@ class EE_MCI_Setup {
    }
    
    /**
-    * Add 'MailChimp List Integration' option (metabox) to events admin (add/edit) page (if the API Key is valid).
+    * Add 'MailChimp List' option (metabox) to events admin (add/edit) page (if the API Key is valid).
     * 
     * @access public
     * @param string $post_type  Type of the post.
     * @return void
     */
-   public function ee_mci_list_integration_metabox( $post_type ) {
-      // Is integration active and is espresso event page.
-      if ( ($post_type == 'espresso_events') && (get_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION) == 'true') ) {
-         add_meta_box( 'espresso_mailchimp_list_integration', __( 'MailChimp List Integration', 'event_espresso' ), array( $this, 'espresso_mailchimp_render_box_content' ), $post_type, 'side', 'default' );
+   public function ee_mci_list_metabox( $post_type ) {
+      // Is MC active and is espresso event page.
+      if ( ($post_type == 'espresso_events') && (get_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION) == 'true') ) {
+         add_meta_box( 'espresso_mailchimp_list', __( 'MailChimp List', 'event_espresso' ), array( $this, 'espresso_mailchimp_render_box_content' ), $post_type, 'side', 'default' );
       }
    }
 
    /**
-    * Get 'MailChimp List Integration' metabox contents.
+    * Get 'MailChimp List' metabox contents.
     * 
     * @access public
     * @param WP_Post $event  The post object.
@@ -164,7 +164,7 @@ class EE_MCI_Setup {
    function espresso_mailchimp_render_box_content( $event ) {
       $mci_controller = new EE_MCI_Controller();
       // Add an nonce field.
-      wp_nonce_field( 'espresso_mailchimp_list_integration_box', 'espresso_mailchimp_list_integration_box_nonce' );
+      wp_nonce_field( 'espresso_mailchimp_list_box', 'espresso_mailchimp_list_box_nonce' );
       $mci_controller->mci_set_metabox_contents($event);
    }
 

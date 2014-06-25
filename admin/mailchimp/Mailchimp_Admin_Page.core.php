@@ -4,7 +4,7 @@
 *
 **/
 
-class Mailchimp_Integration_Admin_Page extends EE_Admin_Page {
+class Mailchimp_Admin_Page extends EE_Admin_Page {
 
    public function __construct( $routing = TRUE ) {
       parent::__construct( $routing );
@@ -62,12 +62,12 @@ class Mailchimp_Integration_Admin_Page extends EE_Admin_Page {
          $key_valid = $mci_controller->mci_is_api_key_valid();
          if ( $key_valid ) {
             $template_data['mc_api_key_ok'] = 'inline';
-            update_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION, 'true');
+            update_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION, 'true');
          } else {
             $template_data['mc_api_key_error'] = 'inline';
             $mcapi_error = $mci_controller->mci_get_response_error();
             $template_data['mailchimp_key_error'] = ' - ' . $mcapi_error['msg'];
-            update_option(ESPRESSO_MAILCHIMP_INTEGRATION_ACTIVE_OPTION, 'false');
+            update_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION, 'false');
          }
       }
       $template_data['mailchimp_double_opt_check'] = '';

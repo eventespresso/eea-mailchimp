@@ -14,15 +14,15 @@
  * ------------------------------------------------------------------------
  */
 /**
- * Class  EEW_MailChimp_Integration
+ * Class  EEW_MailChimp
  *
  * @package         Event Espresso
- * @subpackage      ee4-mailchimp-integration
+ * @subpackage      ee4-mailchimp
  *
  * ------------------------------------------------------------------------
  */
 
-class EEW_MailChimp_Integration extends WP_Widget {
+class EEW_MailChimp extends WP_Widget {
 
     /**
      * Register widget with WordPress.
