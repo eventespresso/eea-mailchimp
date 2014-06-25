@@ -66,9 +66,9 @@ class EE_MCI_Setup {
       // Add 'Settings' link
       add_filter( 'plugin_action_links', array($this, 'filter_espresso_mailchimp_plugin_settings'), 10, 2 );
       // Ajax for MailChimp groups refresh
-      add_action( 'wp_ajax_espresso_mailchimp_upgate_groups', array($this, 'espresso_mailchimp_upgate_groups') );
+      add_action( 'wp_ajax_espresso_mailchimp_update_groups', array($this, 'espresso_mailchimp_update_groups') );
       // Ajax for MailChimp list fields refresh
-      add_action( 'wp_ajax_espresso_mailchimp_upgate_list_fields', array($this, 'espresso_mailchimp_upgate_list_fields') );
+      add_action( 'wp_ajax_espresso_mailchimp_update_list_fields', array($this, 'espresso_mailchimp_update_list_fields') );
 
       // 'MailChimp List Integration' option
       add_action( 'add_meta_boxes', array($this, 'ee_mci_list_integration_metabox') );
@@ -192,7 +192,7 @@ class EE_MCI_Setup {
     *
     * @return void
     */
-   function espresso_mailchimp_upgate_groups() {
+   function espresso_mailchimp_update_groups() {
       $mci_controller = new EE_MCI_Controller();
       ob_start();
       $mci_data = $_POST['mci_data'];
@@ -208,7 +208,7 @@ class EE_MCI_Setup {
     *
     * @return void
     */
-   function espresso_mailchimp_upgate_list_fields() {
+   function espresso_mailchimp_update_list_fields() {
       $mci_controller = new EE_MCI_Controller();
       ob_start();
       $mci_data = $_POST['mci_data'];

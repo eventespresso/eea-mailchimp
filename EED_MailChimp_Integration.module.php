@@ -47,9 +47,9 @@ class EED_Mailchimp_Integration extends EED_Module {
      */
     public static function set_hooks_admin() {
         // Ajax for MailChimp groups refresh
-        add_action( 'wp_ajax_espresso_mailchimp_upgate_groups', array('EED_Mailchimp_Integration', 'espresso_mailchimp_upgate_groups') );
+        add_action( 'wp_ajax_espresso_mailchimp_update_groups', array('EED_Mailchimp_Integration', 'espresso_mailchimp_update_groups') );
         // Ajax for MailChimp list fields refresh
-        add_action( 'wp_ajax_espresso_mailchimp_upgate_list_fields', array('EED_Mailchimp_Integration', 'espresso_mailchimp_upgate_list_fields') );
+        add_action( 'wp_ajax_espresso_mailchimp_update_list_fields', array('EED_Mailchimp_Integration', 'espresso_mailchimp_update_list_fields') );
     }
 
 
@@ -83,7 +83,7 @@ class EED_Mailchimp_Integration extends EED_Module {
      *
      * @return void
      */
-    public static function espresso_mailchimp_upgate_groups() {
+    public static function espresso_mailchimp_update_groups() {
         $mci_controller = new EE_MCI_Controller();
         ob_start();
         $mci_data = $_POST['mci_data'];
@@ -99,7 +99,7 @@ class EED_Mailchimp_Integration extends EED_Module {
      *
      * @return void
      */
-    public static function espresso_mailchimp_upgate_list_fields() {
+    public static function espresso_mailchimp_update_list_fields() {
         $mci_controller = new EE_MCI_Controller();
         ob_start();
         $mci_data = $_POST['mci_data'];
