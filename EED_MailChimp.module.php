@@ -1,28 +1,11 @@
 <?php if ( ! defined( 'EVENT_ESPRESSO_VERSION' )) { exit('NO direct script access allowed'); }
-/*
- * Event Espresso
- *
- * Event Registration and Management Plugin for WordPress
- *
- * @ package        Event Espresso
- * @ author         Event Espresso
- * @ copyright (c)  2008-2014 Event Espresso  All Rights Reserved.
- * @ license        http://eventespresso.com/support/terms-conditions/   * see Plugin Licensing *
- * @ link           http://www.eventespresso.com
- * @ version        EE4
- *
- * ------------------------------------------------------------------------
- */
 /**
- * Class  EED_MailChimp
+ * Class  EED_Mailchimp
  *
  * @package         Event Espresso
  * @subpackage      ee4-mailchimp
- *
- * ------------------------------------------------------------------------
  */
-
-class EED_MailChimp extends EED_Module {
+class EED_Mailchimp extends EED_Module {
 
     /**
      * For hooking into EE Core, other modules, etc.
@@ -31,13 +14,13 @@ class EED_MailChimp extends EED_Module {
      * @return void
      */
     public static function set_hooks() {
-        EE_Config::register_route( 'mailchimp', 'EED_MailChimp', 'run' );
+        EE_Config::register_route( 'mailchimp', 'EED_Mailchimp', 'run' );
 
         // Hook into the EE _process_attendee_information
-        add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_MailChimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+        add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
         // 'MailChimp List' option
-        add_action( 'add_meta_boxes', array('EED_MailChimp', 'espresso_mailchimp_list_metabox') );
-        add_action( 'save_post', array('EED_MailChimp', 'espresso_mailchimp_save_event') );
+        add_action( 'add_meta_boxes', array('EED_Mailchimp', 'espresso_mailchimp_list_metabox') );
+        add_action( 'save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event') );
     }
 
     /**
@@ -76,7 +59,7 @@ class EED_MailChimp extends EED_Module {
         $mci_ver = ESPRESSO_MAILCHIMP_VERSION;
         wp_enqueue_style('espresso_mailchimp_gen_styles', ESPRESSO_MAILCHIMP_URL . "assets/css/ee_mailchimp_styles.css", false, $mci_ver);
         wp_enqueue_script('espresso_mailchimp_base_scripts', ESPRESSO_MAILCHIMP_URL . 'assets/js/ee-mailchimp-base-scripts.js', false, $mci_ver);
-        do_action('AHEE__EED_MailChimp__mailchimp_link_scripts_styles__end');
+        do_action('AHEE__EED_Mailchimp__mailchimp_link_scripts_styles__end');
     }
 
     /**
@@ -133,7 +116,7 @@ class EED_MailChimp extends EED_Module {
      */
     public static function espresso_mailchimp_save_event( $event_id ) {
         // Nonce checks.
-        $is_ok = EED_MailChimp::espresso_mailchimp_authorization_checks('espresso_mailchimp_list_box', 'espresso_mailchimp_list_box_nonce');
+        $is_ok = EED_Mailchimp::espresso_mailchimp_authorization_checks('espresso_mailchimp_list_box', 'espresso_mailchimp_list_box_nonce');
         // Auto-save? ...do nothing.
         if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
             return $event_id;
@@ -154,7 +137,7 @@ class EED_MailChimp extends EED_Module {
     public static function espresso_mailchimp_list_metabox( $post_type ) {
         // Is MC integration active and is espresso event page.
         if ( ($post_type == 'espresso_events') && (get_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION) == 'true') ) {
-            add_meta_box( 'espresso_mailchimp_list', __( 'MailChimp List', 'event_espresso' ), array( 'EED_MailChimp', 'espresso_mailchimp_render_box_content' ), $post_type, 'side', 'default' );
+            add_meta_box( 'espresso_mailchimp_list', __( 'MailChimp List', 'event_espresso' ), array( 'EED_Mailchimp', 'espresso_mailchimp_render_box_content' ), $post_type, 'side', 'default' );
         }
     }
 
