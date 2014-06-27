@@ -69,7 +69,7 @@ class EE_MailChimp extends EE_Addon {
 					'Mailchimp_Admin_Page' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page.core.php',
 					'Mailchimp_Admin_Page_Init' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page_Init.core.php',
 				),
-//				'dms_paths' => array( ESPRESSO_MAILCHIMP_DMS_PATH ),
+				'dms_paths' => array( ESPRESSO_MAILCHIMP_DMS_PATH ),
 				'module_paths' => array(
 					ESPRESSO_MAILCHIMP_DIR . 'EED_Mailchimp.module.php'
 				),
