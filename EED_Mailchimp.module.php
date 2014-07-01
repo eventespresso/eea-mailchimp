@@ -14,13 +14,7 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function set_hooks() {
-		EE_Config::register_route( 'mailchimp', 'EED_Mailchimp', 'run' );
-
-		// Hook into the EE _process_attendee_information
-		add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
-		// 'MailChimp List' option
-		add_action( 'add_meta_boxes', array('EED_Mailchimp', 'espresso_mailchimp_list_metabox') );
-		add_action( 'save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event') );
+        
 	}
 
 	/**
@@ -30,13 +24,21 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function set_hooks_admin() {
+        add_action( 'admin_enqueue_scripts', array( 'EED_Mailchimp', 'mailchimp_link_scripts_styles' ));
+
+        // Hook into the EE _process_attendee_information
+        add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+        // 'MailChimp List' option
+        add_action( 'add_meta_boxes', array('EED_Mailchimp', 'espresso_mailchimp_list_metabox') );
+        add_action( 'save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event') );
+
 		// Ajax for MailChimp groups refresh
 		add_action( 'wp_ajax_espresso_mailchimp_update_groups', array('EED_Mailchimp_Integration', 'espresso_mailchimp_update_groups') );
 		// Ajax for MailChimp list fields refresh
 		add_action( 'wp_ajax_espresso_mailchimp_update_list_fields', array('EED_Mailchimp_Integration', 'espresso_mailchimp_update_list_fields') );
+
+        EE_Config::register_route( 'mailchimp', 'EED_Mailchimp', 'run' );
 	}
-
-
 
 	/**
 	 * Run initial module setup.
@@ -45,9 +47,9 @@ class EED_Mailchimp extends EED_Module {
 	 * @param WP  $WP
 	 * @return void
 	 */
-	public function run( $WP ) {
-		add_action( 'wp_enqueue_scripts', array( $this, 'mailchimp_link_scripts_styles' ));
-	}
+	public function run( $WP ) {global $wpdb; $wpdb->insert('wp_temp_for_tests', array('tests_text_1'=>'mailchimp_run', 'tests_text_2'=>'mailchimp_run'), array('%s', '%s'));
+	
+    }
 
 	/**
 	 * Load the MCI scripts and styles.
@@ -55,7 +57,8 @@ class EED_Mailchimp extends EED_Module {
 	 * @access public
 	 * @return void
 	 */
-	public function mailchimp_link_scripts_styles() {
+	public static function mailchimp_link_scripts_styles() {
+        global $wpdb; $wpdb->insert('wp_temp_for_tests', array('tests_text_1'=>'mailchimp_link_scripts_styles', 'tests_text_2'=>'mailchimp_link_scripts_styles'), array('%s', '%s'));
 		$mci_ver = ESPRESSO_MAILCHIMP_VERSION;
 		wp_enqueue_style('espresso_mailchimp_gen_styles', ESPRESSO_MAILCHIMP_URL . "assets/css/ee_mailchimp_styles.css", false, $mci_ver);
 		wp_enqueue_script('espresso_mailchimp_base_scripts', ESPRESSO_MAILCHIMP_URL . 'assets/js/ee-mailchimp-base-scripts.js', false, $mci_ver);
