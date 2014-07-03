@@ -47,7 +47,7 @@ class EED_Mailchimp extends EED_Module {
 	 * @param WP  $WP
 	 * @return void
 	 */
-	public function run( $WP ) {global $wpdb; $wpdb->insert('wp_temp_for_tests', array('tests_text_1'=>'mailchimp_run', 'tests_text_2'=>'mailchimp_run'), array('%s', '%s'));
+	public function run( $WP ) {
 	
     }
 
@@ -58,7 +58,6 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function mailchimp_link_scripts_styles() {
-        global $wpdb; $wpdb->insert('wp_temp_for_tests', array('tests_text_1'=>'mailchimp_link_scripts_styles', 'tests_text_2'=>'mailchimp_link_scripts_styles'), array('%s', '%s'));
 		$mci_ver = ESPRESSO_MAILCHIMP_VERSION;
 		wp_enqueue_style('espresso_mailchimp_gen_styles', ESPRESSO_MAILCHIMP_URL . "assets/css/ee_mailchimp_styles.css", false, $mci_ver);
 		wp_enqueue_script('espresso_mailchimp_base_scripts', ESPRESSO_MAILCHIMP_URL . 'assets/js/ee-mailchimp-base-scripts.js', false, $mci_ver);
