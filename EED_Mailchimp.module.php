@@ -14,7 +14,8 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function set_hooks() {
-        
+        // Hook into the EE _process_attendee_information
+        add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
 	}
 
 	/**
@@ -26,8 +27,6 @@ class EED_Mailchimp extends EED_Module {
 	public static function set_hooks_admin() {
         add_action( 'admin_enqueue_scripts', array( 'EED_Mailchimp', 'mailchimp_link_scripts_styles' ));
 
-        // Hook into the EE _process_attendee_information
-        add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
         // 'MailChimp List' option
         add_action( 'add_meta_boxes', array('EED_Mailchimp', 'espresso_mailchimp_list_metabox') );
         add_action( 'save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event') );

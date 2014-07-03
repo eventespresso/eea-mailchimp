@@ -1,7 +1,5 @@
 <?php if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) { exit('NO direct script access allowed'); }
 
-define( 'ESPRESSO_MAILCHIMP_DIR', plugin_dir_path( __FILE__ ) );
-define( 'ESPRESSO_MAILCHIMP_BASE_NAME', plugin_basename(__FILE__) );
 define( 'ESPRESSO_MAILCHIMP_URL', plugin_dir_url( ESPRESSO_MAILCHIMP_MAIN_FILE ) );
 define( 'ESPRESSO_MAILCHIMP_ADMIN_URL', get_admin_url() );
 define( 'ESPRESSO_MAILCHIMP_ADMIN_DIR', ESPRESSO_MAILCHIMP_DIR . 'admin' . DS );
@@ -24,8 +22,6 @@ class EE_MailChimp extends EE_Addon {
      */
     const activation_indicator_option_name = 'ee4_mailchimp_activation';
 
-
-
 	/**
 	 * Class constructor
 	 *
@@ -36,8 +32,6 @@ class EE_MailChimp extends EE_Addon {
         // Register the activation/deactivation hooks.
         register_deactivation_hook( ESPRESSO_MAILCHIMP_MAIN_FILE, array($this, 'reset_mci_options') );
     }
-
-
 
     /**
      * Register our add-on in EE.
@@ -82,8 +76,6 @@ class EE_MailChimp extends EE_Addon {
 		);
     }
 
-
-
     /**
      * Some activation options setup.
      *
@@ -96,8 +88,6 @@ class EE_MailChimp extends EE_Addon {
         do_action('AHEE__EE_MailChimp__set_activation_mci_options__post_activation');
     }
 
-
-
     /**
      * Reset some options on deactivation.
      *
@@ -109,8 +99,6 @@ class EE_MailChimp extends EE_Addon {
         do_action('AHEE__EE_MailChimp__reset_mci_options__post_deactivation');
     }
 
-
-
     /**
      *  Additional admin hooks.
      *
@@ -120,11 +108,9 @@ class EE_MailChimp extends EE_Addon {
     public static function additional_mailchimp_admin_hooks() {
         // Is admin and not in M-Mode ?
         if ( is_admin() && ! EE_Maintenance_Mode::instance()->level() ) {
-            add_filter( 'plugin_action_links', array(EE_Registry::instance()->addons->EE_MailChimp, 'espresso_mailchimp_plugin_settings'), 10, 2 );
+            add_filter( 'plugin_action_links', array('EE_MailChimp', 'espresso_mailchimp_plugin_settings'), 10, 2 );
         }
     }
-
-
 
     /**
      * Add a settings link to the Plugins page.
@@ -133,15 +119,13 @@ class EE_MailChimp extends EE_Addon {
      * @param string $file  Main plugins file name.
      * @return array  Updated Links list
      */
-    public function espresso_mailchimp_plugin_settings( $links, $file ) {
+    public static function espresso_mailchimp_plugin_settings( $links, $file ) {
  		if ( $file == ESPRESSO_MAILCHIMP_BASE_NAME ) {
 			// before other links
-			array_unshift( $links, '<a href="admin.php?page='. ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG .'">' . __('Settings') . '</a>' );
+			array_unshift( $links, '<a href="admin.php?page='. ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG .'">' . __('Settings', 'event-espresso') . '</a>' );
 		}
         return $links;
 	}
-
-
 
 	/**
 	 * Overrides parent so we return a name that integrates properly
