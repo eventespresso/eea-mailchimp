@@ -33,15 +33,12 @@ class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base {
 
     public function can_migrate_from_version($version_array) {
         $version_string = '0';
-        if ( get_option('ee4_mailchimp_db_update') ) {
-            $version_string = get_option('ee4_mailchimp_db_update');
+        if ( isset($version_array['MailChimp']) ) {
+            $version_string = $version_array['MailChimp'];
         }
-        if ( $version_string < '2.0.0' ) {
+        if ( version_compare('2.0.0', $version_string) ) {
             // Can be migrated.
             return true;
-        } elseif ( $version_string === '0' ) {
-            // If '0' the db for mailchimp was not yet updated.
-            return false;
         } else {
             // Version doesnt apply for this migration.
             return false;

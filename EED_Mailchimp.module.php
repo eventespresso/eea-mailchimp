@@ -47,7 +47,7 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public function run( $WP ) {
-	
+        
     }
 
 	/**
