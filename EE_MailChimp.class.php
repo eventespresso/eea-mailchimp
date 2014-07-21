@@ -5,6 +5,7 @@ define( 'ESPRESSO_MAILCHIMP_ADMIN_URL', get_admin_url() );
 define( 'ESPRESSO_MAILCHIMP_ADMIN_DIR', ESPRESSO_MAILCHIMP_DIR . 'admin' . DS );
 define( 'ESPRESSO_MAILCHIMP_DB_DIR', ESPRESSO_MAILCHIMP_DIR . 'db' . DS );
 define( 'ESPRESSO_MAILCHIMP_DMS_PATH', ESPRESSO_MAILCHIMP_DB_DIR . 'migration_scripts' . DS );
+define( 'ESPRESSO_MAILCHIMP_MODELS_PATH', ESPRESSO_MAILCHIMP_DB_DIR . 'models' . DS );
 define( 'ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG', 'mailchimp' );
 define( 'ESPRESSO_MAILCHIMP_ACTIVE_OPTION', 'ee_mailchimp_active' );
 define( 'ESPRESSO_MAILCHIMP_API_OPTIONS', 'ee_mailchimp_user_settings' );
@@ -43,8 +44,8 @@ class EE_MailChimp extends EE_Addon {
 
         // Load MailChimp API:
         require_once( ESPRESSO_MAILCHIMP_DIR . 'includes/MailChimp.class.php' );
-        require_once( ESPRESSO_MAILCHIMP_DB_DIR . 'EEM_Event_Mailchimp_List_Group.model.php' );
-        require_once( ESPRESSO_MAILCHIMP_DB_DIR . 'EEM_Question_Mailchimp_Field.model.php' );
+        //require_once( ESPRESSO_MAILCHIMP_DB_DIR . 'EEM_Event_Mailchimp_List_Group.model.php' );
+        //require_once( ESPRESSO_MAILCHIMP_DB_DIR . 'EEM_Question_Mailchimp_Field.model.php' );
 
         // Register our add-on via Plugin API.
         EE_Register_Addon::register(
@@ -74,6 +75,9 @@ class EE_MailChimp extends EE_Addon {
 				)
 			)
 		);
+        
+        // Register db models.
+        EE_Register_Model::register('MailChimp', array( 'model_paths' => array(ESPRESSO_MAILCHIMP_MODELS_PATH), 'class_paths' => array(ESPRESSO_MAILCHIMP_MODELS_PATH) ));
     }
 
     /**

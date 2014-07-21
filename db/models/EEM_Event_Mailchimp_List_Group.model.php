@@ -21,7 +21,6 @@
  * ------------------------------------------------------------------------
  */
 
-
 class EEM_Event_Mailchimp_List_Group extends EEM_Base {
 
     /**
