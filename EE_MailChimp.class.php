@@ -73,9 +73,11 @@ class EE_MailChimp extends EE_Addon {
 				)
 			)
 		);
-        
+
         // Register db models.
-        EE_Register_Model::register('MailChimp', array( 'model_paths' => array(ESPRESSO_MAILCHIMP_MODELS_PATH), 'class_paths' => array(ESPRESSO_MAILCHIMP_MODELS_PATH) ));
+		if( ! did_action( 'activate_plugin' ) ){
+			EE_Register_Model::register('MailChimp', array( 'model_paths' => array(ESPRESSO_MAILCHIMP_MODELS_PATH), 'class_paths' => array(ESPRESSO_MAILCHIMP_MODELS_PATH) ));
+		}
     }
 
     /**
