@@ -529,7 +529,10 @@ class EE_MCI_Controller {
    public function mci_event_subscriptions( $evt_id, $target = NULL ) {
       $mc_list_group = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
       $mc_question_field = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
-      $evt_list = EEM_Event_Mailchimp_List_Group::instance()->get_one( array( array('EVT_ID' => $evt_id) ) )->mc_list();
+      $evt_list = EEM_Event_Mailchimp_List_Group::instance()->get_one( array( array('EVT_ID' => $evt_id) ) );
+      if ( $evt_list != null ) {
+        $evt_list = $evt_list->mc_list();
+      }
       $evt_groups = $evt_qfields = array();
       foreach ($mc_list_group as $mc_group) {
         $evt_groups[] = $mc_group->mc_group();
