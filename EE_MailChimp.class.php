@@ -44,8 +44,6 @@ class EE_MailChimp extends EE_Addon {
 
         // Load MailChimp API:
         require_once( ESPRESSO_MAILCHIMP_DIR . 'includes/MailChimp.class.php' );
-        //require_once( ESPRESSO_MAILCHIMP_DB_DIR . 'EEM_Event_Mailchimp_List_Group.model.php' );
-        //require_once( ESPRESSO_MAILCHIMP_DB_DIR . 'EEM_Question_Mailchimp_Field.model.php' );
 
         // Register our add-on via Plugin API.
         EE_Register_Addon::register(

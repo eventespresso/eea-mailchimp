@@ -32,9 +32,9 @@ class EED_Mailchimp extends EED_Module {
         add_action( 'save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event') );
 
 		// Ajax for MailChimp groups refresh
-		add_action( 'wp_ajax_espresso_mailchimp_update_groups', array('EED_Mailchimp_Integration', 'espresso_mailchimp_update_groups') );
+		add_action( 'wp_ajax_espresso_mailchimp_update_groups', array('EED_Mailchimp', 'espresso_mailchimp_update_groups') );
 		// Ajax for MailChimp list fields refresh
-		add_action( 'wp_ajax_espresso_mailchimp_update_list_fields', array('EED_Mailchimp_Integration', 'espresso_mailchimp_update_list_fields') );
+		add_action( 'wp_ajax_espresso_mailchimp_update_list_fields', array('EED_Mailchimp', 'espresso_mailchimp_update_list_fields') );
 
         EE_Config::register_route( 'mailchimp', 'EED_Mailchimp', 'run' );
 	}

@@ -42,13 +42,3 @@ function load_ee4_espresso_mailchimp_class() {
 	}
 }
 add_action( 'AHEE__EE_System__load_espresso_addons', 'load_ee4_espresso_mailchimp_class', 11 );
-
-
-// Store the names of the tables into the $wpdb
-function espresso_mailchimp_register_tables() {
-   global $wpdb;
-   $wpdb->ee_mci_mailchimp_attendee_rel = "{$wpdb->prefix}events_mailchimp_attendee_rel";
-   $wpdb->ee_mci_mailchimp_event_rel = "{$wpdb->prefix}events_mailchimp_event_rel";
-   $wpdb->ee_mci_mailchimp_question_field_rel = "{$wpdb->prefix}events_mailchimp_question_field_rel";
-}
-add_action('init', 'espresso_mailchimp_register_tables');

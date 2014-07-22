@@ -97,7 +97,6 @@ class EE_MCI_Controller {
     * @return void
     */
    public function mci_submit_to_mailchimp( $spc_obj, $valid_data ) {
-      global $wpdb;
       $attendee = false;
       $subscriber = array();
       do_action('AHEE__EE_MCI_Controller__mci_submit_to_mailchimp__start', $spc_obj, $valid_data);
@@ -156,16 +155,12 @@ class EE_MCI_Controller {
                      // Subscribe attendee
                      $reply = $this->MailChimp->call('lists/subscribe', $subscribe_args);
                      // If there was an error during subscription than process it.
-                     // If success then add new attendee/subscriber to the DB.
                      if ( isset($reply['status']) && ($reply['status'] == 'error') ) {
                         $this->mci_throw_error($reply);
                         // If the error: 'email is already subscribed to a list' then just update the groups.
                         if ( $reply['code'] == 214 ) {
                            $reply = $this->MailChimp->call('lists/update-member', $subscribe_args);
                         }
-                     } else {
-                        do_action('AHEE__EE_MCI_Controller__mci_submit_to_mailchimp__add_attendee_to_db', $spc_obj, $subscriber, $reply);
-                        $wpdb->insert($wpdb->ee_mci_mailchimp_attendee_rel, array('event_id' => $evt_id, 'attendee_id' => $att_id, 'mailchimp_list_id' => $evt_list), array("%d", "%s", "%s"));
                      }
                   }
                }
@@ -274,19 +269,40 @@ class EE_MCI_Controller {
     * @return void
     */
    public function mci_save_metabox_contents( $event_id ) {
-      global $wpdb;
+      // Clear MailChimp data on the current event and then save the new data.
+      $lg_exists = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array('EVT_ID' => $event_id) ) );
+      if ( ! empty($lg_exists) ) {
+        foreach ($lg_exists as $list_group) {
+          $list_group->delete();
+        }
+      }
+
       // Lists and Groups
       $list_id = $_POST['ee_mailchimp_lists'];
       if ( ! empty($_POST['ee_mailchimp_groups']) ) {
-         $group_ids = serialize($_POST['ee_mailchimp_groups']);
-      }
-      $exists = $wpdb->get_row( "SELECT * FROM $wpdb->ee_mci_mailchimp_event_rel WHERE event_id = '$event_id'" );
-      if ( $exists != null ) {
-         $wpdb->update($wpdb->ee_mci_mailchimp_event_rel, array('mailchimp_list_id' => $list_id, 'mailchimp_group_id' => $group_ids), array('event_id' => $event_id));
+        $group_ids = $_POST['ee_mailchimp_groups'];
+        foreach ($group_ids as $group) {
+          $new_list_group = EE_Event_Mailchimp_List_Group::new_instance(
+            array(
+              'EVT_ID' => $event_id,
+              'AMC_mailchimp_list_id' => $list_id,
+              'AMC_mailchimp_group_id' => $group
+            )
+          );
+          $new_list_group->save();
+        }
       } else {
-         $wpdb->insert($wpdb->ee_mci_mailchimp_event_rel, array('event_id' => $event_id, 'mailchimp_list_id' => $list_id, 'mailchimp_group_id' => $group_ids), array("%d", "%s", "%s"));
+        $new_list_group = EE_Event_Mailchimp_List_Group::new_instance(
+          array(
+            'EVT_ID' => $event_id,
+            'AMC_mailchimp_list_id' => $list_id,
+            'AMC_mailchimp_group_id' => -1
+          )
+        );
+        $new_list_group->save();
       }
 
+      $qf_exists = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $event_id) ) );
       // Question Fields
       $qfields_list = base64_decode($_POST['ee_mailchimp_qfields']);
       if ( @unserialize($qfields_list) !== false ) {
@@ -295,16 +311,39 @@ class EE_MCI_Controller {
         $qfields_list = array();
       }
       $list_form_rel = array();
-      foreach ($qfields_list as $question) {
-        // Do not merge Email fields as it has to default to Email question.
-        if ( ($_POST[base64_encode($question)] != '-1') )
-          $list_form_rel[$question] = $_POST[base64_encode($question)];
-      }
-      $qf_exists = $wpdb->get_row( "SELECT * FROM $wpdb->ee_mci_mailchimp_question_field_rel WHERE event_id = '$event_id'" );
-      if ( $qf_exists != null ) {
-         $wpdb->update($wpdb->ee_mci_mailchimp_question_field_rel, array('field_question_rel' => serialize($list_form_rel)), array('event_id' => $event_id));
-      } else {
-         $wpdb->insert($wpdb->ee_mci_mailchimp_question_field_rel, array('event_id' => $event_id, 'field_question_rel' => serialize($list_form_rel)), array("%d", "%s"));
+      foreach ($qfields_list as $mc_question) {
+        if ( ($_POST[base64_encode($mc_question)] != '-1') ) {
+          $ev_question = $_POST[base64_encode($mc_question)];
+          $list_form_rel[$mc_question] = $ev_question;
+
+          $q_found = false;
+          // Update already present Q fields.
+          foreach ($qf_exists as $question_field) {
+            $mc_field = $question_field->mc_field();
+            if ( $mc_field == $mc_question ) {
+              EEM_Question_Mailchimp_Field::instance()->update(
+                array('QST_ID' => $ev_question),
+                array( array('EVT_ID' => $event_id, 'QMC_mailchimp_field_id' => $mc_question) )
+              );
+              $q_found = true;
+            }
+          }
+          // Add Q field if was not present.
+          if ( ! $q_found ) {
+            $new_qfield = EE_Question_Mailchimp_Field::new_instance(
+              array(
+                'EVT_ID' => $event_id,
+                'QST_ID' => $ev_question,
+                'QMC_mailchimp_field_id' => $mc_question
+              )
+            );
+            $new_qfield->save();
+          }
+        } else {
+          $mcqe = EEM_Question_Mailchimp_Field::instance()->get_one( array( array('EVT_ID' => $event_id, 'QMC_mailchimp_field_id' => $mc_question) ) );
+          if ( $mcqe != null )
+            $mcqe->delete();
+        }
       }
    }
 
@@ -316,7 +355,6 @@ class EE_MCI_Controller {
     * @return void
     */
    public function mci_list_mailchimp_lists( $event_id ) {
-      global $wpdb;
       do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
       // Get saved list for this event (if there's one)
       $selected_list = $this->mci_event_subscriptions($event_id, 'list');
@@ -346,7 +384,6 @@ class EE_MCI_Controller {
     * @return void
     */
    public function mci_list_mailchimp_groups( $event_id, $list_id = NULL ) {
-      global $wpdb;
       do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
       // Get saved group for this event (if there's one)
       $selected_gorup = $this->mci_event_subscriptions($event_id, 'groups');
@@ -490,41 +527,33 @@ class EE_MCI_Controller {
     * @return array/string  Id of a group/list or an array of 'List fields - Event questions' relationships, or all in an array.
     */
    public function mci_event_subscriptions( $evt_id, $target = NULL ) {
-      global $wpdb;
-      $event_list = $wpdb->prepare(
-         "SELECT mailchimp_list_id AS ListID 
-         FROM " . $wpdb->ee_mci_mailchimp_event_rel . " 
-         WHERE event_id = %s ", $evt_id
-      );
-      $evt_list = $wpdb->get_results($event_list, ARRAY_A);
-      $event_group = $wpdb->prepare(
-         "SELECT mailchimp_group_id AS GroupID 
-         FROM " . $wpdb->ee_mci_mailchimp_event_rel . " 
-         WHERE event_id = %s ", $evt_id
-      );
-      $evt_groups = $wpdb->get_results($event_group, ARRAY_A);
-      $event_qfields = $wpdb->prepare(
-         "SELECT field_question_rel AS FieldRel 
-         FROM " . $wpdb->ee_mci_mailchimp_question_field_rel . " 
-         WHERE event_id = %s ", $evt_id
-      );
-      $evt_qfields = $wpdb->get_results($event_qfields, ARRAY_A);
+      $mc_list_group = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
+      $mc_question_field = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
+      $evt_list = EEM_Event_Mailchimp_List_Group::instance()->get_one( array( array('EVT_ID' => $evt_id) ) )->mc_list();
+      $evt_groups = $evt_qfields = array();
+      foreach ($mc_list_group as $mc_group) {
+        $evt_groups[] = $mc_group->mc_group();
+      }
+      foreach ($mc_question_field as $mc_qfield) {
+        $evt_qfields[$mc_qfield->mc_field()] = $mc_qfield->mc_event_question();
+      }
+
       $evt_subs = array();
       switch ( $target ) {
          case 'list':
             if ( ! empty($evt_list) ) {
-               $evt_subs = $evt_list[0]['ListID'];
+               $evt_subs = $evt_list;
              } else {
               $evt_subs = -1;
              }
             break;
          case 'groups':
-            if ( ! empty($evt_groups) && @unserialize($evt_groups[0]['GroupID']) !== false )
-               $evt_subs = unserialize($evt_groups[0]['GroupID']);
+            if ( ! empty($evt_groups) )
+               $evt_subs = $evt_groups;
             break;
          case 'question_fields':
-            if ( ! empty($evt_qfields) && @unserialize($evt_qfields[0]['FieldRel']) !== false )
-               $evt_subs = unserialize($evt_qfields[0]['FieldRel']);
+            if ( ! empty($evt_qfields) )
+               $evt_subs = $evt_qfields;
             break;
          case NULL:
             if ( ! empty($evt_groups) && ! empty($evt_list) )
