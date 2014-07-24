@@ -35,16 +35,18 @@ class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base {
         global $wpdb;
         $version_string = '0';
         // Check if old MailChimp table exist.
-        $old_not_exist = false;
+        $old_table_exists = false;
         $mc_table = $wpdb->prefix . "events_mailchimp_event_rel";
         if ( $wpdb->get_var("SHOW TABLES LIKE '" . $mc_table . "'") == $mc_table ) {
-            $old_not_exist = true;
+            $old_table_exists = true;
         }
+		$migrations_ran = EE_Data_Migration_Manager::instance()->get_data_migrations_ran();
+		$core_4_1_0_migration_ran = isset( $migrations_ran['Core'] ) && isset( $migrations_ran['Core']['4.1.0'] );
         $core_version = $version_array['Core'];
         if ( isset($version_array['MailChimp']) ) {
             $version_string = $version_array['MailChimp'];
         }
-        if ( ('2.0.0' > $version_string) && ($core_version >= '4.1.0') && $old_not_exist ) {
+        if ( version_compare( $version_string, '2.0.0', '<') && version_compare($core_version, '4.1.0', '>=') && $old_table_exists && $core_4_1_0_migration_ran ) {
             // Can be migrated.
             return true;
         } else {
