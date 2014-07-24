@@ -33,12 +33,13 @@ class EE_DMS_2_0_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 	 */
 	protected function _migrate_old_row( $old_row ) {
 		global $wpdb;
-		// Get the new REGs for the old answer.
-		$old_attendee_table = $wpdb->prefix . "events_attendee";
-		$new_reg_table = $wpdb->prefix . "esp_registration";
-		$old_groups = $old_row['mailchimp_group_id'];
+		// Get the new event IDs for the old
+		$new_event_id = $this->get_migration_script()->get_mapping_new_pk('events_detail', $old_row['event_id'], 'posts');
+		if( ! $new_event_id ){
+			$this->add_error( sprintf( __( 'Could not migrate old row %s because there is no new event ID for old event with ID %s', 'event_espresso' ), json_encode( $old_row ), $old_row['event_id'] ) );
+		}
 		$cols_n_values = array(
-			'EVT_ID' => $old_row['event_id'],
+			'EVT_ID' => $new_event_id,
 			'AMC_mailchimp_list_id' => $old_row['mailchimp_list_id'],
 			'AMC_mailchimp_group_id' => $old_row['mailchimp_group_id']
 		);
@@ -53,5 +54,5 @@ class EE_DMS_2_0_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 			return 0;
 		}
 	}
-	
+
 }
