@@ -60,8 +60,8 @@ class EE_MCI_Controller {
     * @return void
     */
    public function mci_set_mailchimp_api() {
-      $mcapi_settings = get_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
-      $api_key = ( strlen($mcapi_settings['api_key']) > 1 ) ? $mcapi_settings['api_key'] : 'invalid-usX';
+      $mcapi_settings = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+      $api_key = ( strlen($mcapi_settings->api_settings->api_key) > 1 ) ? $mcapi_settings->api_settings->api_key : 'invalid-usX';
       $this->MailChimp = new \Drewm\MailChimp($api_key);
    }
 
@@ -74,9 +74,9 @@ class EE_MCI_Controller {
     */
    public function mci_is_api_key_valid( $api_key = NULL ) {
       do_action('AHEE__EE_MCI_Controller__mci_is_api_key_valid__start');
-      $mcapi_settings = get_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
+      $mcapi_settings = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
       if ( $api_key == NULL )
-         $api_key = $mcapi_settings['api_key'];
+         $api_key = $mcapi_settings->api_settings->api_key;
       $MailChimp = new \Drewm\MailChimp($api_key);
       $reply = $MailChimp->call('lists/list', array('apikey' => $api_key));
       if ( ($reply == false) || ( isset($reply['status']) && $reply['status'] == 'error' ) ) {
@@ -123,9 +123,9 @@ class EE_MCI_Controller {
                   $evt_qfields = $this->mci_event_subscriptions($evt_id, 'question_fields');
                   // If no list selected for this event than skip the subscription.
                   if ( $evt_list != -1 ) {
-                     $mcapi_settings = get_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
-                     $api_key = $mcapi_settings['api_key'];
-                     $double_optin = ( isset($mcapi_settings['double_optin']) ) ? $mcapi_settings['double_optin'] : true;
+                     $mcapi_settings = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+                     $api_key = $mcapi_settings->api_settings->api_key;
+                     $double_optin = ( isset($mcapi_settings->api_settings->skip_double_optin) ) ? $mcapi_settings->api_settings->skip_double_optin : true;
                      $args = array('apikey' => $api_key, 'id' => $evt_list, 'email' => array('email' => $subscriber['email']), 'double_optin' => $double_optin);
                      if ( ($evt_groups != -1) && ! empty($evt_groups) ) {
                         if ( is_array($evt_groups) ) {
@@ -177,8 +177,8 @@ class EE_MCI_Controller {
     */
    public function mci_get_users_lists() {
       do_action('AHEE__EE_MCI_Controller__mci_get_users_lists__start');
-      $mcapi_settings = get_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
-      $api_key = $mcapi_settings['api_key'];
+      $mcapi_settings = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+      $api_key = $mcapi_settings->api_settings->api_key;
       $reply = $this->MailChimp->call('lists/list', array('apikey' => $api_key));
       if ( ($reply != false) && isset($reply['data']) && ! empty($reply['data'])  ) {
          return $reply['data'];
@@ -196,8 +196,8 @@ class EE_MCI_Controller {
     */
    public function mci_get_users_groups( $list_id ) {
       do_action('AHEE__EE_MCI_Controller__mci_get_users_groups__start');
-      $mcapi_settings = get_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
-      $api_key = $mcapi_settings['api_key'];
+      $mcapi_settings = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+      $api_key = $mcapi_settings->api_settings->api_key;
       if ( $list_id == NULL )
          $list_id = $this->list_id;
       $reply = $this->MailChimp->call('lists/interest-groupings', array('apikey' => $api_key, 'id' => $list_id));
@@ -217,8 +217,8 @@ class EE_MCI_Controller {
     */
    public function mci_get_list_merge_vars( $list_id ) {
       do_action('AHEE__EE_MCI_Controller__mci_get_list_merge_vars__start');
-      $mcapi_settings = get_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
-      $api_key = $mcapi_settings['api_key'];
+      $mcapi_settings = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+      $api_key = $mcapi_settings->api_settings->api_key;
       if ( $list_id == NULL )
          $list_id = $this->list_id;
       $reply = $this->MailChimp->call('lists/merge-vars', array('apikey' => $api_key, 'id' => array($list_id)));

@@ -8,6 +8,13 @@
 class EED_Mailchimp extends EED_Module {
 
 	/**
+	 * @return EED_Mailchimp
+	 */
+	public static function instance() {
+		return parent::get_instance( __CLASS__ );
+	}
+
+	/**
 	 * For hooking into EE Core, other modules, etc.
 	 *
 	 * @access public
@@ -37,6 +44,28 @@ class EED_Mailchimp extends EED_Module {
 		add_action( 'wp_ajax_espresso_mailchimp_update_list_fields', array('EED_Mailchimp', 'espresso_mailchimp_update_list_fields') );
 
         EE_Config::register_route( 'mailchimp', 'EED_Mailchimp', 'run' );
+        //EED_Mailchimp::set_config();
+	}
+
+	/**
+	 *    _set_config
+	 *
+	 * @return EE_Mailchimp_Config
+	 */
+	protected static function set_config() {
+		return EED_Mailchimp::instance()->set_config( 'addons', 'EED_Mailchimp', 'EE_Mailchimp_Config' );
+	}
+
+
+
+	/**
+	 *    _get_config
+	 *
+	 * @return EE_Mailchimp_Config
+	 */
+	protected static function _get_config() {
+		$config = EED_Mailchimp::instance()->get_config( 'addons', 'EED_Mailchimp', 'EE_Mailchimp_Config' );
+		return $config instanceof EE_Mailchimp_Config ? $config : EED_Mailchimp::_set_config();
 	}
 
 	/**
@@ -103,7 +132,8 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function espresso_mailchimp_submit_to_mc( $spc_obj, $valid_data ) {
-		if ( get_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION) == 'true' ) {
+		$mc_config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+		if ( $mc_config->api_settings->mc_active == 'true' ) {
 			$mci_controller = new EE_MCI_Controller();
 			$mci_controller->mci_submit_to_mailchimp( $spc_obj, $valid_data );
 		}
@@ -136,8 +166,9 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function espresso_mailchimp_list_metabox( $post_type ) {
+		$mc_config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
 		// Is MC integration active and is espresso event page.
-		if ( ($post_type == 'espresso_events') && (get_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION) == 'true') ) {
+		if ( ($post_type == 'espresso_events') && ($mc_config->api_settings->mc_active == 'true') ) {
 			add_meta_box( 'espresso_mailchimp_list', __( 'MailChimp List', 'event_espresso' ), array( 'EED_Mailchimp', 'espresso_mailchimp_render_box_content' ), $post_type, 'side', 'default' );
 		}
 	}

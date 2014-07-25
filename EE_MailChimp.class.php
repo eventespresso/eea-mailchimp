@@ -30,8 +30,7 @@ class EE_MailChimp extends EE_Addon {
 	 * @return \EE_MailChimp
 	 */
     public function __construct() {
-        // Register the activation/deactivation hooks.
-        register_deactivation_hook( ESPRESSO_MAILCHIMP_MAIN_FILE, array($this, 'reset_mci_options') );
+        
     }
 
     /**
@@ -55,11 +54,12 @@ class EE_MailChimp extends EE_Addon {
 				'main_file_path' => ESPRESSO_MAILCHIMP_MAIN_FILE,
 				'admin_path' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS,
 				'admin_callback' => 'additional_mailchimp_admin_hooks',
-//				'config_class' => 'EE_MC_Config',
+				'config_class' => 'EE_Mailchimp_Config',
 				'autoloader_paths' => array(
 					'EE_MCI_Controller' => ESPRESSO_MAILCHIMP_DIR . 'includes/EE_MCI_Controller.class.php',
 					'Mailchimp_Admin_Page' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page.core.php',
 					'Mailchimp_Admin_Page_Init' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page_Init.core.php',
+                    'EE_Mailchimp_Config' => ESPRESSO_MAILCHIMP_DIR . 'EE_Mailchimp_Config.php',
 				),
 				'dms_paths' => array( ESPRESSO_MAILCHIMP_DMS_PATH ),
 				'module_paths' => array(
@@ -78,29 +78,6 @@ class EE_MailChimp extends EE_Addon {
 		if( ! did_action( 'activate_plugin' ) ){
 			EE_Register_Model::register('MailChimp', array( 'model_paths' => array(ESPRESSO_MAILCHIMP_MODELS_PATH), 'class_paths' => array(ESPRESSO_MAILCHIMP_MODELS_PATH) ));
 		}
-    }
-
-    /**
-     * Some activation options setup.
-     *
-     * @access public
-     */
-    public static function set_activation_mci_options() {
-        update_option( EE_MailChimp::activation_indicator_option_name, TRUE );
-        add_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION, 'false', '', 'yes');
-        update_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION, 'false');
-        do_action('AHEE__EE_MailChimp__set_activation_mci_options__post_activation');
-    }
-
-    /**
-     * Reset some options on deactivation.
-     *
-     * @access public
-     */
-    public function reset_mci_options() {
-        delete_option(ESPRESSO_MAILCHIMP_API_OPTIONS);
-        update_option(ESPRESSO_MAILCHIMP_ACTIVE_OPTION, 'flase');
-        do_action('AHEE__EE_MailChimp__reset_mci_options__post_deactivation');
     }
 
     /**
