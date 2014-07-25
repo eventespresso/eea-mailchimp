@@ -26,7 +26,8 @@ class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base {
     public function __construct() {
         $this->_pretty_name = __("Data Migration to EE4 MailChimp.", "event_espresso");
         $this->_migration_stages = array(
-            new EE_DMS_2_0_0_mc_list_group()
+            new EE_DMS_2_0_0_mc_list_group(),
+            new EE_DMS_2_0_0_mc_options()
         );
         parent::__construct();
     }
@@ -92,8 +93,6 @@ class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base {
      * @return boolean
      */
     public function schema_changes_after_migration() {
-        // but still will update the mailchimp db version here.
-        update_option('ee4_mailchimp_db_update', '2.0.0');
         return true;
     }
 

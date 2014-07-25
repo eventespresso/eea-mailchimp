@@ -45,7 +45,7 @@ class EE_Mailchimp_Config_Api_Settings extends EE_Config_Base {
 
     public function __construct() {
         $this->api_key = '';
-        $this->skip_double_optin = false;
-        $this->mc_active = false;
+        $this->skip_double_optin = true;
+        $this->mc_active = 'false';
     }
 }
