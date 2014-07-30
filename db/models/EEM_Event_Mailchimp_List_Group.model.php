@@ -16,11 +16,10 @@
  * Class  EEM_Event_Mailchimp_List_Group
  *
  * @package         Event Espresso
- * @subpackage      ee4-mailchimp-integration
+ * @subpackage      ee4-mailchimp
  *
  * ------------------------------------------------------------------------
  */
-
 
 class EEM_Event_Mailchimp_List_Group extends EEM_Base {
 

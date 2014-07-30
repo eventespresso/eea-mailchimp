@@ -1,6 +1,6 @@
 <?php
 /**
- *  Meant to convert DBs between MailChimp Integration for EE3 to MCI for EE4.
+ *  Meant to convert DBs between MailChimp for EE3 to MC for EE4.
  */
 
 /**
@@ -9,39 +9,47 @@
  * instead of construction, because it only gets constructed on first page load
  * (all other times it gets resurrected from a wordpress option).
  */
-$stages = glob( ESPRESSO_MAILCHIMP_DIR . 'db/migration_scripts/1_0_0_stages/*' );
+$stages = glob( ESPRESSO_MAILCHIMP_DIR . 'db/migration_scripts/2_0_0_stages/*' );
 $class_to_filepath = array();
 foreach( $stages as $filepath ) {
     $matches = array();
-    preg_match( '~1_0_0_stages/(.*).dmsstage.php~', $filepath, $matches );
+    preg_match( '~2_0_0_stages/(.*).dmsstage.php~', $filepath, $matches );
     $class_to_filepath[$matches[1]] = $filepath;
 }
 //give addons a chance to autoload their stages too
-$class_to_filepath = apply_filters( 'FHEE__EE_DMS_MailChimp_1_0_0_stages__autoloaded_stages', $class_to_filepath );
+$class_to_filepath = apply_filters( 'FHEE__EE_DMS_MailChimp_2_0_0_stages__autoloaded_stages', $class_to_filepath );
 EEH_Autoloader::register_autoloader( $class_to_filepath );
 
 
-class EE_DMS_MailChimp_1_0_0 extends EE_Data_Migration_Script_Base {
+class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base {
 
     public function __construct() {
-        $this->_pretty_name = __("Data Migration to EE4 MailChimp Integration.", "event_espresso");
+        $this->_pretty_name = __("Data Migration to EE4 MailChimp.", "event_espresso");
         $this->_migration_stages = array(
-            new EE_DMS_1_0_0_mc_list_group()
+            new EE_DMS_2_0_0_mc_list_group(),
+            new EE_DMS_2_0_0_mc_options()
         );
         parent::__construct();
     }
 
     public function can_migrate_from_version($version_array) {
+        global $wpdb;
         $version_string = '0';
-        if ( get_option('ee4_mailchimp_db_update') ) {
-            $version_string = get_option('ee4_mailchimp_db_update');
+        // Check if old MailChimp table exist.
+        $old_table_exists = false;
+        $mc_table = $wpdb->prefix . "events_mailchimp_event_rel";
+        if ( $wpdb->get_var("SHOW TABLES LIKE '" . $mc_table . "'") == $mc_table ) {
+            $old_table_exists = true;
         }
-        if ( $version_string < '1.0' ) {
-            // Can be mgirated.
+		$migrations_ran = EE_Data_Migration_Manager::instance()->get_data_migrations_ran();
+		$core_4_1_0_migration_ran = isset( $migrations_ran['Core'] ) && isset( $migrations_ran['Core']['4.1.0'] );
+        $core_version = $version_array['Core'];
+        if ( isset($version_array['MailChimp']) ) {
+            $version_string = $version_array['MailChimp'];
+        }
+        if ( version_compare( $version_string, '2.0.0', '<') && version_compare($core_version, '4.1.0', '>=') && $old_table_exists && $core_4_1_0_migration_ran ) {
+            // Can be migrated.
             return true;
-        } elseif ( $version_string === '0' ) {
-            // If '0' the db for mailchimp was not yet updated.
-            return false;
         } else {
             // Version doesnt apply for this migration.
             return false;
@@ -49,7 +57,7 @@ class EE_DMS_MailChimp_1_0_0 extends EE_Data_Migration_Script_Base {
     }
 
     public function pretty_name() {
-        return __("Data Migration to EE4 MailChimp Integration.", "event_espresso");
+        return __("Data Migration to EE4 MailChimp.", "event_espresso");
     }
 
     public function schema_changes_before_migration() {
@@ -85,8 +93,6 @@ class EE_DMS_MailChimp_1_0_0 extends EE_Data_Migration_Script_Base {
      * @return boolean
      */
     public function schema_changes_after_migration() {
-        // but still will update the mailchimp db version here.
-        update_option('ee4_mailchimp_db_update', '1.0');
         return true;
     }
 

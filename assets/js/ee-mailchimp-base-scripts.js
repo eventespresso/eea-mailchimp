@@ -18,7 +18,7 @@ function update_mailchimp_groups( list, eventID ){
       url: ajaxurl,
       data:{
          mci_data : mci_data,
-         action : 'espresso_mailchimp_upgate_groups'
+         action : 'espresso_mailchimp_update_groups'
       },
       success: function( response ) {
          $('#espresso-mci-groups-list').html(response);
@@ -33,7 +33,7 @@ function update_mailchimp_list_fields( list, eventID ){
       url: ajaxurl,
       data:{
          mci_data : mci_data,
-         action : 'espresso_mailchimp_upgate_list_fields'
+         action : 'espresso_mailchimp_update_list_fields'
       },
       success: function( response ) {
          $('#espresso-mci-list-fields').html(response);

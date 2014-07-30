@@ -4,7 +4,7 @@
  * Converts EE3 MailChimp Integration Event - List - Groups data to EE4 MCI.
  */
 
-class EE_DMS_1_0_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
+class EE_DMS_2_0_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 
 	/**
 	 * Old table name.
@@ -46,7 +46,7 @@ class EE_DMS_1_0_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 			$this->add_error( sprintf( __( 'Could not migrate old row %s because there is no new event ID for old event with ID %s, because we couldnt find the data for the 4.1 data migration script', 'event_espresso' ), json_encode( $old_row ), $old_row['event_id'] ) );
 		}
 		$cols_n_values = array(
-			'EVT_ID' => $old_row['event_id'],
+			'EVT_ID' => $new_event_id,
 			'AMC_mailchimp_list_id' => $old_row['mailchimp_list_id'],
 			'AMC_mailchimp_group_id' => $old_row['mailchimp_group_id']
 		);

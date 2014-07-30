@@ -16,7 +16,7 @@
  * Class  EE_Question_Mailchimp_Field
  *
  * @package         Event Espresso
- * @subpackage      ee4-mailchimp-integration
+ * @subpackage      ee4-mailchimp
  *
  * ------------------------------------------------------------------------
  */
@@ -53,7 +53,7 @@ class EE_Question_Mailchimp_Field extends EE_Base_Class {
      *
      * @return int
      */
-    public function event_question() {
+    public function mc_event_question() {
         return $this->get('QST_ID');
     }
 

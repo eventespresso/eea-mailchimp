@@ -16,7 +16,7 @@
                            <?php _e("* A <b>MailChimp API Key</b> is required for this plugin.", 'event_espresso'); ?>
                         </p>
                         <p>
-                           <?php _e("Once the API key is configured successfully, a <b>'MailChimp List Integration' box</b> will appear in the right menu of the Event Creation and Event Update dialogs, which will allow you to select which MailChimp List and Group you want to integrate with.", 'event_espresso'); ?>
+                           <?php _e("Once the API key is configured successfully, a <b>'MailChimp List' box</b> will appear in the right menu of the Event Creation and Event Update dialogs, which will allow you to select which MailChimp List and Group you want to integrate with.", 'event_espresso'); ?>
                         </p>
                      </div>
                   </div>
@@ -36,8 +36,8 @@
                            </p>
                            <p>
                               <input size="45" type="text" id="ee-mailchimp-api-key" name="mailchimp_api_key" value="<?php echo $mailchimp_api_key; ?>" />
-                              <img class="ee_mailchimp_apikey_ok" src="<?php echo ESPRESSO_MAILCHIMP_URL; ?>/assets/img/check.png" style="display: <?php echo ( strlen($mc_api_key_ok) > 0 ) ? $mc_api_key_ok : 'none'; ?>;" />
-                              <img class="ee_mailchimp_apikey_error" src="<?php echo ESPRESSO_MAILCHIMP_URL; ?>/assets/img/error.png" style="display: <?php echo ( strlen($mc_api_key_error) > 0 ) ? $mc_api_key_error : 'none'; ?>;" />
+                              <img class="ee_mailchimp_apikey_ok" src="<?php echo ESPRESSO_MAILCHIMP_URL; ?>assets/img/check.png" style="display: <?php echo ( strlen($mc_api_key_ok) > 0 ) ? $mc_api_key_ok : 'none'; ?>;" />
+                              <img class="ee_mailchimp_apikey_error" src="<?php echo ESPRESSO_MAILCHIMP_URL; ?>assets/img/error.png" style="display: <?php echo ( strlen($mc_api_key_error) > 0 ) ? $mc_api_key_error : 'none'; ?>;" />
                               <?php echo $mailchimp_key_error; ?>
                            </p>
                         </div>

@@ -16,7 +16,7 @@
  * Class  EEM_Question_Mailchimp_Field
  *
  * @package         Event Espresso
- * @subpackage      ee4-mailchimp-integration
+ * @subpackage      ee4-mailchimp
  *
  * ------------------------------------------------------------------------
  */
@@ -61,7 +61,7 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
             )
         );
         $this->_model_relations = array(
-            'Event' => new EE_Has_Many_Relation()
+            'Event' => new EE_Belongs_To_Relation()
         );
         parent::__construct();
     }

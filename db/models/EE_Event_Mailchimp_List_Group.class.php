@@ -16,7 +16,7 @@
  * Class  EE_Event_Mailchimp_List_Group
  *
  * @package         Event Espresso
- * @subpackage      ee4-mailchimp-integration
+ * @subpackage      ee4-mailchimp
  *
  * ------------------------------------------------------------------------
  */
@@ -44,7 +44,7 @@ class EE_Event_Mailchimp_List_Group extends EE_Base_Class {
      *
      * @return int
      */
-    public function group() {
+    public function mc_group() {
         return $this->get('AMC_mailchimp_group_id');
     }
 
@@ -53,7 +53,7 @@ class EE_Event_Mailchimp_List_Group extends EE_Base_Class {
      *
      * @return int
      */
-    public function list() {
+    public function mc_list() {
         return $this->get('AMC_mailchimp_list_id');
     }
 
