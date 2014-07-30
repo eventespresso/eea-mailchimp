@@ -33,10 +33,18 @@ class EE_DMS_1_0_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 	 */
 	protected function _migrate_old_row( $old_row ) {
 		global $wpdb;
-		// Get the new REGs for the old answer.
-		$old_attendee_table = $wpdb->prefix . "events_attendee";
-		$new_reg_table = $wpdb->prefix . "esp_registration";
-		$old_groups = $old_row['mailchimp_group_id'];
+		$migrations_ran = EE_Data_Migration_Manager::instance()->get_data_migrations_ran();
+		$core_4_1_0_migration = isset( $migrations_ran['Core'] ) && isset( $migrations_ran['Core']['4.1.0'] ) ? $migrations_ran['Core']['4.1.0'] : NULL;
+		// Get the new event IDs for the old
+		if( $core_4_1_0_migration ){
+			$new_event_id = $core_4_1_0_migration->get_mapping_new_pk($wpdb->prefix.'events_detail', $old_row['event_id'], $wpdb->posts);
+			if( ! $new_event_id ){
+				$this->add_error( sprintf( __( 'Could not migrate old row %s because there is no new event ID for old event with ID %s', 'event_espresso' ), json_encode( $old_row ), $old_row['event_id'] ) );
+			}
+		}else{
+			$new_event_id = 0;
+			$this->add_error( sprintf( __( 'Could not migrate old row %s because there is no new event ID for old event with ID %s, because we couldnt find the data for the 4.1 data migration script', 'event_espresso' ), json_encode( $old_row ), $old_row['event_id'] ) );
+		}
 		$cols_n_values = array(
 			'EVT_ID' => $old_row['event_id'],
 			'AMC_mailchimp_list_id' => $old_row['mailchimp_list_id'],
@@ -53,5 +61,5 @@ class EE_DMS_1_0_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 			return 0;
 		}
 	}
-	
+
 }
