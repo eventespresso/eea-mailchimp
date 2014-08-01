@@ -560,7 +560,7 @@ class EE_MCI_Controller {
             break;
          case NULL:
             if ( ! empty($evt_groups) && ! empty($evt_list) )
-               $evt_subs = array('list' => $evt_list[0]['ListID'], 'groups' => $evt_groups[0]['GroupID'], 'qfields' => $evt_qfields[0]['FieldRel']);
+               $evt_subs = array('list' => $evt_list, 'groups' => $evt_groups, 'qfields' => $evt_qfields);
             break;
       }
       return $evt_subs;
