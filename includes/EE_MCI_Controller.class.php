@@ -61,7 +61,8 @@ class EE_MCI_Controller {
     */
    public function mci_set_mailchimp_api() {
       $mcapi_settings = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
-      $api_key = ( strlen($mcapi_settings->api_settings->api_key) > 1 ) ? $mcapi_settings->api_settings->api_key : 'invalid-usX';
+      $set_apik = $mcapi_settings->api_settings->api_key;
+      $api_key = ( (strlen($set_apik) > 1) && $this->mci_is_api_key_valid($set_apik) ) ? $set_apik : 'invalid-usX';
       $this->MailChimp = new \Drewm\MailChimp($api_key);
    }
 
@@ -75,8 +76,16 @@ class EE_MCI_Controller {
    public function mci_is_api_key_valid( $api_key = NULL ) {
       do_action('AHEE__EE_MCI_Controller__mci_is_api_key_valid__start');
       $mcapi_settings = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
-      if ( $api_key == NULL )
+      if ( $api_key == NULL ) {
          $api_key = $mcapi_settings->api_settings->api_key;
+      }
+      // MailChimp API does not check for the '-' and throws an error, so let's do the check ourselves.
+      $exp_key = explode('-', $api_key);
+      if ( (strpos($api_key, '-') === false) || ! is_array($exp_key) || (count($exp_key) <= 1) || (count($exp_key) > 2) ) {
+         $this->mci_throw_error(false);
+         do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
+         return false;
+      }
       $MailChimp = new \Drewm\MailChimp($api_key);
       $reply = $MailChimp->call('lists/list', array('apikey' => $api_key));
       if ( ($reply == false) || ( isset($reply['status']) && $reply['status'] == 'error' ) ) {
@@ -140,11 +149,15 @@ class EE_MCI_Controller {
                                     }
                                  }
                               }
-                              $args['merge_vars']['groupings'][] = array('id' => intval($grouping[1]), 'groups' => array(base64_decode($grouping[2])));
+                              if ( isset($grouping[2]) ) {
+                                 $args['merge_vars']['groupings'][] = array('id' => intval($grouping[1]), 'groups' => array(base64_decode($grouping[2])));
+                              }
                            }
                         } else {
                            $grouping = explode('-', $evt_groups);
-                           $args['merge_vars']['groupings'][] = array('id' => intval($grouping[1]), 'groups' => array(base64_decode($grouping[2])));
+                           if ( isset($grouping[2]) ) {
+                             $args['merge_vars']['groupings'][] = array('id' => intval($grouping[1]), 'groups' => array(base64_decode($grouping[2])));
+                           }
                         }
                      }
                      foreach ($evt_qfields as $list_field => $event_question) {
