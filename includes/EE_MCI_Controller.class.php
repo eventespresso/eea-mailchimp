@@ -149,11 +149,15 @@ class EE_MCI_Controller {
                                     }
                                  }
                               }
-                              $args['merge_vars']['groupings'][] = array('id' => intval($grouping[1]), 'groups' => array(base64_decode($grouping[2])));
+                              if ( isset($grouping[2]) ) {
+                                 $args['merge_vars']['groupings'][] = array('id' => intval($grouping[1]), 'groups' => array(base64_decode($grouping[2])));
+                              }
                            }
                         } else {
                            $grouping = explode('-', $evt_groups);
-                           $args['merge_vars']['groupings'][] = array('id' => intval($grouping[1]), 'groups' => array(base64_decode($grouping[2])));
+                           if ( isset($grouping[2]) ) {
+                             $args['merge_vars']['groupings'][] = array('id' => intval($grouping[1]), 'groups' => array(base64_decode($grouping[2])));
+                           }
                         }
                      }
                      foreach ($evt_qfields as $list_field => $event_question) {
