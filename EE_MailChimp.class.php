@@ -68,7 +68,7 @@ class EE_MailChimp extends EE_Addon {
 				),
 				// if plugin update engine is being used for auto-updates. not needed if PUE is not being used.
 				'pue_options'			=> array(
-					'pue_plugin_slug' => 'ee4-mailchimp',
+					'pue_plugin_slug' => 'eea-mailchimp',
 					'checkPeriod' => '24',
 					'use_wp_update' => FALSE
 				)
