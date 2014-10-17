@@ -34,7 +34,7 @@ class EEM_Event_Mailchimp_List_Group extends EEM_Base {
      *
      * @access public
      * @return EEM_Event_Mailchimp_List_Group instance
-     */ 
+     */
     public static function instance() {
         // Check if instance of EEM_Event_Mailchimp_List_Group already exists.
         if ( self::$_instance === NULL ) {
@@ -64,7 +64,17 @@ class EEM_Event_Mailchimp_List_Group extends EEM_Base {
         );
         parent::__construct();
     }
-    
+
+
+    /**
+     * resets the model and returns it
+     * @return EEM_Event_Mailchimp_List_Group
+     */
+    public static function reset(){
+        self::$_instance = NULL;
+        return self::instance();
+    }
+
 }
 
 ?>
