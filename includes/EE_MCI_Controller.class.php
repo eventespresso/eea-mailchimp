@@ -160,9 +160,25 @@ class EE_MCI_Controller {
                            }
                         }
                      }
+                     // Question fields.
                      foreach ($evt_qfields as $list_field => $event_question) {
-                        if ( @isset($subscriber[$event_question]) )
-                           $args['merge_vars'][$list_field] = $subscriber[$event_question];
+                        if ( @isset($subscriber[$event_question]) ) {
+                           // If Qfield is a State then get the state name not the code.
+                           if ( $event_question === 'state' ) {
+                              $state = EEM_State::instance()->get_one_by_ID($subscriber[$event_question]);
+                              $args['merge_vars'][$list_field] = $state->name();
+                           } elseif ( is_array($subscriber[$event_question]) ) {
+                              $selected = '';
+                              foreach ($subscriber[$event_question] as $q_key => $q_value) {
+                                 if ( ! empty($selected) )
+                                    $selected .= ', ';
+                                 $selected .= $q_value;
+                              }
+                              $args['merge_vars'][$list_field] = $selected;
+                           } else {
+                              $args['merge_vars'][$list_field] = $subscriber[$event_question];
+                           }
+                        }
                      }
                      $subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $args);
                      // Subscribe attendee
