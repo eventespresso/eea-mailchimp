@@ -27,7 +27,7 @@ class EEM_Event_Mailchimp_List_Group extends EEM_Base {
      * Instance of the Attendee object
      * @access private
      */
-    private static $_instance = NULL;
+    protected static $_instance = NULL;
 
     /**
      * This funtion is a singleton method used to instantiate the EEM_Event_Mailchimp_List_Group object

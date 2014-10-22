@@ -28,7 +28,7 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
      * Instance of the Attendee object
      * @access private
      */
-    private static $_instance = NULL;
+    protected static $_instance = NULL;
 
     /**
      * This funtion is a singleton method used to instantiate the EEM_Question_Mailchimp_Field object
