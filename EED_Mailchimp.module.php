@@ -94,9 +94,8 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function mailchimp_link_scripts_styles() {
-		$mci_ver = ESPRESSO_MAILCHIMP_VERSION;
-		wp_enqueue_style('espresso_mailchimp_gen_styles', ESPRESSO_MAILCHIMP_URL . "assets/css/ee_mailchimp_styles.css", false, $mci_ver);
-		wp_enqueue_script('espresso_mailchimp_base_scripts', ESPRESSO_MAILCHIMP_URL . 'assets/js/ee-mailchimp-base-scripts.js', false, $mci_ver);
+		wp_enqueue_style('espresso_mailchimp_gen_styles', ESPRESSO_MAILCHIMP_URL . "assets/css/ee_mailchimp_styles.css", false, ESPRESSO_MAILCHIMP_VERSION );
+		wp_enqueue_script('espresso_mailchimp_base_scripts', ESPRESSO_MAILCHIMP_URL . 'assets/js/ee-mailchimp-base-scripts.js', false, ESPRESSO_MAILCHIMP_VERSION );
 		do_action('AHEE__EED_Mailchimp__mailchimp_link_scripts_styles__end');
 	}
 
@@ -175,7 +174,6 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function espresso_mailchimp_list_metabox( $post_type ) {
-		$mc_config = EED_Mailchimp::instance()->config();
 		// Is MC integration active and is espresso event page.
 		if ( $post_type == 'espresso_events' ) {
 			add_meta_box( 'espresso_mailchimp_list', __( 'MailChimp List', 'event_espresso' ), array( 'EED_Mailchimp', 'espresso_mailchimp_render_box_content' ), $post_type, 'side', 'default' );
