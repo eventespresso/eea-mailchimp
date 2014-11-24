@@ -21,7 +21,7 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function set_hooks() {
-        // Hook into the EE _process_attendee_information
+		// Hook into the EE _process_attendee_information
         add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
 	}
 
@@ -32,7 +32,7 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function set_hooks_admin() {
-        // Hook into the EE _process_attendee_information
+		// Hook into the EE _process_attendee_information
         add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
 
         add_action( 'admin_enqueue_scripts', array( 'EED_Mailchimp', 'mailchimp_link_scripts_styles' ));
@@ -47,8 +47,9 @@ class EED_Mailchimp extends EED_Module {
 		add_action( 'wp_ajax_espresso_mailchimp_update_list_fields', array('EED_Mailchimp', 'espresso_mailchimp_update_list_fields') );
 
         EE_Config::register_route( 'mailchimp', 'EED_Mailchimp', 'run' );
-        //EED_Mailchimp::set_config();
 	}
+
+
 
 	/**
 	 *    _set_config
@@ -56,20 +57,24 @@ class EED_Mailchimp extends EED_Module {
 	 * @return EE_Mailchimp_Config
 	 */
 	protected static function set_config() {
-		return EED_Mailchimp::instance()->set_config( 'addons', 'EED_Mailchimp', 'EE_Mailchimp_Config' );
+		EED_Mailchimp::instance()->set_config_section( 'addons' );
+		EED_Mailchimp::instance()->set_config_name( 'Mailchimp' );
+		EED_Mailchimp::instance()->set_config_class( 'EE_Mailchimp_Config' );
 	}
 
 
 
 	/**
-	 *    _get_config
+	 *    config
 	 *
 	 * @return EE_Mailchimp_Config
 	 */
-	protected static function _get_config() {
-		$config = EED_Mailchimp::instance()->get_config( 'addons', 'EED_Mailchimp', 'EE_Mailchimp_Config' );
-		return $config instanceof EE_Mailchimp_Config ? $config : EED_Mailchimp::_set_config();
+	public function config() {
+		EED_Mailchimp::set_config();
+		return parent::config();
 	}
+
+
 
 	/**
 	 * Run initial module setup.
@@ -79,7 +84,7 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public function run( $WP ) {
-        
+
     }
 
 	/**
@@ -135,8 +140,8 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function espresso_mailchimp_submit_to_mc( $spc_obj, $valid_data ) {
-		$mc_config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
-		if ( $mc_config->api_settings->mc_active == 'true' ) {
+		$mc_config = EED_Mailchimp::instance()->config();
+		if ( $mc_config->api_settings->mc_active == TRUE ) {
 			$mci_controller = new EE_MCI_Controller();
 			$mci_controller->mci_submit_to_mailchimp( $spc_obj, $valid_data );
 		}
@@ -146,7 +151,7 @@ class EED_Mailchimp extends EED_Module {
 	 * Save the meta when the post is saved.
 	 *
 	 * @param int $event_id The ID of the event being saved.
-	 * @return void
+	 * @return int
 	 */
 	public static function espresso_mailchimp_save_event( $event_id ) {
 		// Nonce checks.
@@ -159,6 +164,7 @@ class EED_Mailchimp extends EED_Module {
 		// Got here so let's save the data.
 		$mci_controller = new EE_MCI_Controller();
 		$mci_controller->mci_save_metabox_contents($event_id);
+		return $event_id;
 	}
 
 	/**
@@ -169,9 +175,9 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function espresso_mailchimp_list_metabox( $post_type ) {
-		$mc_config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+		$mc_config = EED_Mailchimp::instance()->config();
 		// Is MC integration active and is espresso event page.
-		if ( ($post_type == 'espresso_events') && ($mc_config->api_settings->mc_active == 'true') ) {
+		if ( $post_type == 'espresso_events' ) {
 			add_meta_box( 'espresso_mailchimp_list', __( 'MailChimp List', 'event_espresso' ), array( 'EED_Mailchimp', 'espresso_mailchimp_render_box_content' ), $post_type, 'side', 'default' );
 		}
 	}
