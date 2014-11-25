@@ -163,8 +163,6 @@ class EE_MCI_Controller {
 						if ( $attendee instanceof EE_Attendee ) {
 							$EVT_ID = $registration->event_ID();
 							$event_list = $this->mci_event_list( $EVT_ID );
-							$event_groups = $this->mci_event_list_group( $EVT_ID );
-							$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
 							// If no list selected for this event than skip the subscription.
 							if ( ! empty( $event_list )) {
 								$subscribe_args = array(
@@ -173,36 +171,20 @@ class EE_MCI_Controller {
 									'email' 				=> array( 'email' => $attendee->email() ),
 									'double_optin' 	=> isset( $this->_config->api_settings->skip_double_optin ) ? $this->_config->api_settings->skip_double_optin : TRUE
 								);
-								$subscribe_args = $this->_add_event_group_vars_to_subscribe_args( $event_groups, $subscribe_args );
-								// Question fields.
-								foreach ( $question_fields as $list_field => $event_question ) {
-									if ( isset( $subscriber[ $event_question ] )) {
-										// If question field is a State then get the state name not the code.
-										if ( $event_question === 'state' ) {
-											$state = EEM_State::instance()->get_one_by_ID($subscriber[$event_question]);
-											$subscribe_args['merge_vars'][$list_field] = $state->name();
-										} elseif ( is_array($subscriber[$event_question]) ) {
-											$selected = '';
-											foreach ($subscriber[$event_question] as $q_key => $q_value) {
-												if ( ! empty($selected) )
-													$selected .= ', ';
-												$selected .= $q_value;
-											}
-											$subscribe_args['merge_vars'][$list_field] = $selected;
-										} else {
-											$subscribe_args['merge_vars'][$list_field] = $subscriber[$event_question];
-										}
-									}
-								}
+								// Group vars
+								$subscribe_args = $this->_add_event_group_vars_to_subscribe_args( $EVT_ID, $subscribe_args );
+								// Question fields
+								$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
+								// filter it
 								$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args );
 								// Subscribe attendee
-								$reply = $this->MailChimp->call('lists/subscribe', $subscribe_args);
+								$reply = $this->MailChimp->call( 'lists/subscribe', $subscribe_args );
 								// If there was an error during subscription than process it.
-								if ( isset($reply['status']) && ($reply['status'] == 'error') ) {
-									$this->mci_throw_error($reply);
+								if ( isset( $reply['status'] ) && $reply['status'] == 'error' ) {
+									$this->mci_throw_error( $reply );
 									// If the error: 'email is already subscribed to a list' then just update the groups.
 									if ( $reply['code'] == 214 ) {
-										$this->MailChimp->call('lists/update-member', $subscribe_args);
+										$this->MailChimp->call( 'lists/update-member', $subscribe_args );
 									}
 								}
 							}
@@ -216,14 +198,15 @@ class EE_MCI_Controller {
 
 
 	/**
-	 * add_event_group_vars_to_subscribe_args
+	 * _add_event_group_vars_to_subscribe_args
 	 *
 	 * @access public
-	 * @param array $event_groups
+	 * @param int $EVT_ID
 	 * @param array $subscribe_args
 	 * @return array
 	 */
-	protected function _add_event_group_vars_to_subscribe_args( $event_groups = array(),  $subscribe_args = array() ) {
+	protected function _add_event_group_vars_to_subscribe_args( $EVT_ID = 0,  $subscribe_args = array() ) {
+		$event_groups = $this->mci_event_list_group( $EVT_ID );
 		if ( ! empty( $event_groups )) {
 			if ( is_array( $event_groups )) {
 				foreach ( $event_groups as $event_group ) {
@@ -264,6 +247,84 @@ class EE_MCI_Controller {
 
 
 
+	/**
+	 * _get_question_answers_for_registration
+	 * returns an array of
+	 *
+	 * @access public
+	 * @param EE_Registration $registration
+	 * @return array
+	 */
+	protected function _get_question_answers_for_registration( EE_Registration $registration ) {
+		// empty array to add stuff to
+		$question_answers = array();
+		if ( $registration instanceof EE_Registration ) {
+			// grab the registrant's answers
+			$registration_answers = $registration->answers();
+			if ( ! empty( $registration_answers )) {
+				foreach ( $registration_answers as $registration_answer ) {
+					if ( $registration_answer instanceof EE_Answer ) {
+						// get the related question for the answer
+						$registration_question = $registration_answer->question();
+						if ( $registration_question instanceof EE_Question ) {
+							// for system questions
+							if ( $registration_question->is_system_question() ) {
+								// use the system ID for the array key
+								$question_answers[ $registration_question->system_ID() ] = $registration_answer->pretty_value();
+							} else {
+								// or just the regular question ID for non-system questions
+								$question_answers[ $registration_question->ID() ] = $registration_answer->pretty_value();
+							}
+						}
+					}
+				}
+			}
+		}
+		return $question_answers;
+	}
+
+
+
+	/**
+	 * _add_registration_question_answers_to_subscribe_args
+	 *
+	 * @access public
+	 * @param EE_Registration $registration
+	 * @param int           $EVT_ID
+	 * @param array           $subscribe_args
+	 * @throws \EE_Error
+	 * @return array
+	 */
+	protected function _add_registration_question_answers_to_subscribe_args( EE_Registration $registration, $EVT_ID = 0,  $subscribe_args = array() ) {
+		if ( ! isset( $subscribe_args['merge_vars'] )) {
+			throw new EE_Error( __( 'The MailChimp Subscriber arguments array is malformed!','event_espresso' ));
+		}
+		// get MailChimp question fields
+		$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
+		// get the registrant's question answers
+		$question_answers = $this->_get_question_answers_for_registration( $registration );
+		foreach ( $question_fields as $mc_list_field => $question_ID ) {
+			if ( isset( $question_answers[ $question_ID ] )) {
+				// If question field is a State then get the state name not the code.
+				if ( $question_ID === 'state' ) {
+					$state = EEM_State::instance()->get_one_by_ID( $question_answers[ $question_ID ] );
+					$subscribe_args['merge_vars'][ $mc_list_field ] = $state->name();
+				} else if ( is_array( $question_answers[ $question_ID ] )) {
+					$selected = '';
+					foreach ( $question_answers[ $question_ID ] as $q_key => $q_value ) {
+						$selected .= $selected == '' ? $q_value : ', ' . $q_value;
+					}
+					$subscribe_args['merge_vars'][$mc_list_field] = $selected;
+				} else {
+					$subscribe_args['merge_vars'][$mc_list_field] = $question_answers[ $question_ID ];
+				}
+			}
+		}
+		return $subscribe_args;
+	}
+
+
+
   /**
     * Retrieve all of the lists defined for your user account.
     *
@@ -294,7 +355,7 @@ class EE_MCI_Controller {
       if ( $list_id == NULL )
          $list_id = $this->list_id;
       $reply = $this->MailChimp->call('lists/interest-groupings', array('apikey' => $this->_api_key, 'id' => $list_id));
-      if ( ($reply != false) && ! empty($reply) && (@$reply['status'] != 'error') ) {
+      if ( $reply != FALSE && ! empty( $reply ) && isset( $reply['status'] ) && $reply['status'] != 'error' ) {
          return $reply;
       } else {
          return array();
@@ -315,11 +376,30 @@ class EE_MCI_Controller {
       if ( $list_id == NULL )
          $list_id = $this->list_id;
       $reply = $this->MailChimp->call('lists/merge-vars', array('apikey' => $this->_api_key, 'id' => array($list_id)));
-      if ( ($reply != false) && isset($reply['data']) && ! empty($reply['data'])  ) {
+      if ( $reply != FALSE && isset( $reply['data'] ) && ! empty( $reply['data'] )) {
         return $reply['data'][0]['merge_vars'];
       } else {
         return array();
       }
+   }
+
+
+
+  /**
+    * mci_ajax_loading
+    *
+    * @access public
+    * @param string $id  extra css id tag to be appended to existing
+    * @return void
+    */
+   public function mci_ajax_loading( $id = '' ) {
+	   $id = ! empty( $id ) ? 'id="ee-mailchimp-ajax-loading-' . $id . '" ' : '';
+	   ?>
+		<div <?php echo $id; ?>class="ee-mailchimp-ajax-loading" style="display:none;">
+			<span class="ee-spinner ee-spin"></span>
+			<span class="ee-loading-txt small-text"><?php _e( 'loading...', 'event_espresso' );?></span>
+		</div>
+	   <?php
    }
 
 
@@ -342,17 +422,17 @@ class EE_MCI_Controller {
                <div id="espresso-mci-lists">
                    <?php
                    // Lists / Groups section
-                   $this->mci_list_mailchimp_lists(); ?>
+                   $this->mci_list_mailchimp_lists( $this->list_id );
+				   ?>
                </div>
+				<?php $this->mci_ajax_loading( 'groups' ); ?>
                <div id="espresso-mci-groups-list">
-                  <?php $this->mci_list_mailchimp_groups( $event->ID ); ?>
+                  <?php $this->mci_list_mailchimp_groups( $event->ID, $this->list_id ); ?>
                </div>
             </div>
+			 <?php $this->mci_ajax_loading( 'fields' ); ?>
             <div id="espresso-mci-list-fields" class="espresso_mci_list_fields">
-               <?php
-               // List fields section
-               $this->mci_list_mailchimp_fields( $event->ID );
-               ?>
+               <?php $this->mci_list_mailchimp_fields( $event->ID, $this->list_id ); ?>
             </div>
          </div>
          <?php
@@ -420,12 +500,9 @@ class EE_MCI_Controller {
 
       $qf_exists = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $event_id) ) );
       // Question Fields
-      $qfields_list = base64_decode($_POST['ee_mailchimp_qfields']);
-      if ( @unserialize($qfields_list) !== false ) {
-        $qfields_list = unserialize($qfields_list);
-      } else {
-        $qfields_list = array();
-      }
+	$qfields_list = base64_decode( $_POST['ee_mailchimp_qfields'] );
+	$qfields_list = maybe_unserialize( $qfields_list );
+	$qfields_list = is_array( $qfields_list ) ? $qfields_list : array();
       $list_form_rel = array();
       foreach ($qfields_list as $mc_question) {
         if ( ($_POST[base64_encode($mc_question)] != '-1') ) {
@@ -435,7 +512,7 @@ class EE_MCI_Controller {
           $q_found = false;
           // Update already present Q fields.
           foreach ($qf_exists as $question_field) {
-            $mc_field = $question_field->mc_field();
+			  $mc_field = $question_field instanceof EE_Question_Mailchimp_Field ? $question_field->mc_field() : '';
             if ( $mc_field == $mc_question ) {
               EEM_Question_Mailchimp_Field::instance()->update(
                 array('QST_ID' => $ev_question),
@@ -469,25 +546,22 @@ class EE_MCI_Controller {
 	 * Display the MailChimp user Lists for given event.
 	 *
 	 * @access public
+	 * @param int $list_id
 	 * @return void
 	 */
-   public function mci_list_mailchimp_lists() {
+   public function mci_list_mailchimp_lists( $list_id = 0 ) {
       do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
 	   ?>
 	   <label for="ee-mailchimp-lists"><?php _e( 'Please select a List:', 'event_espresso' );?></label><br />
 	   <?php
       $mc_lists = $this->mci_get_users_lists();
+	   array_push( $mc_lists, array( 'id' => '-1', 'name' => __( 'Do not send to MailChimp', 'event_espresso' )));
 	   if ( ! empty( $mc_lists )) {
       ?>
       <select id="ee-mailchimp-lists" name="ee_mailchimp_lists" class="ee_mailchimp_dropdowns">
-         <option value="-1" <?php echo ( $this->list_id === -1 ) ? 'selected' : ''; ?>><?php _e( 'Do not send to MailChimp', 'event_espresso' );?></option>
-         <?php
-            foreach ( $mc_lists as $list_no => $list ) {
-               ?>
-               <option value="<?php echo $list['id']; ?>" <?php echo ( $this->list_id === $list['id'] ) ? 'selected' : ''; ?>><?php echo $list['name']; ?></option>
-               <?php
-            }
-         ?>
+         <?php foreach ( $mc_lists as $list ) { ?>
+               <option value="<?php echo $list['id']; ?>" <?php echo ( $list_id == $list['id'] ) ? 'selected="selected"' : ''; ?>><?php echo $list['name']; ?></option>
+         <?php } ?>
       </select>
       <?php
 	   } else {
@@ -497,22 +571,21 @@ class EE_MCI_Controller {
 	   }
    }
 
-   /**
-    * Display MailChimp interest Groupings for the given event (depending on the selected List).
-    *
-    * @access public
-    * @param int $event_id  The ID of the Event.
-    * @return void
-    */
-   public function mci_list_mailchimp_groups( $event_id ) {
+
+
+	/**
+	 * Display MailChimp interest Groupings for the given event (depending on the selected List).
+	 *
+	 * @access public
+	 * @param int $event_id The ID of the Event.
+	 * @param int $list_id
+	 * @return void
+	 */
+   public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
       do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
       // Get saved group for this event (if there's one)
 	   $event_list_group = $this->mci_event_list_group( $event_id );
-	   d( $event_list_group );
-	   $event_list_group = $this->mci_event_subscriptions_OLD( $event_id, 'groups' );
-	   d( $event_list_group );
-	   $user_groups = $this->mci_get_users_groups( $this->list_id );
-//	   d( $user_groups );
+	   $user_groups = $this->mci_get_users_groups( $list_id );
 
 	   ?>
       <form id="ee-mailchimp-groups-list" method="post">
@@ -566,10 +639,13 @@ class EE_MCI_Controller {
         ?>
         <div id="espresso-mci-list-merge-fields">
           <table class="espresso_mci_merge_fields_tb">
-            <tr class="ee_mailchimp_field_heads">
-              <th><b><?php _e( 'List Fields', 'event_espresso' );?></b></th>
-              <th><b><?php _e( 'Form Fields', 'event_espresso' );?></b></th>
-            </tr>
+			  <thead>
+				<tr class="ee_mailchimp_field_heads">
+				  <th><b><?php _e( 'List Fields', 'event_espresso' );?></b></th>
+				  <th><b><?php _e( 'Form Fields', 'event_espresso' );?></b></th>
+				</tr>
+			  </thead>
+			  <tbody>
             <?php
             foreach ($list_fields as $l_field) {
               $starred = '*';
@@ -587,10 +663,14 @@ class EE_MCI_Controller {
                       <option value="<?php echo $q_field['QST_ID']; ?>"
                         <?php
                           // Default to main fields if exist:
-                          echo ( (@$selected_fields[$l_field['tag']] == $q_field['QST_ID'])
-                            || (($q_field['QST_ID'] == 'email') && ($l_field['tag'] == 'EMAIL') && ! array_key_exists('EMAIL', $selected_fields))
-                            || (($q_field['QST_ID'] == 'lname') && ($l_field['tag'] == 'LNAME') && ! array_key_exists('LNAME', $selected_fields))
-                            || (($q_field['QST_ID'] == 'fname') && ($l_field['tag'] == 'FNAME') && ! array_key_exists('FNAME', $selected_fields)) ) ? 'selected' : '';
+                          if (
+							  	( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] ) && $selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] )
+                            	|| ( $q_field['QST_ID'] == 'email' && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
+                            	|| ( $q_field['QST_ID'] == 'lname' && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
+                            	|| ( $q_field['QST_ID'] == 'fname' && $l_field['tag'] == 'FNAME' && ! array_key_exists( 'FNAME', $selected_fields ))
+						  ) {
+							  echo 'selected';
+						  }
                         ?>>
                         <?php echo $q_field['QST_Name']; ?>
                       </option>
@@ -602,6 +682,7 @@ class EE_MCI_Controller {
               $hide_fields[] = $l_field['tag'];
             }
             ?>
+			  </tbody>
           </table>
           <input type="hidden" name="ee_mailchimp_qfields" value="<?php echo base64_encode(serialize($hide_fields)); ?>" />
         </div>
@@ -640,9 +721,11 @@ class EE_MCI_Controller {
       $question_groups = $this->mci_get_event_question_groups($event_id);
       if ( is_array($question_groups) && ! empty($question_groups) ) {
         foreach ($question_groups as $QG_list) {
-          foreach ($QG_list->questions() as $q_list) {
-            $questions[] = array( 'QST_Name' => $q_list->get('QST_display_text'), 'QST_ID' => ( $q_list->get('QST_system') != '' ) ? $q_list->get('QST_system') : $q_list->get('QST_ID') );
-          }
+			if ( $QG_list instanceof EE_Question_Group ) {
+				foreach ( $QG_list->questions() as $q_list ) {
+					$questions[] = array( 'QST_Name' => $q_list->get('QST_display_text'), 'QST_ID' => ( $q_list->get('QST_system') != '' ) ? $q_list->get('QST_system') : $q_list->get('QST_ID') );
+				}
+			}
         }
         return $questions;
       } else {
@@ -661,7 +744,8 @@ class EE_MCI_Controller {
     */
    public function mci_event_list( $EVT_ID ) {
 	   EE_Registry::instance()->load_model( 'Event_Mailchimp_List_Group' );
-	   $event_list = EEM_Event_Mailchimp_List_Group::instance()->get_one_by_ID( $EVT_ID );
+	   $event_list = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array( 'EVT_ID' => $EVT_ID ), 'limit' => 1 ));
+	   $event_list = current( $event_list );
 	   return $event_list instanceof EE_Event_Mailchimp_List_Group ? $event_list->mc_list() : NULL;
    }
 
@@ -675,13 +759,10 @@ class EE_MCI_Controller {
     * @return EE_Event_Mailchimp_List_Group[]
     */
    public function mci_event_list_group( $EVT_ID ) {
-	   echo '<h5 style="color:#2EA2CC;">$EVT_ID : <span style="color:#E76700">' . $EVT_ID . '</span><br/><span style="font-size:9px;font-weight:normal;color:#666">' . __FILE__ . '</span>    <b style="font-size:10px;color:#333">  ' . __LINE__ . ' </b></h5>';
 	   EE_Registry::instance()->load_model( 'Event_Mailchimp_List_Group' );
 	   $mc_list_groups = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array('EVT_ID' => $EVT_ID) ) );
-	   d( $mc_list_groups );
 	   $event_list_groups = array();
 	   foreach ( $mc_list_groups as $mc_list_group ) {
-		   d( $mc_list_group );
 		   if ( $mc_list_group instanceof EE_Event_Mailchimp_List_Group ) {
 			   $event_list_groups[] = $mc_list_group->mc_group();
 		   }
@@ -696,7 +777,7 @@ class EE_MCI_Controller {
     *
     * @access public
     * @param int $EVT_ID  The ID of the Event.
-    * @return EE_Event_Mailchimp_List_Group[]
+    * @return array
     */
    public function mci_event_list_question_fields( $EVT_ID ) {
 	   EE_Registry::instance()->load_model( 'Question_Mailchimp_Field' );
@@ -739,18 +820,25 @@ class EE_MCI_Controller {
 	 * @return array/string  Id of a group/list or an array of 'List fields - Event questions' relationships, or all in an array.
 	 */
 	public function mci_event_subscriptions_OLD( $evt_id, $target = NULL ) {
-		$mc_list_group = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
-		$mc_question_field = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
 		$evt_list = EEM_Event_Mailchimp_List_Group::instance()->get_one( array( array('EVT_ID' => $evt_id) ) );
 		if ( $evt_list != null ) {
-			$evt_list = $evt_list->mc_list();
+			if ( $evt_list instanceof EE_Event_Mailchimp_List_Group ) {
+				$evt_list = $evt_list->mc_list();
+			}
 		}
-		$evt_groups = $evt_qfields = array();
+		$evt_groups = array();
+		$mc_list_group = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
 		foreach ($mc_list_group as $mc_group) {
-			$evt_groups[] = $mc_group->mc_group();
+			if ( $mc_group instanceof EE_Event_Mailchimp_List_Group ) {
+				$evt_groups[] = $mc_group->mc_group();
+			}
 		}
+		$evt_qfields = array();
+		$mc_question_field = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
 		foreach ($mc_question_field as $mc_qfield) {
-			$evt_qfields[$mc_qfield->mc_field()] = $mc_qfield->mc_event_question();
+			if ( $mc_qfield instanceof EE_Question_Mailchimp_Field ) {
+				$evt_qfields[$mc_qfield->mc_field()] = $mc_qfield->mc_event_question();
+			}
 		}
 
 		$evt_subs = array();
