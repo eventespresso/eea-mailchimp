@@ -38,8 +38,7 @@
 }
 
 #ee-mailchimp-groups dt {
-   margin-bottom: 5px;
-   color: #295d6a;
+   margin-bottom: 1em;
 }
 
 div#espresso-mci-list-merge-fields {
@@ -47,28 +46,28 @@ div#espresso-mci-list-merge-fields {
 }
 
 .espresso_mci_merge_fields_tb .nci_asterisk {
-   color: #4194aa;
+   color: #E44064;
 }
 
 table.espresso_mci_merge_fields_tb {
-   background: #fafafa;
-   margin: 0 auto;
+	width: 100%;
+   margin: 0;
+	text-align: left;
 }
-
+.espresso_mci_merge_fields_tb thead {
+	border-bottom: 1px solid #ccc;
+}
+.espresso_mci_merge_fields_tb th,
 .espresso_mci_merge_fields_tb td {
-   padding: 2px 5px 0 5px;
+   padding: 2px 5px 5px;
 }
-
-.espresso_mci_merge_fields_tb th {
-   border-bottom: 1px solid #b9e3ee;
-   padding: 5px 10px 5px 10px;
-   color: #295d6a;
+.espresso_mci_merge_fields_tb .ee_mci_list_fields {
+   margin: 0;
 }
-
-.espresso_mci_merge_fields_tb p.ee_mci_list_fields {
-   margin-right: 10px;
+.espresso_mci_merge_fields_tb .ee_event_fields_selects {
+   margin: 0;
 }
 
 #espresso-mci-list-merge-fields {
-   max-width: 280px;
+   max-width: 275px;
 }
