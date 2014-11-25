@@ -35,7 +35,7 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
      *
      * @access public
      * @return EEM_Question_Mailchimp_Field instance
-     */ 
+     */
     public static function instance() {
         // Check if instance of EEM_Question_Mailchimp_Field already exists.
         if ( self::$_instance === NULL ) {
@@ -65,7 +65,17 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
         );
         parent::__construct();
     }
-        
+
+
+    /**
+     * resets the model and returns it
+     * @return EEM_Question_Mailchimp_Field
+     */
+    public static function reset(){
+        self::$_instance = NULL;
+        return self::instance();
+    }
+
 }
 
 ?>
