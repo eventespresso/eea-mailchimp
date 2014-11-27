@@ -77,7 +77,7 @@ class EE_MCI_Controller {
 	   require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
 	   $this->MailChimp = new \Drewm\MailChimp( $this->_api_key );
 	   $reply = $this->MailChimp->call( 'lists/list', array( 'apikey' => $this->_api_key ) );
-	   $this->mci_is_api_key_valid( $reply );
+	   $this->mci_is_api_key_valid( $this->_api_key, $reply );
    }
 
 
@@ -192,8 +192,8 @@ class EE_MCI_Controller {
 					}
 				}
 			}
-         }
-      }
+    }
+   }
 
 
 
@@ -355,7 +355,7 @@ class EE_MCI_Controller {
       if ( $list_id == NULL )
          $list_id = $this->list_id;
       $reply = $this->MailChimp->call('lists/interest-groupings', array('apikey' => $this->_api_key, 'id' => $list_id));
-      if ( $reply != FALSE && ! empty( $reply ) && isset( $reply['status'] ) && $reply['status'] != 'error' ) {
+      if ( $reply != FALSE && ! empty( $reply ) && ( ! isset($reply['status']) || $reply['status'] != 'error') ) {
          return $reply;
       } else {
          return array();
@@ -500,9 +500,9 @@ class EE_MCI_Controller {
 
       $qf_exists = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $event_id) ) );
       // Question Fields
-	$qfields_list = base64_decode( $_POST['ee_mailchimp_qfields'] );
-	$qfields_list = maybe_unserialize( $qfields_list );
-	$qfields_list = is_array( $qfields_list ) ? $qfields_list : array();
+    	$qfields_list = base64_decode( $_POST['ee_mailchimp_qfields'] );
+    	$qfields_list = maybe_unserialize( $qfields_list );
+    	$qfields_list = is_array( $qfields_list ) ? $qfields_list : array();
       $list_form_rel = array();
       foreach ($qfields_list as $mc_question) {
         if ( ($_POST[base64_encode($mc_question)] != '-1') ) {
@@ -512,7 +512,7 @@ class EE_MCI_Controller {
           $q_found = false;
           // Update already present Q fields.
           foreach ($qf_exists as $question_field) {
-			  $mc_field = $question_field instanceof EE_Question_Mailchimp_Field ? $question_field->mc_field() : '';
+            $mc_field = $question_field instanceof EE_Question_Mailchimp_Field ? $question_field->mc_field() : '';
             if ( $mc_field == $mc_question ) {
               EEM_Question_Mailchimp_Field::instance()->update(
                 array('QST_ID' => $ev_question),
