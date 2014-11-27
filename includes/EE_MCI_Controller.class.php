@@ -248,16 +248,50 @@ class EE_MCI_Controller {
 
 
 	/**
-	 * _get_question_answers_for_registration
-	 * returns an array of
+	 * _get_attendee_details_for_registration
 	 *
 	 * @access public
 	 * @param EE_Registration $registration
 	 * @return array
 	 */
-	protected function _get_question_answers_for_registration( EE_Registration $registration ) {
+	protected function _get_attendee_details_for_registration( EE_Registration $registration ) {
 		// empty array to add stuff to
 		$question_answers = array();
+		if ( $registration instanceof EE_Registration ) {
+			$attendee = $registration->attendee();
+			if ( $attendee instanceof EE_Attendee ) {
+				EE_Registry::instance()->load_model( 'Attendee' );
+				$attendee_properties = array(
+					EEM_Attendee::fname_question_id 			=> 'ATT_fname',
+					EEM_Attendee::lname_question_id 			=> 'ATT_lname',
+					EEM_Attendee::email_question_id 			=> 'ATT_email',
+					EEM_Attendee::address_question_id 		=> 'ATT_address',
+					EEM_Attendee::address2_question_id 	=> 'ATT_address2',
+					EEM_Attendee::city_question_id 				=> 'STA_ID',
+					EEM_Attendee::state_question_id 			=> 'CNT_ISO',
+					EEM_Attendee::country_question_id 		=> 'ATT_zip',
+					EEM_Attendee::zip_question_id 				=> 'ATT_email',
+					EEM_Attendee::phone_question_id 			=> 'ATT_phone'
+				);
+				foreach ( $attendee_properties as $QST_ID => $attendee_property ) {
+					$question_answers[ $QST_ID ] = $attendee->get( $attendee_property );
+				}
+			}
+		}
+		return $question_answers;
+	}
+
+
+
+	/**
+	 * _get_question_answers_for_registration
+	 *
+	 * @access public
+	 * @param EE_Registration $registration
+	 * @param array           $question_answers
+	 * @return array
+	 */
+	protected function _get_question_answers_for_registration( EE_Registration $registration, $question_answers = array() ) {
 		if ( $registration instanceof EE_Registration ) {
 			// grab the registrant's answers
 			$registration_answers = $registration->answers();
@@ -301,8 +335,10 @@ class EE_MCI_Controller {
 		}
 		// get MailChimp question fields
 		$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
+		// get the registrant's attendee details
+		$question_answers = $this->_get_attendee_details_for_registration( $registration );
 		// get the registrant's question answers
-		$question_answers = $this->_get_question_answers_for_registration( $registration );
+		$question_answers = $this->_get_question_answers_for_registration( $registration, $question_answers );
 		foreach ( $question_fields as $mc_list_field => $question_ID ) {
 			if ( isset( $question_answers[ $question_ID ] )) {
 				// If question field is a State then get the state name not the code.
