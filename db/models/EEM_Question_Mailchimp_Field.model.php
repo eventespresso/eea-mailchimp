@@ -36,7 +36,7 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
      * @access public
      * @return EEM_Question_Mailchimp_Field instance
      */
-    public static function instance() {
+    public static function instance( $timezone = NULL ) {
         // Check if instance of EEM_Question_Mailchimp_Field already exists.
         if ( self::$_instance === NULL ) {
             // Instantiate Espresso_model.
@@ -69,9 +69,10 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
 
     /**
      * resets the model and returns it
+     * 
      * @return EEM_Question_Mailchimp_Field
      */
-    public static function reset(){
+    public static function reset( $timezone = NULL ) {
         self::$_instance = NULL;
         return self::instance();
     }
