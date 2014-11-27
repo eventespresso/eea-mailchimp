@@ -140,7 +140,7 @@ class EED_Mailchimp extends EED_Module {
 	 */
 	public static function espresso_mailchimp_submit_to_mc( $spc_obj, $valid_data ) {
 		$mc_config = EED_Mailchimp::instance()->config();
-		if ( $mc_config->api_settings->mc_active == TRUE ) {
+		if ( $mc_config->api_settings->mc_active ) {
 			$mci_controller = new EE_MCI_Controller();
 			$mci_controller->mci_submit_to_mailchimp( $spc_obj, $valid_data );
 		}
@@ -174,8 +174,9 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function espresso_mailchimp_list_metabox( $post_type ) {
+		$mc_config = EED_Mailchimp::instance()->config();
 		// Is MC integration active and is espresso event page.
-		if ( $post_type == 'espresso_events' ) {
+		if ( $post_type == 'espresso_events' && $mc_config->api_settings->mc_active ) {
 			add_meta_box( 'espresso_mailchimp_list', __( 'MailChimp List', 'event_espresso' ), array( 'EED_Mailchimp', 'espresso_mailchimp_render_box_content' ), $post_type, 'side', 'default' );
 		}
 	}
