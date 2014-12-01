@@ -330,10 +330,13 @@ class EE_MCI_Controller {
 	 * @return array
 	 */
 	protected function _add_registration_question_answers_to_subscribe_args( EE_Registration $registration, $EVT_ID = 0,  $subscribe_args = array() ) {
-		if ( ! isset( $subscribe_args['merge_vars'] )) {
+		if ( ! is_array( $subscribe_args )) {
 			throw new EE_Error( __( 'The MailChimp Subscriber arguments array is malformed!','event_espresso' ));
 		}
-		// get MailChimp question fields
+		if ( ! isset( $subscribe_args['merge_vars'] )) {
+			$subscribe_args['merge_vars'] = array();
+		}
+			// get MailChimp question fields
 		$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
 		// get the registrant's attendee details
 		$question_answers = $this->_get_attendee_details_for_registration( $registration );
