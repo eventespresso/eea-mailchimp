@@ -59,6 +59,13 @@ class EE_MCI_Controller {
 	*/
    private $list_id = 0;
 
+	/**
+	 * The List of question IDs.
+	 * @access private
+	 * @var array $_question_list_id
+	 */
+	private $_question_list_id = array();
+
 
 
 	/**
@@ -68,16 +75,28 @@ class EE_MCI_Controller {
 	 * @return EE_MCI_Controller
 	 */
    function __construct( $api_key = '' ) {
-	   do_action( 'AHEE__EE_MCI_Controller__class_constructor__init_controller' );
-	   $this->_config = EED_Mailchimp::instance()->config();
-	   // verify api key
-	   $api_key = ! empty( $api_key ) ? $api_key : $this->_config->api_settings->api_key;
-	   $this->_api_key = $this->mci_is_api_key_valid( $api_key );
-	   // create
-	   require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
-	   $this->MailChimp = new \Drewm\MailChimp( $this->_api_key );
-	   $reply = $this->MailChimp->call( 'lists/list', array( 'apikey' => $this->_api_key ) );
-	   $this->mci_is_api_key_valid( $this->_api_key, $reply );
+		do_action( 'AHEE__EE_MCI_Controller__class_constructor__init_controller' );
+		$this->_config = EED_Mailchimp::instance()->config();
+		$this->_question_list_id = array(
+			1 => 'fname',
+			2 => 'lname',
+			3 => 'email',
+			4 => 'address',
+			5 => 'address2',
+			6 => 'city',
+			7 => 'state',
+			8 => 'country',
+			9 => 'zip',
+			10 => 'phone'
+		);
+		// verify api key
+		$api_key = ! empty( $api_key ) ? $api_key : $this->_config->api_settings->api_key;
+		$this->_api_key = $this->mci_is_api_key_valid( $api_key );
+		// create
+		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
+		$this->MailChimp = new \Drewm\MailChimp( $this->_api_key );
+		$reply = $this->MailChimp->call( 'lists/list', array( 'apikey' => $this->_api_key ) );
+		$this->mci_is_api_key_valid( $this->_api_key, $reply );
    }
 
 
@@ -192,7 +211,7 @@ class EE_MCI_Controller {
 					}
 				}
 			}
-    }
+        }
    }
 
 
@@ -262,16 +281,16 @@ class EE_MCI_Controller {
 			if ( $attendee instanceof EE_Attendee ) {
 				EE_Registry::instance()->load_model( 'Attendee' );
 				$attendee_properties = array(
-					EEM_Attendee::fname_question_id 			=> 'ATT_fname',
-					EEM_Attendee::lname_question_id 			=> 'ATT_lname',
-					EEM_Attendee::email_question_id 			=> 'ATT_email',
-					EEM_Attendee::address_question_id 		=> 'ATT_address',
-					EEM_Attendee::address2_question_id 	=> 'ATT_address2',
-					EEM_Attendee::city_question_id 				=> 'STA_ID',
-					EEM_Attendee::state_question_id 			=> 'CNT_ISO',
-					EEM_Attendee::country_question_id 		=> 'ATT_zip',
-					EEM_Attendee::zip_question_id 				=> 'ATT_email',
-					EEM_Attendee::phone_question_id 			=> 'ATT_phone'
+					EEM_Attendee::fname_question_id       => 'ATT_fname',
+					EEM_Attendee::lname_question_id       => 'ATT_lname',
+					EEM_Attendee::email_question_id       => 'ATT_email',
+					EEM_Attendee::address_question_id     => 'ATT_address',
+					EEM_Attendee::address2_question_id    => 'ATT_address2',
+					EEM_Attendee::city_question_id        => 'STA_ID',
+					EEM_Attendee::state_question_id       => 'CNT_ISO',
+					EEM_Attendee::country_question_id     => 'ATT_zip',
+					EEM_Attendee::zip_question_id         => 'ATT_email',
+					EEM_Attendee::phone_question_id       => 'ATT_phone'
 				);
 				foreach ( $attendee_properties as $QST_ID => $attendee_property ) {
 					$question_answers[ $QST_ID ] = $attendee->get( $attendee_property );
@@ -340,19 +359,21 @@ class EE_MCI_Controller {
 		// get the registrant's question answers
 		$question_answers = $this->_get_question_answers_for_registration( $registration, $question_answers );
 		foreach ( $question_fields as $mc_list_field => $question_ID ) {
-			if ( isset( $question_answers[ $question_ID ] )) {
+			// Older version used names for an IDs (now using int).
+			$q_id = ( is_numeric($question_ID) )? $question_ID : array_search($question_ID, $this->_question_list_id);
+			if ( isset( $question_answers[ $q_id ] )) {
 				// If question field is a State then get the state name not the code.
-				if ( $question_ID === 'state' ) {
-					$state = EEM_State::instance()->get_one_by_ID( $question_answers[ $question_ID ] );
+				if ( $q_id === 7 ) {	// If a state.
+					$state = EEM_State::instance()->get_one_by_ID( $question_answers[ $q_id ] );
 					$subscribe_args['merge_vars'][ $mc_list_field ] = $state->name();
-				} else if ( is_array( $question_answers[ $question_ID ] )) {
+				} else if ( is_array( $question_answers[ $q_id ] )) {
 					$selected = '';
-					foreach ( $question_answers[ $question_ID ] as $q_key => $q_value ) {
+					foreach ( $question_answers[ $q_id ] as $q_key => $q_value ) {
 						$selected .= $selected == '' ? $q_value : ', ' . $q_value;
 					}
 					$subscribe_args['merge_vars'][$mc_list_field] = $selected;
 				} else {
-					$subscribe_args['merge_vars'][$mc_list_field] = $question_answers[ $question_ID ];
+					$subscribe_args['merge_vars'][$mc_list_field] = $question_answers[ $q_id ];
 				}
 			}
 		}
@@ -700,10 +721,10 @@ class EE_MCI_Controller {
                         <?php
                           // Default to main fields if exist:
                           if (
-							  	( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] ) && $selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] )
-                            	|| ( $q_field['QST_ID'] == 'email' && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
-                            	|| ( $q_field['QST_ID'] == 'lname' && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
-                            	|| ( $q_field['QST_ID'] == 'fname' && $l_field['tag'] == 'FNAME' && ! array_key_exists( 'FNAME', $selected_fields ))
+								( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] ) && ($selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || $selected_fields[ $l_field['tag'] ] == $this->_question_list_id[$q_field['QST_ID']]) )
+								|| ( ($q_field['QST_ID'] == 3 || $q_field['QST_ID'] == 'email') && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
+								|| ( ($q_field['QST_ID'] == 2 || $q_field['QST_ID'] == 'lname') && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
+								|| ( ($q_field['QST_ID'] == 1 || $q_field['QST_ID'] == 'fname') && $l_field['tag'] == 'FNAME' && ! array_key_exists( 'FNAME', $selected_fields ))
 						  ) {
 							  echo 'selected';
 						  }
@@ -759,11 +780,14 @@ class EE_MCI_Controller {
         foreach ($question_groups as $QG_list) {
 			if ( $QG_list instanceof EE_Question_Group ) {
 				foreach ( $QG_list->questions() as $q_list ) {
-					$questions[] = array( 'QST_Name' => $q_list->get('QST_display_text'), 'QST_ID' => ( $q_list->get('QST_system') != '' ) ? $q_list->get('QST_system') : $q_list->get('QST_ID') );
+					$questions[] = array( 
+						'QST_Name' => $q_list->get('QST_display_text'),
+						'QST_ID' => $q_list->get('QST_ID')
+					);
 				}
 			}
-        }
-        return $questions;
+		}
+		return $questions;
       } else {
         return array();
       }
