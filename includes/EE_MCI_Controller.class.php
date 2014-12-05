@@ -134,9 +134,10 @@ class EE_MCI_Controller {
 				$registrations = $spco_obj->checkout->transaction->registrations( $spco_obj->checkout->reg_cache_where_params, TRUE );
 			}
 		} else if ( $spco_obj instanceof EED_Single_Page_Checkout ) {
+			$transaction = EE_Registry::instance()->SSN->get_session_data( 'transaction' );
 			// for EE versions < 4.6
-			if ( $spco_obj->transaction() instanceof EE_Transaction ) {
-				$registrations = $spco_obj->transaction()->registrations( array(), TRUE );
+			if ( $transaction instanceof EE_Transaction ) {
+				$registrations = $transaction->registrations( array(), TRUE );
 			}
 		}
 		return $registrations;
