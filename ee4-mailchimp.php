@@ -1,6 +1,6 @@
 <?php
 /*
-  Plugin Name: Event Espresso - MailChimp (EE4.3+)
+  Plugin Name: Event Espresso - MailChimp (EE4.4.5+)
   Plugin URI: http://www.eventespresso.com/
   Description: A MailChimp addon for Event Espresso.
 

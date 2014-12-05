@@ -47,7 +47,7 @@ class EE_MailChimp extends EE_Addon {
 			array(
 				'version' 					=> ESPRESSO_MAILCHIMP_VERSION,
 				'class_name' 			=> 'EE_MailChimp',
-				'min_core_version' => '4.3.0',
+				'min_core_version' => '4.4.5',
 				'main_file_path' 		=> ESPRESSO_MAILCHIMP_MAIN_FILE,
 				'admin_path' 			=> ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS,
 				'admin_callback' 	=> 'additional_mailchimp_admin_hooks',
