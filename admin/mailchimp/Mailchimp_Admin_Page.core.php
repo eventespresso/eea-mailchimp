@@ -134,9 +134,9 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 	 */
 	protected function _update_mailchimp() {
 		$query_args = array( 'action' => 'default' );
+		/** @type EE_Mailchimp_Config $config */
+		$config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
 		if ( isset( $_POST['mailchimp_api_key'] ) && ! empty( $_POST['mailchimp_api_key'] )) {
-			/** @type EE_Mailchimp_Config $config */
-			$config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
 			$mailchimp_api_key = sanitize_text_field( $_POST['mailchimp_api_key'] );
 			$mci_controller = new EE_MCI_Controller( $mailchimp_api_key );
 			// Validate the MailChimp API Key
@@ -162,6 +162,9 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 			$error_msg = __( 'Please enter a MailChimp API key.', 'event_espresso' );
 			EE_Error::add_error( $error_msg, __FILE__, __FUNCTION__, __LINE__ );
 			$query_args['mcapi_error'] = $error_msg;
+			$config->api_settings->mc_active = FALSE;
+			$config->api_settings->api_key = '';
+			EE_Config::instance()->update_config( 'addons', 'Mailchimp', $config );
 		}
 		if ( isset( $query_args['mcapi_error'] )) {
 			$query_args['mcapi_error'] = urlencode( $query_args['mcapi_error'] );
