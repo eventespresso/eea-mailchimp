@@ -140,7 +140,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 			$mailchimp_api_key = sanitize_text_field( $_POST['mailchimp_api_key'] );
 			$mci_controller = new EE_MCI_Controller( $mailchimp_api_key );
 			// Validate the MailChimp API Key
-			$key_valid = $mci_controller->mci_is_api_key_valid( $mailchimp_api_key );
+			$key_valid = $mci_controller->mci_get_api_key();
 			if ( $key_valid ) {
 				$key_valid = TRUE;
 				$config->api_settings->mc_active = 1;

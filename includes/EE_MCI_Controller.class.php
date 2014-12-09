@@ -96,7 +96,7 @@ class EE_MCI_Controller {
 		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
 		$this->MailChimp = new \Drewm\MailChimp( $this->_api_key );
 		$reply = $this->MailChimp->call( 'lists/list', array( 'apikey' => $this->_api_key ) );
-		$this->mci_is_api_key_valid( $this->_api_key, $reply );
+		$this->_api_key = $this->mci_is_api_key_valid( $this->_api_key, $reply );
 	}
 
 
@@ -947,7 +947,15 @@ class EE_MCI_Controller {
 		}
 		$this->mcapi_error = apply_filters('FHEE__EE_MCI_Controller__mci_throw_error__mcapi_error', $error);
 	}
+	
 
+	/**
+	 * mci_get_api_key
+	 * @return string/bool  MC API Key if present/valid
+	 */
+	public function mci_get_api_key() {
+		return $this->_api_key;
+	}
 
 
 	/**
