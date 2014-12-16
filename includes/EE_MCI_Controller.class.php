@@ -78,16 +78,16 @@ class EE_MCI_Controller {
 		do_action( 'AHEE__EE_MCI_Controller__class_constructor__init_controller' );
 		$this->_config = EED_Mailchimp::instance()->config();
 		$this->_question_list_id = array(
-			1 => 'fname',
-			2 => 'lname',
-			3 => 'email',
-			4 => 'address',
-			5 => 'address2',
-			6 => 'city',
-			7 => 'state',
-			8 => 'country',
-			9 => 'zip',
-			10 => 'phone'
+			EEM_Attendee::fname_question_id       => 'fname',
+			EEM_Attendee::lname_question_id       => 'lname',
+			EEM_Attendee::email_question_id       => 'email',
+			EEM_Attendee::address_question_id     => 'address',
+			EEM_Attendee::address2_question_id    => 'address2',
+			EEM_Attendee::city_question_id        => 'city',
+			EEM_Attendee::state_question_id       => 'state',
+			EEM_Attendee::country_question_id     => 'country',
+			EEM_Attendee::zip_question_id         => 'zip',
+			EEM_Attendee::phone_question_id       => 'phone'
 		);
 		// verify api key
 		$api_key = ! empty( $api_key ) ? $api_key : $this->_config->api_settings->api_key;
@@ -286,10 +286,10 @@ class EE_MCI_Controller {
 					EEM_Attendee::email_question_id       => 'ATT_email',
 					EEM_Attendee::address_question_id     => 'ATT_address',
 					EEM_Attendee::address2_question_id    => 'ATT_address2',
-					EEM_Attendee::city_question_id        => 'STA_ID',
-					EEM_Attendee::state_question_id       => 'CNT_ISO',
-					EEM_Attendee::country_question_id     => 'ATT_zip',
-					EEM_Attendee::zip_question_id         => 'ATT_email',
+					EEM_Attendee::city_question_id        => 'ATT_city',
+					EEM_Attendee::state_question_id       => 'STA_ID',
+					EEM_Attendee::country_question_id     => 'CNT_ISO',
+					EEM_Attendee::zip_question_id         => 'ATT_zip',
 					EEM_Attendee::phone_question_id       => 'ATT_phone'
 				);
 				foreach ( $attendee_properties as $QST_ID => $attendee_property ) {
@@ -314,7 +314,7 @@ class EE_MCI_Controller {
 		if ( $registration instanceof EE_Registration ) {
 			// grab the registrant's answers
 			$registration_answers = $registration->answers();
-			if ( ! empty( $registration_answers )) {
+			if ( ! empty( $registration_answers ) ) {
 				foreach ( $registration_answers as $registration_answer ) {
 					if ( $registration_answer instanceof EE_Answer ) {
 						// get the related question for the answer
@@ -349,24 +349,25 @@ class EE_MCI_Controller {
 	 * @return array
 	 */
 	protected function _add_registration_question_answers_to_subscribe_args( EE_Registration $registration, $EVT_ID = 0,  $subscribe_args = array() ) {
-		if ( ! is_array( $subscribe_args )) {
+		if ( ! is_array( $subscribe_args ) ) {
 			throw new EE_Error( __( 'The MailChimp Subscriber arguments array is malformed!','event_espresso' ));
 		}
-		if ( ! isset( $subscribe_args['merge_vars'] )) {
+		if ( ! isset( $subscribe_args['merge_vars'] ) ) {
 			$subscribe_args['merge_vars'] = array();
 		}
-			// get MailChimp question fields
+		// get MailChimp question fields
 		$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
 		// get the registrant's attendee details
 		$question_answers = $this->_get_attendee_details_for_registration( $registration );
 		// get the registrant's question answers
 		$question_answers = $this->_get_question_answers_for_registration( $registration, $question_answers );
+
 		foreach ( $question_fields as $mc_list_field => $question_ID ) {
 			// Older version used names for an IDs (now using int).
 			$q_id = ( is_numeric($question_ID) )? $question_ID : array_search($question_ID, $this->_question_list_id);
-			if ( isset( $question_answers[ $q_id ] )) {
+			if ( isset($question_answers[ $q_id ]) ) {
 				// If question field is a State then get the state name not the code.
-				if ( $q_id === 7 ) {	// If a state.
+				if ( $q_id == 7 ) {	// If a state.
 					$state = EEM_State::instance()->get_one_by_ID( $question_answers[ $q_id ] );
 					$subscribe_args['merge_vars'][ $mc_list_field ] = $state->name();
 				} else if ( is_array( $question_answers[ $q_id ] )) {
