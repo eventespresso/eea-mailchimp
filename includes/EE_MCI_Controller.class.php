@@ -174,20 +174,22 @@ class EE_MCI_Controller {
 		// Do not submit if the key is not valid or there is no valid submit data.
 		if ( $this->MailChimp instanceof \Drewm\MailChimp && ! empty( $spc_obj )) {
 			$registrations = $this->_mci_get_registrations( $spc_obj );
+			$registered_attendees = array();
 			// now loop thru registrations to get the related attendee objects
 			if ( ! empty( $registrations )) {
 				foreach ( $registrations as $registration ) {
 					if ( $registration instanceof EE_Registration ) {
 						$attendee = $registration->attendee();
-						if ( $attendee instanceof EE_Attendee ) {
+						$att_email = $attendee->email();
+						if ( ( $attendee instanceof EE_Attendee ) && !in_array($att_email, $registered_attendees) ) {
 							$EVT_ID = $registration->event_ID();
 							$event_list = $this->mci_event_list( $EVT_ID );
 							// If no list selected for this event than skip the subscription.
 							if ( ! empty( $event_list )) {
 								$subscribe_args = array(
-									'apikey' 				=> $this->_api_key,
-									'id' 						=> $event_list,
-									'email' 				=> array( 'email' => $attendee->email() ),
+									'apikey' 		=> $this->_api_key,
+									'id' 			=> $event_list,
+									'email' 		=> array( 'email' => $att_email ),
 									'double_optin' 	=> isset( $this->_config->api_settings->skip_double_optin ) ? $this->_config->api_settings->skip_double_optin : TRUE
 								);
 								// Group vars
@@ -198,6 +200,7 @@ class EE_MCI_Controller {
 								$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args );
 								// Subscribe attendee
 								$reply = $this->MailChimp->call( 'lists/subscribe', $subscribe_args );
+								$registered_attendees[] = $att_email;
 								// If there was an error during subscription than process it.
 								if ( isset( $reply['status'] ) && $reply['status'] == 'error' ) {
 									$this->mci_throw_error( $reply );
@@ -361,11 +364,10 @@ class EE_MCI_Controller {
 		$question_answers = $this->_get_attendee_details_for_registration( $registration );
 		// get the registrant's question answers
 		$question_answers = $this->_get_question_answers_for_registration( $registration, $question_answers );
-
 		foreach ( $question_fields as $mc_list_field => $question_ID ) {
 			// Older version used names for an IDs (now using int).
 			$q_id = ( is_numeric($question_ID) )? $question_ID : array_search($question_ID, $this->_question_list_id);
-			if ( isset($question_answers[ $q_id ]) ) {
+			if ( isset($question_answers[ $q_id ]) && !empty($question_answers[ $q_id ]) ) {
 				// If question field is a State then get the state name not the code.
 				if ( $q_id == 7 ) {	// If a state.
 					$state = EEM_State::instance()->get_one_by_ID( $question_answers[ $q_id ] );
