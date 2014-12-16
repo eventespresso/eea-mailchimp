@@ -559,42 +559,44 @@ class EE_MCI_Controller {
 
 		$qf_exists = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $event_id) ) );
 		// Question Fields
-		$qfields_list = base64_decode( $_POST['ee_mailchimp_qfields'] );
-		$qfields_list = maybe_unserialize( $qfields_list );
-		$qfields_list = is_array( $qfields_list ) ? $qfields_list : array();
-		$list_form_rel = array();
-		foreach ($qfields_list as $mc_question) {
-			if ( ($_POST[base64_encode($mc_question)] != '-1') ) {
-				$ev_question = $_POST[base64_encode($mc_question)];
-				$list_form_rel[$mc_question] = $ev_question;
+		if ( isset($_POST['ee_mailchimp_qfields']) ) {
+			$qfields_list = base64_decode( $_POST['ee_mailchimp_qfields'] );
+			$qfields_list = maybe_unserialize( $qfields_list );
+			$qfields_list = is_array( $qfields_list ) ? $qfields_list : array();
+			$list_form_rel = array();
+			foreach ($qfields_list as $mc_question) {
+				if ( ($_POST[base64_encode($mc_question)] != '-1') ) {
+					$ev_question = $_POST[base64_encode($mc_question)];
+					$list_form_rel[$mc_question] = $ev_question;
 
-				$q_found = false;
-				// Update already present Q fields.
-				foreach ($qf_exists as $question_field) {
-					$mc_field = $question_field instanceof EE_Question_Mailchimp_Field ? $question_field->mc_field() : '';
-					if ( $mc_field == $mc_question ) {
-						EEM_Question_Mailchimp_Field::instance()->update(
-							array('QST_ID' => $ev_question),
-							array( array('EVT_ID' => $event_id, 'QMC_mailchimp_field_id' => $mc_question) )
-						);
-						$q_found = true;
+					$q_found = false;
+					// Update already present Q fields.
+					foreach ($qf_exists as $question_field) {
+						$mc_field = $question_field instanceof EE_Question_Mailchimp_Field ? $question_field->mc_field() : '';
+						if ( $mc_field == $mc_question ) {
+							EEM_Question_Mailchimp_Field::instance()->update(
+								array('QST_ID' => $ev_question),
+								array( array('EVT_ID' => $event_id, 'QMC_mailchimp_field_id' => $mc_question) )
+							);
+							$q_found = true;
+						}
 					}
+					// Add Q field if was not present.
+					if ( ! $q_found ) {
+						$new_qfield = EE_Question_Mailchimp_Field::new_instance(
+							array(
+								'EVT_ID' => $event_id,
+								'QST_ID' => $ev_question,
+								'QMC_mailchimp_field_id' => $mc_question
+							)
+						);
+						$new_qfield->save();
+					}
+				} else {
+					$mcqe = EEM_Question_Mailchimp_Field::instance()->get_one( array( array('EVT_ID' => $event_id, 'QMC_mailchimp_field_id' => $mc_question) ) );
+					if ( $mcqe != null )
+						$mcqe->delete();
 				}
-				// Add Q field if was not present.
-				if ( ! $q_found ) {
-					$new_qfield = EE_Question_Mailchimp_Field::new_instance(
-						array(
-							'EVT_ID' => $event_id,
-							'QST_ID' => $ev_question,
-							'QMC_mailchimp_field_id' => $mc_question
-						)
-					);
-					$new_qfield->save();
-				}
-			} else {
-				$mcqe = EEM_Question_Mailchimp_Field::instance()->get_one( array( array('EVT_ID' => $event_id, 'QMC_mailchimp_field_id' => $mc_question) ) );
-				if ( $mcqe != null )
-					$mcqe->delete();
 			}
 		}
 	}
@@ -690,8 +692,8 @@ class EE_MCI_Controller {
 	public function mci_list_mailchimp_fields( $event_id = 0, $list_id = 0  ) {
 		$list_fields = $this->mci_get_list_merge_vars( $list_id );
 		$selected_fields = $this->mci_event_list_question_fields( $event_id );
-
 		$evt_questions = $this->mci_get_event_all_questions($event_id);
+
 		// To save the list of mailchimp Fields for the future use.
 		$hide_fields = array();
 		if ( ! empty($list_fields) ) {
@@ -723,7 +725,8 @@ class EE_MCI_Controller {
 													<?php
 													// Default to main fields if exist:
 													if (
-														( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] ) && ($selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || $selected_fields[ $l_field['tag'] ] == $this->_question_list_id[$q_field['QST_ID']]) )
+														( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] ) 
+														&& ( $selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || ( isset($this->_question_list_id[$q_field['QST_ID']]) && $selected_fields[ $l_field['tag'] ] == $this->_question_list_id[$q_field['QST_ID']] ) ) )
 														|| ( ($q_field['QST_ID'] == 3 || $q_field['QST_ID'] == 'email') && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
 														|| ( ($q_field['QST_ID'] == 2 || $q_field['QST_ID'] == 'lname') && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
 														|| ( ($q_field['QST_ID'] == 1 || $q_field['QST_ID'] == 'fname') && $l_field['tag'] == 'FNAME' && ! array_key_exists( 'FNAME', $selected_fields ))
