@@ -791,10 +791,13 @@ class EE_MCI_Controller {
 	        foreach ($question_groups as $QG_list) {
 				if ( $QG_list instanceof EE_Question_Group ) {
 					foreach ( $QG_list->questions() as $q_list ) {
-						$questions[] = array( 
+						$qst = array( 
 							'QST_Name' => $q_list->get('QST_display_text'),
 							'QST_ID' => $q_list->get('QST_ID')
 						);
+						if ( ! in_array($qst, $questions) ) {
+							$questions[] = $qst;
+						}
 					}
 				}
 			}
