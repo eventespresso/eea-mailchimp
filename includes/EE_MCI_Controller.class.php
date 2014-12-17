@@ -372,6 +372,9 @@ class EE_MCI_Controller {
 				if ( $q_id == 7 ) {	// If a state.
 					$state = EEM_State::instance()->get_one_by_ID( $question_answers[ $q_id ] );
 					$subscribe_args['merge_vars'][ $mc_list_field ] = $state->name();
+				} else if ( $q_id == 8 ) {	// If a Country (change ISO to a full name).
+					$country = $registration->attendee()->country_obj();
+					$subscribe_args['merge_vars'][ $mc_list_field ] = $country->name();
 				} else if ( is_array( $question_answers[ $q_id ] )) {
 					$selected = '';
 					foreach ( $question_answers[ $q_id ] as $q_key => $q_value ) {
