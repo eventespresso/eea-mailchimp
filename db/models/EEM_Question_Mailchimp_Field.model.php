@@ -69,9 +69,10 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
 
     /**
      * resets the model and returns it
+     * 
      * @return EEM_Question_Mailchimp_Field
      */
-    public static function reset( $timezone = NULL ){
+    public static function reset( $timezone = NULL ) {
         self::$_instance = NULL;
         return self::instance();
     }
