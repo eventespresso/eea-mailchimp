@@ -11,16 +11,16 @@ if ( '4.4.0' > EVENT_ESPRESSO_VERSION ) {
 
       public function __construct() {
          do_action('AHEE_log', __FILE__, __FUNCTION__, '');
-         define( 'EE_MAILCHIMP_SETT_LABEL', __('Mailchimp', 'event_espresso') );
-         define( 'EE_MAILCHIMP_SETT_ADMIN_URL', admin_url( 'admin.php?page=' . ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG ) );
-         define( 'EE_MAILCHIMP_SETT_TEMPLATE_PATH', ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp/templates/' );
+         define( 'EE_MAILCHIMP_LABEL', __('Mailchimp', 'event_espresso') );
+         define( 'EE_MAILCHIMP_ADMIN_URL', admin_url( 'admin.php?page=' . ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG ) );
+         define( 'EE_MAILCHIMP_TEMPLATE_PATH', ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp/templates/' );
          parent::__construct();
          $this->_folder_path = ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS;
       }
 
       protected function _set_init_properties() {
-         $this->label = __('EE MailChimp', 'event_espresso');
-         $this->menu_label = __('MailChimp', 'event_espresso');
+         $this->label = EE_MAILCHIMP_LABEL;
+         $this->menu_label = EE_MAILCHIMP_LABEL;
          $this->menu_slug = ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG;
          $this->capability = 'administrator';
       }
@@ -42,15 +42,15 @@ if ( '4.4.0' > EVENT_ESPRESSO_VERSION ) {
 
       public function __construct() {
          do_action('AHEE_log', __FILE__, __FUNCTION__, '');
-         define( 'EE_MAILCHIMP_SETT_LABEL', __('Mailchimp', 'event_espresso') );
-         define( 'EE_MAILCHIMP_SETT_ADMIN_URL', admin_url( 'admin.php?page=' . ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG ) );
-         define( 'EE_MAILCHIMP_SETT_TEMPLATE_PATH', ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp/templates/' );
+         define( 'EE_MAILCHIMP_LABEL', __( 'Mailchimp', 'event_espresso' ));
+         define( 'EE_MAILCHIMP_ADMIN_URL', admin_url( 'admin.php?page=' . ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG ) );
+         define( 'EE_MAILCHIMP_TEMPLATE_PATH', ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp/templates/' );
          parent::__construct();
          $this->_folder_path = ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS;
       }
 
       protected function _set_init_properties() {
-         $this->label = __('EE MailChimp', 'event_espresso');
+         $this->label = EE_MAILCHIMP_LABEL;
       }
 
       protected function _set_menu_map() {
@@ -60,7 +60,7 @@ if ( '4.4.0' > EVENT_ESPRESSO_VERSION ) {
             'show_on_menu' => TRUE,
             'parent_slug' => 'espresso_events',
             'menu_slug' => ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG,
-            'menu_label' => __('MailChimp', 'event_espresso'),
+            'menu_label' => EE_MAILCHIMP_LABEL,
             'capability' => 'administrator',
             'admin_init_page' => $this
          ));
@@ -68,5 +68,3 @@ if ( '4.4.0' > EVENT_ESPRESSO_VERSION ) {
    }
 
 }
-
-?>
