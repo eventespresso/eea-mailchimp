@@ -1,24 +1,35 @@
 <?php
-
-/*
+/**
+ * Class EE_Mailchimp_Config
+ *
  * Settings for the MailChimp
+ *
+ * @package 			Event Espresso
+ * @subpackage 	eea-mailchimp
+ * @author 				Nazar Kolivoshka
+ * @since                1.0
+ *
  */
 class EE_Mailchimp_Config extends EE_Config_Base {
 
     /**
-     *
      * @var EE_Mailchimp_Config_Api_Settings
      */
     public $api_settings;
 
-    public function __construct() {
+
+
+	/**
+	 * @return EE_Mailchimp_Config
+	 */
+	public function __construct() {
         $this->api_settings = new EE_Mailchimp_Config_Api_Settings();
     }
-    
+
     /**
-     * 
-     * @return array one dimensional. All nested config classes properties are 
-     * 'flatened'. Eg, $this->tooltip->show becomes array key 'tooltip_show' in the newly
+     *
+     * @return array one dimensional. All nested config classes properties are
+     * 'flattened'. Eg, $this->tooltip->show becomes array key 'tooltip_show' in the newly
      * formed array
      */
     public function to_flat_array() {
@@ -36,16 +47,52 @@ class EE_Mailchimp_Config extends EE_Config_Base {
         }
         return $flattened_vars;
     }
+
+
+
 }
 
-class EE_Mailchimp_Config_Api_Settings extends EE_Config_Base {
-    public $api_key;
-    public $skip_double_optin;
-    public $mc_active;
 
-    public function __construct() {
+
+
+
+/**
+ * Class EE_Mailchimp_Config_Api_Settings
+ *
+ * Description
+ *
+ * @package 			Event Espresso
+ * @subpackage 	eea-mailchimp
+ * @author 				Nazar Kolivoshka
+ * @since                1.0
+ *
+ */
+class EE_Mailchimp_Config_Api_Settings extends EE_Config_Base {
+
+	/**
+	 * @var string $api_key
+	 */
+    public $api_key;
+	/**
+	 * @var bool $skip_double_optin
+	 */
+    public $skip_double_optin;
+	/**
+	 * @var bool $mc_active
+	 */
+	public $mc_active;
+
+
+
+	/**
+	 * @return EE_Mailchimp_Config_Api_Settings
+	 */
+	public function __construct() {
         $this->api_key = '';
-        $this->skip_double_optin = true;
-        $this->mc_active = 'false';
+        $this->skip_double_optin = TRUE;
+        $this->mc_active = FALSE;
     }
+
+
+
 }

@@ -28,25 +28,26 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
      * Instance of the Attendee object
      * @access private
      */
-    private static $_instance = NULL;
+    protected static $_instance = NULL;
 
     /**
      * This funtion is a singleton method used to instantiate the EEM_Question_Mailchimp_Field object
      *
      * @access public
      * @return EEM_Question_Mailchimp_Field instance
-     */ 
-    public static function instance() {
+     */
+    public static function instance( $timezone = NULL ) {
         // Check if instance of EEM_Question_Mailchimp_Field already exists.
         if ( self::$_instance === NULL ) {
             // Instantiate Espresso_model.
-            self::$_instance = new self();
+            self::$_instance = new self( $timezone );
         }
+		self::$_instance->set_timezone( $timezone );
         // EEM_Question_Mailchimp_Field object
         return self::$_instance;
     }
 
-    protected function __construct() {
+    protected function __construct( $timezone = NULL ) {
         $this->singular_item = __('Mailchimp List Group', 'event_espresso');
         $this->plural_item = __('Mailchimp List Groups', 'event_espresso');
         $this->_tables = array(
@@ -63,9 +64,20 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
         $this->_model_relations = array(
             'Event' => new EE_Belongs_To_Relation()
         );
-        parent::__construct();
+        parent::__construct( $timezone );
     }
-        
+
+
+    /**
+     * resets the model and returns it
+     * 
+     * @return EEM_Question_Mailchimp_Field
+     */
+    public static function reset( $timezone = NULL ) {
+        self::$_instance = NULL;
+        return self::instance();
+    }
+
 }
 
 ?>
