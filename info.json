@@ -12,5 +12,7 @@
 	],
 	"github" : false,
 	"awsbucket" : "",
-	"awsregion" : ""
+	"awsregion" : "",
+	"srcBuildFolderName" : "eea-mailchimp",
+	"textDomain" : "event_espresso"
 }
