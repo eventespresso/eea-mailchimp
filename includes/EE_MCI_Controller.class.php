@@ -206,6 +206,8 @@ class EE_MCI_Controller {
 									$this->mci_throw_error( $reply );
 									// If the error: 'email is already subscribed to a list' then just update the groups.
 									if ( $reply['code'] == 214 ) {
+										// Do not replace the interest groups if user already subscribed.
+										$subscribe_args['replace_interests'] = false;
 										$this->MailChimp->call( 'lists/update-member', $subscribe_args );
 									}
 								}
