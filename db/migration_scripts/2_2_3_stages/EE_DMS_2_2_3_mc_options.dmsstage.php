@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Converts MailChimp 2.1.0 options to MC 2.2.0+.
+ * Converts MailChimp 2.1.0 options to MC 2.2.3.
  */
-class EE_DMS_2_2_0_mc_options extends EE_Data_Migration_Script_Stage {
+class EE_DMS_2_2_3_mc_options extends EE_Data_Migration_Script_Stage {
 
 	protected $_mc_options_to_migrate = array(
 		'Mailchimp',
