@@ -98,7 +98,7 @@ class EE_MailChimp extends EE_Addon {
     public static function espresso_mailchimp_plugin_settings( $links, $file ) {
  		if ( $file == ESPRESSO_MAILCHIMP_BASE_NAME ) {
 			// before other links
-			array_unshift( $links, '<a href="admin.php?page='. ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG .'">' . __('Settings', 'event-espresso') . '</a>' );
+			array_unshift( $links, '<a href="admin.php?page='. ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG .'">' . __('Settings', 'event_espresso') . '</a>' );
 		}
         return $links;
 	}
