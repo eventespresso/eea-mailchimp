@@ -105,6 +105,20 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 		$config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
 		//d( $config );
 		$this->_template_args['mailchimp_double_opt_check'] =  isset( $config->api_settings->skip_double_optin ) && $config->api_settings->skip_double_optin === FALSE ? 'checked="checked"' : '';
+		
+		$this->_template_args['submit_to_mc_end'] = $this->_template_args['submit_to_mc_complete'] = $this->_template_args['submit_to_mc_success'] = '';
+		switch ( $config->api_settings->submit_to_mc_when ) {
+			case 'attendee-information-end':
+				$this->_template_args['submit_to_mc_end'] = 'selected';
+				break;
+			case 'reg-step-completed':
+				$this->_template_args['submit_to_mc_complete'] = 'selected';
+				break;
+			default:
+				$this->_template_args['submit_to_mc_complete'] = 'selected';
+				break;
+		}
+
 		$this->_template_args['mailchimp_api_key'] = isset( $config->api_settings, $config->api_settings->api_key ) ? $config->api_settings->api_key : '';
 		if ( isset( $this->_req_data['mcapi_error'] ) && ! empty( $this->_req_data['mcapi_error'] )) {
 			$this->_template_args['mailchimp_key_error'] = '<span class="important-notice">' . $this->_req_data['mcapi_error'] . '</span>';
@@ -146,6 +160,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 				$config->api_settings->mc_active = 1;
 				$config->api_settings->api_key = $mailchimp_api_key;
 				$config->api_settings->skip_double_optin = empty( $_POST['mailchimp_double_opt'] ) ? TRUE : FALSE;
+				$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-completed' : $_POST['submit_to_mc_when'];
 				EE_Config::instance()->update_config( 'addons', 'Mailchimp', $config );
 			} else {
 				$key_valid = FALSE;
@@ -155,6 +170,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 				$query_args['mcapi_error'] = $error_msg;
 				$config->api_settings->mc_active = FALSE;
 				$config->api_settings->api_key = '';
+				$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-completed' : $_POST['submit_to_mc_when'];
 				EE_Config::instance()->update_config( 'addons', 'Mailchimp', $config );
 			}
 		} else {
@@ -164,6 +180,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 			$query_args['mcapi_error'] = $error_msg;
 			$config->api_settings->mc_active = FALSE;
 			$config->api_settings->api_key = '';
+			$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-completed' : $_POST['submit_to_mc_when'];
 			EE_Config::instance()->update_config( 'addons', 'Mailchimp', $config );
 		}
 		if ( isset( $query_args['mcapi_error'] )) {

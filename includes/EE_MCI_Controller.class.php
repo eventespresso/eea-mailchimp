@@ -138,42 +138,56 @@ class EE_MCI_Controller {
 
 
 	/**
-	 * Retrieve EE_Registration objects from incoming data
+	 * Retrieve EE_Registration and EE_Transaction objects from incoming data.
 	 *
 	 * @access protected
 	 * @param EED_Single_Page_Checkout || EE_SPCO_Reg_Step_Attendee_Information $spco_obj
-	 * @return EE_Registration[]
+	 * @return array ( EE_Transaction, EE_Registration[] )
 	 */
 	protected function _mci_get_registrations( $spco_obj ) {
-		$registrations = array();
+		$spco_registrations = array();
+		$spco_transaction = false;
 		// what kind of SPCO object did we receive?
 		if ( $spco_obj instanceof EE_SPCO_Reg_Step_Attendee_Information ) {
 			// for EE versions > 4.6
 			if ( $spco_obj->checkout instanceof EE_Checkout && $spco_obj->checkout->transaction instanceof EE_Transaction ) {
-				$registrations = $spco_obj->checkout->transaction->registrations( $spco_obj->checkout->reg_cache_where_params, TRUE );
+				$spco_registrations = $spco_obj->checkout->transaction->registrations( $spco_obj->checkout->reg_cache_where_params, TRUE );
+				$spco_transaction = $spco_obj->checkout->transaction;
 			}
 		} else if ( $spco_obj instanceof EED_Single_Page_Checkout ) {
 			$transaction = EE_Registry::instance()->SSN->get_session_data( 'transaction' );
 			// for EE versions < 4.6
 			if ( $transaction instanceof EE_Transaction ) {
-				$registrations = $transaction->registrations( array(), TRUE );
+				$spco_registrations = $transaction->registrations( array(), TRUE );
+				$spco_transaction = $transaction;
 			}
+		} else if ( $spco_obj instanceof EE_Checkout ) {
+			$spco_registrations = $spco_obj->transaction->registrations( $spco_obj->reg_cache_where_params, TRUE );
+			$spco_transaction = $spco_obj;
 		}
-		return $registrations;
+		return array( 'registrations' => $spco_registrations, 'transaction' => $spco_transaction );
 	}
+
 
 	/**
      * Subscribe new attendee to MailChimp list selected for current event.
      *
-     * @param EED_Single_Page_Checkout $spc_obj  Single Page Checkout (SPCO) Object.
-     * @param array $valid_data  Valid data from the Attendee Information Registration form.
+	 * Depending by what hook this was called (process_attendee_information__end or update_txn_based_on_payment__successful) the:
+	 * $spc_obj could be an instanceof: EE_SPCO_Reg_Step_Attendee_Information, EED_Single_Page_Checkout or EE_Checkout.
+     *
+     * @param EED_Single_Page_Checkout/EE_SPCO_Reg_Step_Attendee_Information/EE_Checkout $spc_obj  Single Page Checkout (SPCO) Object.
+     * @param array/EE_Payment $valid_data  Valid data from the Attendee Information Registration form / EE_Payment.
      * @return void
      */
 	public function mci_submit_to_mailchimp( $spc_obj, $valid_data ) {
-		do_action('AHEE__EE_MCI_Controller__mci_submit_to_mailchimp__start', $spc_obj, $valid_data);
 		// Do not submit if the key is not valid or there is no valid submit data.
 		if ( $this->MailChimp instanceof \Drewm\MailChimp && ! empty( $spc_obj )) {
-			$registrations = $this->_mci_get_registrations( $spc_obj );
+			$spco_data = $this->_mci_get_registrations( $spc_obj );
+			$registrations = $spco_data['registrations'];
+			$spco_transaction = $spco_data['transaction'];
+
+			do_action('AHEE__EE_MCI_Controller__mci_submit_to_mailchimp__start', $spco_transaction, $registrations);
+			
 			$registered_attendees = array();
 			// now loop thru registrations to get the related attendee objects
 			if ( ! empty( $registrations )) {

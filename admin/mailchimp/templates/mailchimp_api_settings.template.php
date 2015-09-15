@@ -40,6 +40,21 @@
 					</p>
 				</td>
 			</tr>
+			<tr valign="top">
+				<th><?php _e( 'Submit to MailChimp when...', 'event_espresso' ); ?></th>
+				<td>
+					<select name="submit_to_mc_when">
+						<option value="attendee-information-end" <?php echo $submit_to_mc_end; ?> >attendee submits information</option>
+						<option value="reg-step-completed" <?php echo $submit_to_mc_complete; ?> >attendee completes registration</option>
+					</select>
+
+					<p class="description">
+						<?php
+							_e( '* When should the attendee data be submitted to MailChimp?', 'event_espresso' );
+						?>
+					</p>
+				</td>
+			</tr>
 		</tbody>
 	</table>
 </div>

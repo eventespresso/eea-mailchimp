@@ -21,8 +21,7 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function set_hooks() {
-		// Hook into the EE _process_attendee_information
-        add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+		EED_Mailchimp::set_eemc_hooks();
 	}
 
 	/**
@@ -32,21 +31,40 @@ class EED_Mailchimp extends EED_Module {
 	 * @return void
 	 */
 	public static function set_hooks_admin() {
-		// Hook into the EE _process_attendee_information
-        add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+		EED_Mailchimp::set_eemc_hooks();
 
-        add_action( 'admin_enqueue_scripts', array( 'EED_Mailchimp', 'mailchimp_link_scripts_styles' ));
+		add_action( 'admin_enqueue_scripts', array( 'EED_Mailchimp', 'mailchimp_link_scripts_styles' ));
 
-        // 'MailChimp List' option
-        add_action( 'add_meta_boxes', array('EED_Mailchimp', 'espresso_mailchimp_list_metabox') );
-        add_action( 'save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event') );
+		// 'MailChimp List' option
+		add_action( 'add_meta_boxes', array('EED_Mailchimp', 'espresso_mailchimp_list_metabox') );
+		add_action( 'save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event') );
 
 		// Ajax for MailChimp groups refresh
 		add_action( 'wp_ajax_espresso_mailchimp_update_groups', array('EED_Mailchimp', 'espresso_mailchimp_update_groups') );
 		// Ajax for MailChimp list fields refresh
 		add_action( 'wp_ajax_espresso_mailchimp_update_list_fields', array('EED_Mailchimp', 'espresso_mailchimp_update_list_fields') );
 
-        EE_Config::register_route( 'mailchimp', 'EED_Mailchimp', 'run' );
+		EE_Config::register_route( 'mailchimp', 'EED_Mailchimp', 'run' );
+	}
+
+
+	public static function set_eemc_hooks() {
+		$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
+		// Hook into the EE _process_attendee_information.
+		switch ( $mc_config->api_settings->submit_to_mc_when ) {
+			case 'attendee-information-end':
+				add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+				remove_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+				break;
+			case 'reg-step-completed':
+				add_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+				remove_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+				break;
+			default:
+				add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+				remove_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+				break;
+		}
 	}
 
 
@@ -85,7 +103,7 @@ class EED_Mailchimp extends EED_Module {
 	 */
 	public function run( $WP ) {
 
-    }
+	}
 
 	/**
 	 * Load the MCI scripts and styles.
@@ -135,14 +153,14 @@ class EED_Mailchimp extends EED_Module {
 	 * Submit new attendee information to MailChimp (if any MailChimp list to submit to selected for the current event).
 	 *
 	 * @param EED_Single_Page_Checkout $spc_obj  Single Page Checkout (SPCO) Object.
-	 * @param array $valid_data  Valid data from the Attendee Information Registration form.
+	 * @param array/EE_Payment $spc_data  Valid data from the Attendee Information Registration form / EE_Payment.
 	 * @return void
 	 */
-	public static function espresso_mailchimp_submit_to_mc( $spc_obj, $valid_data ) {
+	public static function espresso_mailchimp_submit_to_mc( $spc_obj, $spc_data ) {
 		$mc_config = EED_Mailchimp::instance()->config();
 		if ( $mc_config->api_settings->mc_active ) {
 			$mci_controller = new EE_MCI_Controller();
-			$mci_controller->mci_submit_to_mailchimp( $spc_obj, $valid_data );
+			$mci_controller->mci_submit_to_mailchimp( $spc_obj, $spc_data );
 		}
 	}
 
