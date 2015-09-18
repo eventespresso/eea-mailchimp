@@ -51,19 +51,12 @@ class EED_Mailchimp extends EED_Module {
 	public static function set_eemc_hooks() {
 		$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
 		// Hook into the EE _process_attendee_information.
-		switch ( $mc_config->api_settings->submit_to_mc_when ) {
-			case 'attendee-information-end':
-				add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
-				remove_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
-				break;
-			case 'reg-step-completed':
-				add_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
-				remove_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
-				break;
-			default:
-				add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
-				remove_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
-				break;
+		if ( $mc_config->api_settings->submit_to_mc_when == 'attendee-information-end' ) {
+			add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+			remove_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc') );
+		} else if ( $mc_config->api_settings->submit_to_mc_when == 'reg-step-completed' || $mc_config->api_settings->submit_to_mc_when == 'reg-step-approved' ) {
+			add_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
+			remove_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc') );
 		}
 	}
 

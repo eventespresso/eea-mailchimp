@@ -193,9 +193,19 @@ class EE_MCI_Controller {
 			if ( ! empty( $registrations )) {
 				foreach ( $registrations as $registration ) {
 					if ( $registration instanceof EE_Registration ) {
+						$need_reg_status = $reg_approved = false;
+						$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
+						if ( $mc_config->api_settings->submit_to_mc_when === 'reg-step-approved' ) {
+							$need_reg_status = true;
+							$reg_status = $registration->status_ID();
+							if ( $reg_status === EEM_Registration::status_id_approved ) {
+								$reg_approved = true;
+							}
+						}
+
 						$attendee = $registration->attendee();
 						$att_email = $attendee->email();
-						if ( ( $attendee instanceof EE_Attendee ) && !in_array($att_email, $registered_attendees) ) {
+						if ( ( $attendee instanceof EE_Attendee ) && ! in_array($att_email, $registered_attendees) && ( ! $need_reg_status || $need_reg_status && $reg_approved ) ) {
 							$EVT_ID = $registration->event_ID();
 							$event_list = $this->mci_event_list( $EVT_ID );
 							// If no list selected for this event than skip the subscription.

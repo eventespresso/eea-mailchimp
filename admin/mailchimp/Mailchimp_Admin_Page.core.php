@@ -106,13 +106,16 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 		//d( $config );
 		$this->_template_args['mailchimp_double_opt_check'] =  isset( $config->api_settings->skip_double_optin ) && $config->api_settings->skip_double_optin === FALSE ? 'checked="checked"' : '';
 		
-		$this->_template_args['submit_to_mc_end'] = $this->_template_args['submit_to_mc_complete'] = $this->_template_args['submit_to_mc_success'] = '';
+		$this->_template_args['submit_to_mc_end'] = $this->_template_args['submit_to_mc_complete'] = $this->_template_args['submit_to_mc_approved'] = '';
 		switch ( $config->api_settings->submit_to_mc_when ) {
 			case 'attendee-information-end':
 				$this->_template_args['submit_to_mc_end'] = 'selected';
 				break;
 			case 'reg-step-completed':
 				$this->_template_args['submit_to_mc_complete'] = 'selected';
+				break;
+			case 'reg-step-approved':
+				$this->_template_args['submit_to_mc_approved'] = 'selected';
 				break;
 			default:
 				$this->_template_args['submit_to_mc_complete'] = 'selected';

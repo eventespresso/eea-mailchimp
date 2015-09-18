@@ -41,11 +41,12 @@
 				</td>
 			</tr>
 			<tr valign="top">
-				<th><?php _e( 'Submit to MailChimp when...', 'event_espresso' ); ?></th>
+				<th><?php _e( 'Submit to MailChimp when ...', 'event_espresso' ); ?></th>
 				<td>
 					<select name="submit_to_mc_when">
-						<option value="attendee-information-end" <?php echo $submit_to_mc_end; ?> >attendee submits information</option>
-						<option value="reg-step-completed" <?php echo $submit_to_mc_complete; ?> >attendee completes registration</option>
+						<option value="attendee-information-end" <?php echo $submit_to_mc_end; ?> >subscriber submits information.</option>
+						<option value="reg-step-completed" <?php echo $submit_to_mc_complete; ?> >registration is completed (payment status does not matter).</option>
+						<option value="reg-step-approved" <?php echo $submit_to_mc_approved; ?> >registration is completed with an approved status.</option>
 					</select>
 
 					<p class="description">
