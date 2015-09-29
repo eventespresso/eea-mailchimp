@@ -49,6 +49,9 @@ class EED_Mailchimp extends EED_Module {
 
 
 	public static function set_eemc_hooks() {
+		// Set defaults.
+		EED_Mailchimp::setup_mc_defaults();
+		// Set hooks.
 		$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
 		// Hook into the EE _process_attendee_information.
 		if ( $mc_config->api_settings->submit_to_mc_when == 'attendee-information-end' ) {
@@ -58,6 +61,21 @@ class EED_Mailchimp extends EED_Module {
 			add_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
 			remove_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc') );
 		}
+	}
+
+
+	/**
+	 *    Setup defaults.
+	 *
+	 *    @access public
+	 *    @return void
+	 */
+	public static function setup_mc_defaults() {
+		$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
+		if ( ! isset($mc_config->api_settings->submit_to_mc_when) || empty($mc_config->api_settings->submit_to_mc_when) ) {
+			$mc_config->api_settings->submit_to_mc_when = 'reg-step-approved';
+		}
+		EE_Config::instance()->update_config( 'addons', 'Mailchimp', $mc_config );
 	}
 
 
