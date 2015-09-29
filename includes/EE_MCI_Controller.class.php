@@ -681,7 +681,7 @@ class EE_MCI_Controller {
 		$user_groups = $this->mci_get_users_groups( $list_id );
 
 		?>
-		<form id="ee-mailchimp-groups-list" method="post">
+		<div id="ee-mailchimp-groups-list">
 			<label for="ee-mailchimp-groups"><?php _e( 'Please select a Group:', 'event_espresso' );?></label>
 			<dl id="ee-mailchimp-groups" class="ee_mailchimp_dropdowns">
 				<?php
@@ -707,7 +707,7 @@ class EE_MCI_Controller {
 				}
 				?>
 			</dl>
-		</form>
+		</div>
 		<?php
 	}
 
