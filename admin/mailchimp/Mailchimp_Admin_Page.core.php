@@ -6,48 +6,48 @@
 
 class Mailchimp_Admin_Page extends EE_Admin_Page {
 
-   public function __construct( $routing = TRUE ) {
-      parent::__construct( $routing );
-   }
+	public function __construct( $routing = TRUE ) {
+		parent::__construct( $routing );
+	}
 
-   protected function _init_page_props() {
-      $this->page_slug = ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG;
-      $this->page_label = EE_MAILCHIMP_LABEL;
-   }
+	protected function _init_page_props() {
+		$this->page_slug = ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG;
+		$this->page_label = EE_MAILCHIMP_LABEL;
+	}
 
-   protected function _ajax_hooks() {
-      //todo: all hooks for ajax goes here.
-   }
+	protected function _ajax_hooks() {
+		//todo: all hooks for ajax goes here.
+	}
 
-   protected function _define_page_props() {
-      $this->_admin_base_url = EE_MAILCHIMP_ADMIN_URL;
-      $this->_admin_page_title = $this->page_label;
-	   $this->_labels = array();
-   }
+	protected function _define_page_props() {
+		$this->_admin_base_url = EE_MAILCHIMP_ADMIN_URL;
+		$this->_admin_page_title = $this->page_label;
+		$this->_labels = array();
+	}
 
-   protected function _set_page_routes() {
-      $this->_page_routes = array(
-         'default' => array(
-			 'func' => '_mailchimp_api_settings'
-		 ),
-		 'update_mailchimp'	=> array(
-			 'func' => '_update_mailchimp',
-			 'noheader' => TRUE
-		 )
-	  );
-   }
+	protected function _set_page_routes() {
+		$this->_page_routes = array(
+			'default' => array(
+				'func' => '_mailchimp_api_settings'
+			),
+			'update_mailchimp'	=> array(
+				'func' => '_update_mailchimp',
+				'noheader' => TRUE
+			)
+		);
+	}
 
-   protected function _set_page_config() {
-      $this->_page_config = array(
-         'default' => array(
-            'nav' => array(
-               'label' => __('Main Settings', 'event_espresso'),
-               'order' => 10
-               ),
-            'metaboxes' => array( '_publish_post_box', '_espresso_news_post_box', '_espresso_links_post_box', '_espresso_sponsors_post_box' , '_mailchimp_meta_boxes' )
-		 )
-      );
-   }
+	protected function _set_page_config() {
+		$this->_page_config = array(
+			'default' => array(
+				'nav' => array(
+					'label' => __('Main Settings', 'event_espresso'),
+					'order' => 10
+				),
+				'metaboxes' => array( '_publish_post_box', '_espresso_news_post_box', '_espresso_links_post_box', '_espresso_sponsors_post_box' , '_mailchimp_meta_boxes' )
+			)
+		);
+	}
 
 
 
@@ -118,7 +118,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 				$this->_template_args['submit_to_mc_approved'] = 'selected';
 				break;
 			default:
-				$this->_template_args['submit_to_mc_complete'] = 'selected';
+				$this->_template_args['submit_to_mc_approved'] = 'selected';
 				break;
 		}
 
@@ -163,7 +163,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 				$config->api_settings->mc_active = 1;
 				$config->api_settings->api_key = $mailchimp_api_key;
 				$config->api_settings->skip_double_optin = empty( $_POST['mailchimp_double_opt'] ) ? TRUE : FALSE;
-				$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-completed' : $_POST['submit_to_mc_when'];
+				$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-approved' : $_POST['submit_to_mc_when'];
 				EE_Config::instance()->update_config( 'addons', 'Mailchimp', $config );
 			} else {
 				$key_valid = FALSE;
@@ -173,7 +173,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 				$query_args['mcapi_error'] = $error_msg;
 				$config->api_settings->mc_active = FALSE;
 				$config->api_settings->api_key = '';
-				$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-completed' : $_POST['submit_to_mc_when'];
+				$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-approved' : $_POST['submit_to_mc_when'];
 				EE_Config::instance()->update_config( 'addons', 'Mailchimp', $config );
 			}
 		} else {
@@ -183,7 +183,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 			$query_args['mcapi_error'] = $error_msg;
 			$config->api_settings->mc_active = FALSE;
 			$config->api_settings->api_key = '';
-			$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-completed' : $_POST['submit_to_mc_when'];
+			$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-approved' : $_POST['submit_to_mc_when'];
 			EE_Config::instance()->update_config( 'addons', 'Mailchimp', $config );
 		}
 		if ( isset( $query_args['mcapi_error'] )) {
