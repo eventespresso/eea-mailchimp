@@ -23,7 +23,7 @@ class EE_DMS_2_2_3_mc_options extends EE_Data_Migration_Script_Stage {
 			$config = new EE_Mailchimp_Config();
 			EE_Config::instance()->addons->EE_Mailchimp = $config;
 		}
-		$success = EE_Config::instance()->update_config('addons', 'Mailchimp', $config);
+                $success = EE_Config::instance()->set_config('addons', 'Mailchimp', 'EE_Mailchimp_Config', $config);
 		if ( ! $success ) {
 			$this->add_error( EE_Error::get_notices() );
 		}
