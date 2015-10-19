@@ -1,6 +1,6 @@
 <?php
 /**
- *  Meant to convert DBs between MailChimp 2.1.0 and MC 2.2.3.
+ *  Meant to convert DBs between MailChimp 2.1.0 and MC 2.3.0.
  */
 /**
  * Make sure we have all the stages loaded too
@@ -9,24 +9,24 @@
  * (all other times it gets resurrected from a wordpress option).
  */
 
-$stages = glob( ESPRESSO_MAILCHIMP_DIR . 'db/migration_scripts/2_2_3_stages/*' );
+$stages = glob( ESPRESSO_MAILCHIMP_DIR . 'db/migration_scripts/2_3_0_stages/*' );
 $class_to_filepath = array();
 foreach( $stages as $filepath ) {
     $matches = array();
-    preg_match( '~2_2_3_stages/(.*).dmsstage.php~', $filepath, $matches );
+    preg_match( '~2_3_0_stages/(.*).dmsstage.php~', $filepath, $matches );
     $class_to_filepath[$matches[1]] = $filepath;
 }
 //give addons a chance to autoload their stages too
-$class_to_filepath = apply_filters( 'FHEE__EE_DMS_MailChimp_2_2_3_stages__autoloaded_stages', $class_to_filepath );
+$class_to_filepath = apply_filters( 'FHEE__EE_DMS_MailChimp_2_3_0_stages__autoloaded_stages', $class_to_filepath );
 EEH_Autoloader::register_autoloader( $class_to_filepath );
 
 
-class EE_DMS_MailChimp_2_2_3 extends EE_Data_Migration_Script_Base {
+class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base {
 
     public function __construct() {
         $this->_pretty_name = __("EE4 MailChimp data Migration to 2.2.0", "event_espresso");
         $this->_migration_stages = array(
-            new EE_DMS_2_2_3_mc_options()
+            new EE_DMS_2_3_0_mc_options()
         );
         parent::__construct();
     }
@@ -43,7 +43,7 @@ class EE_DMS_MailChimp_2_2_3 extends EE_Data_Migration_Script_Base {
         $mc_old_config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
 
         if ( ( ( version_compare( $version_string, '2.1.0', '>=' ) && version_compare( $version_string, '2.2.0', '<' ) )
-            || ( version_compare( $version_string, '2.2.0', '>=' ) && version_compare( $version_string, '2.2.3', '<' ) && empty($mc_new_config->api_settings->api_key) ) )
+            || ( version_compare( $version_string, '2.2.0', '>=' ) && version_compare( $version_string, '2.3.0', '<' ) && empty($mc_new_config->api_settings->api_key) ) )
             && version_compare( $core_version, '4.4.0', '>=' ) && isset($mc_old_config->api_settings) && ! empty($mc_old_config->api_settings->api_key) ) {
             // Can be migrated.
             return true;
@@ -57,7 +57,7 @@ class EE_DMS_MailChimp_2_2_3 extends EE_Data_Migration_Script_Base {
     }
 
     public function pretty_name() {
-        return __("EE4 MailChimp data Migration to 2.2.3", "event_espresso");
+        return __("EE4 MailChimp data Migration to 2.3.0", "event_espresso");
     }
 
     public function schema_changes_before_migration() {
