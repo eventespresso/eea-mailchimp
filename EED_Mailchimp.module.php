@@ -74,8 +74,8 @@ class EED_Mailchimp extends EED_Module {
 		$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
 		if ( ! isset($mc_config->api_settings->submit_to_mc_when) || empty($mc_config->api_settings->submit_to_mc_when) ) {
 			$mc_config->api_settings->submit_to_mc_when = 'reg-step-approved';
+			EE_Config::instance()->update_config( 'addons', 'Mailchimp', $mc_config );
 		}
-		EE_Config::instance()->update_config( 'addons', 'Mailchimp', $mc_config );
 	}
 
 
