@@ -227,6 +227,11 @@ class EE_MCI_Controller {
 								$registered_attendees[] = $att_email;
 								// If there was an error during subscription than process it.
 								if ( isset( $reply['status'] ) && $reply['status'] == 'error' ) {
+
+									// Log failed MailChimp API response.
+									do_action( 'AHEE_log', __FILE__, __FUNCTION__, $reply['status'] . ': ' . $reply['code'], 'MailChimp->call("lists/subscribe")'); 
+									do_action( 'AHEE_log', __FILE__, __FUNCTION__, $reply['error'], 'MailChimp->call("lists/subscribe")'); 
+
 									$this->mci_throw_error( $reply );
 									// If the error: 'email is already subscribed to a list' then just update the groups.
 									if ( $reply['code'] == 214 ) {
