@@ -225,6 +225,9 @@ class EE_MCI_Controller {
 								// Subscribe attendee
 								$reply = $this->MailChimp->call( 'lists/subscribe', $subscribe_args );
 								$registered_attendees[] = $att_email;
+
+								do_action( 'AHEE_log', __FILE__, __FUNCTION__, '');
+
 								// If there was an error during subscription than process it.
 								if ( isset( $reply['status'] ) && $reply['status'] == 'error' ) {
 
