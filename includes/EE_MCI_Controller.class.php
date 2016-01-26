@@ -221,7 +221,7 @@ class EE_MCI_Controller {
 								// Question fields
 								$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
 								// filter it
-								$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args );
+								$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args, $registration, $EVT_ID );
 								// Subscribe attendee
 								$reply = $this->MailChimp->call( 'lists/subscribe', $subscribe_args );
 								$registered_attendees[] = $att_email;
