@@ -38,7 +38,7 @@ class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base {
         // Check if old MailChimp table exist.
         $old_table_exists = false;
         $mc_table = $wpdb->prefix . "events_mailchimp_event_rel";
-        if ( $wpdb->get_var("SHOW TABLES LIKE '" . $mc_table . "'") == $mc_table ) {
+        if ( EEH_Activation::table_exists( $mc_table ) ) {
             $old_table_exists = true;
         }
 		$migrations_ran = EE_Data_Migration_Manager::instance()->get_data_migrations_ran();
