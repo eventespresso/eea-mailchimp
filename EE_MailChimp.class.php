@@ -23,6 +23,16 @@ class EE_MailChimp extends EE_Addon {
      */
     const activation_indicator_option_name = 'ee4_mailchimp_activation';
 
+    /**
+     *  name used to save the config
+     */
+    const CONFIG_NAME = 'Mailchimp';
+
+    /**
+     *  Class used for storing config
+     */
+    const CONFIG_CLASS = 'EE_Mailchimp_Config';
+
 	/**
 	 * Class constructor
 	 *
@@ -45,34 +55,40 @@ class EE_MailChimp extends EE_Addon {
         EE_Register_Addon::register(
 			'MailChimp',
 			array(
-				'version' 					=> ESPRESSO_MAILCHIMP_VERSION,
-				'class_name' 			=> 'EE_MailChimp',
-				'min_core_version' => '4.4.5',
-				'main_file_path' 		=> ESPRESSO_MAILCHIMP_MAIN_FILE,
-				'admin_path' 			=> ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS,
+				'version' 			=> ESPRESSO_MAILCHIMP_VERSION,
+				'class_name' 		=> 'EE_MailChimp',
+				'min_core_version'  => '4.4.5',
+				'main_file_path' 	=> ESPRESSO_MAILCHIMP_MAIN_FILE,
+				'admin_path' 		=> ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS,
 				'admin_callback' 	=> 'additional_mailchimp_admin_hooks',
-				'config_class' 			=> 'EE_Mailchimp_Config',
-				'config_name' 		=> 'Mailchimp',
+				'config_class' 		=> EE_MailChimp::CONFIG_CLASS,
+				'config_name' 		=> EE_MailChimp::CONFIG_NAME,
 				'autoloader_paths'	=> array(
-					'EE_MCI_Controller' 					=> ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'EE_MCI_Controller.class.php',
-					'Mailchimp_Admin_Page' 			=> ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page.core.php',
-					'Mailchimp_Admin_Page_Init' 	=> ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page_Init.core.php',
-                    'EE_Mailchimp_Config' 				=> ESPRESSO_MAILCHIMP_DIR . 'EE_Mailchimp_Config.php'
+					'EE_MCI_Controller' 		=> ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'EE_MCI_Controller.class.php',
+					'Mailchimp_Admin_Page' 		=> ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page.core.php',
+					'Mailchimp_Admin_Page_Init' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page_Init.core.php',
+                    'EE_Mailchimp_Config' 		=> ESPRESSO_MAILCHIMP_DIR . 'EE_Mailchimp_Config.php'
 				),
 				'dms_paths' 			=> array( ESPRESSO_MAILCHIMP_DMS_PATH ),
-				'module_paths' 		=> array( ESPRESSO_MAILCHIMP_DIR . 'EED_Mailchimp.module.php' ),
+				'module_paths' 		    => array( ESPRESSO_MAILCHIMP_DIR . 'EED_Mailchimp.module.php' ),
 				'pue_options'			=> array(
 					'pue_plugin_slug' 	=> 'eea-mailchimp',
-					'checkPeriod' 			=> '24',
+					'checkPeriod' 		=> '24',
 					'use_wp_update' 	=> FALSE
 				)
 			)
 		);
 
         // Register db models.
-		if ( ! did_action( 'activate_plugin' )) {
-			EE_Register_Model::register( 'MailChimp', array( 'model_paths' => array( ESPRESSO_MAILCHIMP_MODELS_PATH ), 'class_paths' => array( ESPRESSO_MAILCHIMP_CLASSES_PATH )));
-		}
+	    if ( ! did_action( 'activate_plugin' ) ) {
+		    EE_Register_Model::register(
+			    'MailChimp',
+			    array(
+				    'model_paths' => array( ESPRESSO_MAILCHIMP_MODELS_PATH ),
+				    'class_paths' => array( ESPRESSO_MAILCHIMP_CLASSES_PATH ),
+			    )
+		    );
+	    }
     }
 
     /**
