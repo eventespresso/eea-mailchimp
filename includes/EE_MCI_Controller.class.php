@@ -194,7 +194,8 @@ class EE_MCI_Controller {
 				foreach ( $registrations as $registration ) {
 					if ( $registration instanceof EE_Registration ) {
 						$need_reg_status = $reg_approved = false;
-						$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
+						/** @type EE_Mailchimp_Config $mc_config */
+						$mc_config = EED_Mailchimp::get_config();
 						if ( $mc_config->api_settings->submit_to_mc_when === 'reg-step-approved' ) {
 							$need_reg_status = true;
 							$reg_status = $registration->status_ID();
