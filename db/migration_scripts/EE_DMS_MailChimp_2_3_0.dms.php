@@ -38,7 +38,7 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base {
         if ( isset($version_array['MailChimp']) ) {
             $version_string = $version_array['MailChimp'];
         }
-
+	    EE_Registry::instance()->load_core( 'Config' );
         $mc_new_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
         $mc_old_config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
 
