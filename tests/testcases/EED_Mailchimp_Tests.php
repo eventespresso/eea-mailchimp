@@ -38,11 +38,27 @@ class EED_Mailchimp_Tests extends EE_UnitTestCase {
      */
     function test_mailchimp_front_hooks_added() {
         // Hook into the EE _process_attendee_information.
-	    $this->assertTrue(
-		    has_action(
-			    'AHEE__EE_Single_Page_Checkout__process_attendee_information__end',
-			    array( 'EED_Mailchimp', 'espresso_mailchimp_submit_to_mc' )
-		    ) !== false
+        // Use one hook or the other. Should not be both at the same time. 
+	    $this->assertTrue( ( 
+                has_action(
+    			    'AHEE__EE_Single_Page_Checkout__process_attendee_information__end',
+    			    array( 'EED_Mailchimp', 'espresso_mailchimp_submit_to_mc' )
+    		    ) !== false 
+                && has_action(
+                    'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed',
+                    array( 'EED_Mailchimp', 'espresso_mailchimp_submit_to_mc' )
+                ) === false 
+            )
+            || (
+                has_action(
+                    'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed',
+                    array( 'EED_Mailchimp', 'espresso_mailchimp_submit_to_mc' )
+                ) !== false
+                && has_action(
+                    'AHEE__EE_Single_Page_Checkout__process_attendee_information__end',
+                    array( 'EED_Mailchimp', 'espresso_mailchimp_submit_to_mc' )
+                ) === false
+            )
 	    );
     }
 }

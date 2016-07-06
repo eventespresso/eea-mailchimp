@@ -23,6 +23,6 @@ class EE_Mailchimp_Config_Tests extends EE_UnitTestCase {
         $this->assertTrue( is_array($array_comfig) );
         $this->assertEquals( $array_comfig['api_settings_api_key'], '' );
         $this->assertEquals( $array_comfig['api_settings_skip_double_optin'], true );
-        $this->assertEquals( $array_comfig['api_settings_mc_active'], 'false' );
+        $this->assertEquals( $array_comfig['api_settings_mc_active'], false );
     }
 }

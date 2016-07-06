@@ -90,17 +90,18 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      *
      * @param string $key MC Api test Key
      * @param bool $result is key valid
+     * @param array $call_reply MC Api call response
      */
-    public function test_mc_api_key_validation($key, $result) {
-        $key_valid = $this->_mci_controller->mci_is_api_key_valid($key);
-        $this->assertEquals( $key_valid, $result );
+    public function test_mc_api_key_validation($key, $result, $call_reply = array() ) {
+        $key_valid = $this->_mci_controller->mci_is_api_key_valid($key, $call_reply);
+        $this->assertEquals( $result, $key_valid );
 
         // Test how MC Controller will handle an error and what will we get in the $mcapi_error.
         if ( $result === false ) {
             $mci_error = $this->_mci_controller->mci_get_response_error();
             // Was the code changed through the filter?
             $this->assertEquals( $mci_error['code'], '7000' );
-            $this->assertEquals( $mci_error['msg'], 'Unknown MailChimp API Error' );
+            $this->assertEquals( $mci_error['msg'], 'Invalid MailChimp API Key.' );
         }
     }
 
@@ -109,8 +110,13 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      */
     public function mc_test_keys_provider() {
         return array(
-            array('b40528421d083eff83b9b6ba11d8f928-us8', true),
-            array('b40528421d083eff83b9b6ba11d8f928-us55', false),
+            array('b40528421d083eff83b9b6ba11d8f928-us8', 'b40528421d083eff83b9b6ba11d8f928-us8'),
+            array('b40528421d083eff83b9b6ba11d8f928-us8', false, array(
+                'status' => 'error',
+                'code' => '7000',
+                'name' => 'Invalid MailChimp API Key.',
+                'error' => 'Invalid MailChimp API Key.')
+            ),
             array('b40528421d083eff83-b9b6ba11d8f928u-s8', false),
             array('b40528421d083eff83b9b6ba11d8f928us8', false),
             array('b40528421d083eff83b9b6ba11d8f928us8-', false),
