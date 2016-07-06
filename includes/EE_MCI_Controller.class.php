@@ -119,7 +119,7 @@ class EE_MCI_Controller {
 			return FALSE;
 		}
 		// MailChimp API does not check for the '-' and throws an error, so let's do the check ourselves.
-		if ( ! strlen( $this->_api_key ) > 1 ||  strpos( $api_key, '-' ) === FALSE ) {
+		if ( ! strlen( $this->_api_key ) > 1 ||  strpos( $api_key, '-' ) === FALSE || strpos( $api_key, '-' ) === strlen($api_key) - 1 ) {
 			$this->mci_throw_error( FALSE );
 			do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
 			return FALSE;
