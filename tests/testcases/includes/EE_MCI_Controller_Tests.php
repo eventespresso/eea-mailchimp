@@ -13,13 +13,27 @@
  */
 class EE_MCI_Controller_Tests extends EE_UnitTestCase {
 
-    private $_mci_controller;
+	/**
+	 * @var EE_MCI_Controller $_mci_controller
+	 */
+	private $_mci_controller;
 
-    private $_mci_config;
+	/**
+	 * @var EE_Mailchimp_Config $_mci_config
+	 */
+	private $_mci_config;
 
-    private $_ee_event;
+	/**
+	 * @var EE_Event $_ee_event
+	 */
+	private $_ee_event;
 
-    private $_list_id;
+	/**
+	 * @var string $_list_id
+	 */
+	private $_list_id;
+
+
 
     public function setUp() {
         parent::setUp();
@@ -27,11 +41,11 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         $this->_list_id = 'a1913d44fe';
 
         // MailChimp Settings.
-        $this->_mci_config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+        $this->_mci_config = EED_Mailchimp::get_config();
 
         // Set a valid MailChimp API Key.
         $this->_mci_config->api_settings->api_key = 'b40528421d083eff83b9b6ba11d8f928-us8';
-        EE_Config::instance()->update_config( 'addons', 'EE_Mailchimp', $this->_mci_config );
+	    EED_Mailchimp::update_config( $this->_mci_config );
 
         // MailChimp Controller.
         $this->_mci_controller = new EE_MCI_Controller();
@@ -43,7 +57,13 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         add_filter('FHEE__EE_MCI_Controller__mci_throw_error__mcapi_error', array('EE_MCI_Controller_Tests', 'notatest_apply_mci_error_filter'));
     }
 
-    public static function notatest_apply_mci_error_filter( $error ) {
+
+
+	/**
+	 * @param $error
+	 * @return mixed
+	 */
+	public static function notatest_apply_mci_error_filter( $error ) {
         $error['code'] = '7000';
         return $error;
     }
@@ -67,20 +87,21 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      *
      * @depends test_mci_controller_instance
      * @dataProvider mc_test_keys_provider
-     * 
+     *
      * @param string $key MC Api test Key
      * @param bool $result is key valid
+     * @param array $call_reply MC Api call response
      */
-    public function test_mc_api_key_validation($key, $result) {
-        $key_valid = $this->_mci_controller->mci_is_api_key_valid($key);
-        $this->assertEquals( $key_valid, $result );
+    public function test_mc_api_key_validation($key, $result, $call_reply = array() ) {
+        $key_valid = $this->_mci_controller->mci_is_api_key_valid($key, $call_reply);
+        $this->assertEquals( $result, $key_valid );
 
         // Test how MC Controller will handle an error and what will we get in the $mcapi_error.
         if ( $result === false ) {
             $mci_error = $this->_mci_controller->mci_get_response_error();
-            // Was the code changed throught the filter?
+            // Was the code changed through the filter?
             $this->assertEquals( $mci_error['code'], '7000' );
-            $this->assertEquals( $mci_error['msg'], 'Unknown MailChimp API Error' );
+            $this->assertEquals( $mci_error['msg'], 'Invalid MailChimp API Key.' );
         }
     }
 
@@ -89,8 +110,13 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      */
     public function mc_test_keys_provider() {
         return array(
-            array('b40528421d083eff83b9b6ba11d8f928-us8', true),
-            array('b40528421d083eff83b9b6ba11d8f928-us55', false),
+            array('b40528421d083eff83b9b6ba11d8f928-us8', 'b40528421d083eff83b9b6ba11d8f928-us8'),
+            array('b40528421d083eff83b9b6ba11d8f928-us8', false, array(
+                'status' => 'error',
+                'code' => '7000',
+                'name' => 'Invalid MailChimp API Key.',
+                'error' => 'Invalid MailChimp API Key.')
+            ),
             array('b40528421d083eff83-b9b6ba11d8f928u-s8', false),
             array('b40528421d083eff83b9b6ba11d8f928us8', false),
             array('b40528421d083eff83b9b6ba11d8f928us8-', false),
@@ -155,10 +181,9 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      */
     public function test_mci_getting_event_subscriptions() {
         // These will be empty as no lists/groups were added.
-        $no_event_list = $this->_mci_controller->mci_event_subscriptions($this->_ee_event->ID(), 'list');
-        $no_event_groups = $this->_mci_controller->mci_event_subscriptions($this->_ee_event->ID(), 'groups');
-        $this->assertTrue( $no_event_list == -1 );
-        $this->assertTrue( is_array($no_event_groups) );
+        $mci_event_subscriptions = $this->_mci_controller->mci_event_subscriptions($this->_ee_event->ID() );
+        $this->assertNull( $mci_event_subscriptions['list'] );
+        $this->assertTrue( is_array( $mci_event_subscriptions['groups']) );
 
         // Add a list and a group to the event.
         $group_id = '16-545-TWFueQ==';
@@ -170,16 +195,14 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
             )
         );
         $new_list_group->save();
-        $event_list = $this->_mci_controller->mci_event_subscriptions($this->_ee_event->ID(), 'list');
-        $event_groups = $this->_mci_controller->mci_event_subscriptions($this->_ee_event->ID(), 'groups');
-        $this->assertTrue( isset($event_list) );
-        $this->assertTrue( $event_list === $this->_list_id );
-        $this->assertTrue( is_array($event_groups) );
-        $this->assertTrue( in_array($group_id, $event_groups) );
+	    $mci_event_subscriptions = $this->_mci_controller->mci_event_subscriptions( $this->_ee_event->ID() );
+	    $this->assertTrue( isset( $mci_event_subscriptions['list']) );
+	    $this->assertTrue( $mci_event_subscriptions['list'] === $this->_list_id );
+        $this->assertTrue( is_array( $mci_event_subscriptions['groups']) );
+        $this->assertTrue( in_array($group_id, $mci_event_subscriptions['groups']) );
 
         // Test for event questions.
-        $event_questions = $this->_mci_controller->mci_event_subscriptions($this->_ee_event->ID(), 'question_fields');
-        $this->assertTrue( is_array($event_questions) );
+        $this->assertTrue( is_array( $mci_event_subscriptions['qfields']) );
         //$this->assertTrue( ! empty($event_questions) );
 
         // Test with no target (second) variable.
@@ -210,11 +233,11 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         $_POST['ee_mailchimp_qfields'] = base64_encode(serialize($list_field_tags));
 
         $this->_mci_controller->mci_save_metabox_contents($this->_ee_event->ID());
-        $list = $this->_mci_controller->mci_event_subscriptions($this->_ee_event->ID(), 'list');
-        $groups = $this->_mci_controller->mci_event_subscriptions($this->_ee_event->ID(), 'groups');
-        $q_fields = $this->_mci_controller->mci_event_subscriptions($this->_ee_event->ID(), 'question_fields');
-
-        $this->assertTrue( $list === $this->_list_id );
+	    $mci_event_subscriptions = $this->_mci_controller->mci_event_subscriptions( $this->_ee_event->ID() );
+	    $list = $mci_event_subscriptions['list'];
+        $groups = $mci_event_subscriptions['groups'];
+        $q_fields = $mci_event_subscriptions['qfields'];
+	    $this->assertTrue( $list === $this->_list_id );
         foreach ($list_groups as $group) {
             $this->assertTrue( in_array($group, $groups) );
         }
@@ -229,9 +252,8 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
     public function test_mailchimp_lists_content() {
         $mc_lists = $this->_mci_controller->mci_get_users_lists();
         ob_start();
-            $this->_mci_controller->mci_list_mailchimp_lists($this->_ee_event->ID());
-            $lists_content = ob_get_contents();
-        ob_end_clean();
+        $this->_mci_controller->mci_list_mailchimp_lists($this->_ee_event->ID());
+        $lists_content = ob_get_clean();
         foreach ($mc_lists as $list_no => $list) {
             $this->assertTrue( strpos($lists_content, $list['name']) !== false );
         }
@@ -243,9 +265,8 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
     public function test_mailchimp_groups_content() {
         $mc_gorups = $this->_mci_controller->mci_get_users_groups($this->_list_id);
         ob_start();
-            $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), $this->_list_id);
-            $ok_groups_content = ob_get_contents();
-        ob_end_clean();
+        $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), $this->_list_id);
+        $ok_groups_content = ob_get_clean();
         foreach ($mc_gorups as $grouping) {
             $this->assertTrue( strpos($ok_groups_content, $grouping['name']) !== false );
             foreach ($grouping['groups'] as $group) {
@@ -254,9 +275,8 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         }
         // If no groups in the list.
         ob_start();
-            $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), 'invalid-list-id');
-            $none_groups_content = ob_get_contents();
-        ob_end_clean();
+        $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), 'invalid-list-id');
+        $none_groups_content = ob_get_clean();
         $this->assertTrue( strpos($none_groups_content, 'No groups found for this List.') !== false );
     }
 
@@ -290,18 +310,18 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      */
     public function test_mci_metabox_contents() {
         ob_start();
-            $this->_mci_controller->mci_set_metabox_contents(get_post($this->_ee_event->ID(), 'OBJECT '));
-            $ok_metabox_contents = ob_get_contents();
-        ob_end_clean();
+        $this->_mci_controller->mci_set_metabox_contents(get_post($this->_ee_event->ID(), 'OBJECT '));
+        $ok_metabox_contents = ob_get_clean();
         $this->assertTrue( strpos($ok_metabox_contents, 'espresso_mailchimp_integration_metabox') !== false );
 
         // Invalid Key so no contents in the metabox.
         $this->_mci_config->api_settings->api_key = 'b40528421d083eff83b9b6ba11sdsdd8f928-us8';
-        EE_Config::instance()->update_config( 'addons', 'EE_Mailchimp', $this->_mci_config );
+	    EED_Mailchimp::update_config( $this->_mci_config );
         ob_start();
-            $this->_mci_controller->mci_set_metabox_contents(get_post($this->_ee_event->ID(), 'OBJECT '));
-            $metabox_contents = ob_get_contents();
-        ob_end_clean();
-        $this->assertTrue( empty($metabox_contents) );
+        $this->_mci_controller->mci_set_metabox_contents(get_post($this->_ee_event->ID(), 'OBJECT '));
+        $metabox_contents = ob_get_clean();
+	    $this->assertFalse( empty($metabox_contents) );
     }
 }
+
+// Location:/tests/testcases/includes/EE_MCI_Controller_Tests.php

@@ -44,15 +44,12 @@ class EED_Mailchimp extends EED_Module {
 		// Ajax for MailChimp list fields refresh
 		add_action( 'wp_ajax_espresso_mailchimp_update_list_fields', array('EED_Mailchimp', 'espresso_mailchimp_update_list_fields') );
 
-		EE_Config::register_route( 'mailchimp', 'EED_Mailchimp', 'run' );
 	}
 
 
 	public static function set_eemc_hooks() {
 		// Set defaults.
-		EED_Mailchimp::setup_mc_defaults();
-		// Set hooks.
-		$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
+		$mc_config = EED_Mailchimp::setup_mc_defaults();
 		// Hook into the EE _process_attendee_information.
 		if ( $mc_config->api_settings->submit_to_mc_when == 'attendee-information-end' ) {
 			add_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
@@ -67,15 +64,29 @@ class EED_Mailchimp extends EED_Module {
 	/**
 	 *    Setup defaults.
 	 *
-	 *    @access public
-	 *    @return void
+	 * @return EE_Mailchimp_Config
 	 */
 	public static function setup_mc_defaults() {
-		$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
+		$mc_config = EED_Mailchimp::get_config();
 		if ( ! isset($mc_config->api_settings->submit_to_mc_when) || empty($mc_config->api_settings->submit_to_mc_when) ) {
 			$mc_config->api_settings->submit_to_mc_when = 'reg-step-approved';
-			EE_Config::instance()->update_config( 'addons', 'Mailchimp', $mc_config );
+			EED_Mailchimp::update_config( $mc_config );
 		}
+		return $mc_config;
+	}
+
+
+
+	/**
+	 * get_config
+	 *
+	 * @return EE_Mailchimp_Config
+	 */
+	public static function get_config() {
+		if ( EED_Mailchimp::instance()->config_name() === '' ) {
+			EED_Mailchimp::set_config();
+		}
+		return EED_Mailchimp::instance()->config();
 	}
 
 
@@ -85,10 +96,23 @@ class EED_Mailchimp extends EED_Module {
 	 *
 	 * @return EE_Mailchimp_Config
 	 */
-	protected static function set_config() {
+	public static function set_config() {
 		EED_Mailchimp::instance()->set_config_section( 'addons' );
-		EED_Mailchimp::instance()->set_config_name( 'Mailchimp' );
-		EED_Mailchimp::instance()->set_config_class( 'EE_Mailchimp_Config' );
+		EED_Mailchimp::instance()->set_config_name( EE_MailChimp::CONFIG_NAME );
+		EED_Mailchimp::instance()->set_config_class( EE_MailChimp::CONFIG_CLASS );
+	}
+
+
+
+	/**
+	 * update_config
+	 *
+	 * @param \EE_Mailchimp_Config $config
+	 * @return \EE_Mailchimp_Config
+	 * @throws \EE_Error
+	 */
+	public static function update_config( EE_Mailchimp_Config $config ) {
+		return EED_Mailchimp::instance()->_update_config( $config );
 	}
 
 

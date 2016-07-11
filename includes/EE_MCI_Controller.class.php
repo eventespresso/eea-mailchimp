@@ -119,7 +119,7 @@ class EE_MCI_Controller {
 			return FALSE;
 		}
 		// MailChimp API does not check for the '-' and throws an error, so let's do the check ourselves.
-		if ( ! strlen( $this->_api_key ) > 1 ||  strpos( $api_key, '-' ) === FALSE ) {
+		if ( ! strlen( $this->_api_key ) > 1 ||  strpos( $api_key, '-' ) === FALSE || strpos( $api_key, '-' ) === strlen($api_key) - 1 ) {
 			$this->mci_throw_error( FALSE );
 			do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
 			return FALSE;
@@ -187,14 +187,15 @@ class EE_MCI_Controller {
 			$spco_transaction = $spco_data['transaction'];
 
 			do_action('AHEE__EE_MCI_Controller__mci_submit_to_mailchimp__start', $spco_transaction, $registrations);
-			
+
 			$registered_attendees = array();
 			// now loop thru registrations to get the related attendee objects
 			if ( ! empty( $registrations )) {
 				foreach ( $registrations as $registration ) {
 					if ( $registration instanceof EE_Registration ) {
 						$need_reg_status = $reg_approved = false;
-						$mc_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
+						/** @type EE_Mailchimp_Config $mc_config */
+						$mc_config = EED_Mailchimp::get_config();
 						if ( $mc_config->api_settings->submit_to_mc_when === 'reg-step-approved' ) {
 							$need_reg_status = true;
 							$reg_status = $registration->status_ID();
@@ -221,20 +222,12 @@ class EE_MCI_Controller {
 								// Question fields
 								$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
 								// filter it
-								$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args, $registration, $EVT_ID );
+								$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args );
 								// Subscribe attendee
 								$reply = $this->MailChimp->call( 'lists/subscribe', $subscribe_args );
 								$registered_attendees[] = $att_email;
-
-								do_action( 'AHEE_log', __FILE__, __FUNCTION__, '');
-
 								// If there was an error during subscription than process it.
 								if ( isset( $reply['status'] ) && $reply['status'] == 'error' ) {
-
-									// Log failed MailChimp API response.
-									do_action( 'AHEE_log', __FILE__, __FUNCTION__, $reply['status'] . ': ' . $reply['code'], 'MailChimp->call("lists/subscribe")'); 
-									do_action( 'AHEE_log', __FILE__, __FUNCTION__, $reply['error'], 'MailChimp->call("lists/subscribe")'); 
-
 									$this->mci_throw_error( $reply );
 									// If the error: 'email is already subscribed to a list' then just update the groups.
 									if ( $reply['code'] == 214 ) {
@@ -765,7 +758,7 @@ class EE_MCI_Controller {
 													<?php
 													// Default to main fields if exist:
 													if (
-														( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] ) 
+														( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] )
 														&& ( $selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || ( isset($this->_question_list_id[$q_field['QST_ID']]) && $selected_fields[ $l_field['tag'] ] == $this->_question_list_id[$q_field['QST_ID']] ) ) )
 														|| ( ($q_field['QST_ID'] == 3 || $q_field['QST_ID'] == 'email') && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
 														|| ( ($q_field['QST_ID'] == 2 || $q_field['QST_ID'] == 'lname') && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
@@ -825,7 +818,7 @@ class EE_MCI_Controller {
 	        foreach ($question_groups as $QG_list) {
 				if ( $QG_list instanceof EE_Question_Group ) {
 					foreach ( $QG_list->questions() as $q_list ) {
-						$qst = array( 
+						$qst = array(
 							'QST_Name' => $q_list->get('QST_display_text'),
 							'QST_ID' => $q_list->get('QST_ID')
 						);
@@ -853,7 +846,7 @@ class EE_MCI_Controller {
 	public function mci_event_list( $EVT_ID ) {
 		EE_Registry::instance()->load_model( 'Event_Mailchimp_List_Group' );
 		$event_list = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array( 'EVT_ID' => $EVT_ID ), 'limit' => 1 ));
-		$event_list = current( $event_list );
+		$event_list = reset( $event_list );
 		return $event_list instanceof EE_Event_Mailchimp_List_Group ? $event_list->mc_list() : NULL;
 	}
 
@@ -909,14 +902,16 @@ class EE_MCI_Controller {
 	 * @return array/string  Id of a group/list or an array of 'List fields - Event questions' relationships, or all in an array.
 	 */
 	public function mci_event_subscriptions( $EVT_ID ) {
-		$event_list = $this->mci_event_list( $EVT_ID );
-		$event_groups = $this->mci_event_list_group( $EVT_ID );
-		$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
 		return array(
-			'list' 			=> isset( $event_list[0], $event_list[0]['ListID'] ) ? $event_list[0]['ListID'] : array(),
-			'groups' 	=> isset( $event_groups[0], $event_groups[0]['GroupID'] ) ? $event_groups[0]['GroupID'] : array(),
-			'qfields' 	=> isset( $question_fields[0], $question_fields[0]['FieldRel'] ) ? $question_fields[0]['FieldRel'] : array(),
+			'list' 		=> $this->mci_event_list( $EVT_ID ),
+			'groups' 	=> $this->mci_event_list_group( $EVT_ID ),
+			'qfields' 	=> $this->mci_event_list_question_fields( $EVT_ID ),
 		);
+		// return array(
+		// 	'list' 		=> isset( $event_list[0], $event_list[0]['ListID'] ) ? $event_list[0]['ListID'] : array(),
+		// 	'groups' 	=> isset( $event_groups[0], $event_groups[0]['GroupID'] ) ? $event_groups[0]['GroupID'] : array(),
+		// 	'qfields' 	=> isset( $question_fields[0], $question_fields[0]['FieldRel'] ) ? $question_fields[0]['FieldRel'] : array(),
+		// );
 	}
 
 	/**
@@ -993,7 +988,7 @@ class EE_MCI_Controller {
 		}
 		$this->mcapi_error = apply_filters('FHEE__EE_MCI_Controller__mci_throw_error__mcapi_error', $error);
 	}
-	
+
 
 	/**
 	 * mci_get_api_key
@@ -1013,5 +1008,3 @@ class EE_MCI_Controller {
 	}
 
 }
-
-?>

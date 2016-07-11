@@ -19,11 +19,12 @@ class EED_Mailchimp_Tests extends EE_UnitTestCase {
         $this->_list_id = 'a1913d44fe';
 
         // MailChimp Settings.
-        $this->_mci_config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+        $this->_mci_config = EED_Mailchimp::get_config();
 
         // Set a valid MailChimp API Key.
         $this->_mci_config->api_settings->api_key = 'b40528421d083eff83b9b6ba11d8f928-us8';
-        EE_Config::instance()->update_config( 'addons', 'EE_Mailchimp', $this->_mci_config );
+
+	    EED_Mailchimp::update_config( $this->_mci_config );
 
         // MailChimp Controller.
         $this->_mci_controller = new EE_MCI_Controller();
@@ -37,6 +38,27 @@ class EED_Mailchimp_Tests extends EE_UnitTestCase {
      */
     function test_mailchimp_front_hooks_added() {
         // Hook into the EE _process_attendee_information.
-        $this->assertTrue( has_action('AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2) !== false );
+        // Use one hook or the other. Should not be both at the same time. 
+	    $this->assertTrue( ( 
+                has_action(
+    			    'AHEE__EE_Single_Page_Checkout__process_attendee_information__end',
+    			    array( 'EED_Mailchimp', 'espresso_mailchimp_submit_to_mc' )
+    		    ) !== false 
+                && has_action(
+                    'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed',
+                    array( 'EED_Mailchimp', 'espresso_mailchimp_submit_to_mc' )
+                ) === false 
+            )
+            || (
+                has_action(
+                    'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed',
+                    array( 'EED_Mailchimp', 'espresso_mailchimp_submit_to_mc' )
+                ) !== false
+                && has_action(
+                    'AHEE__EE_Single_Page_Checkout__process_attendee_information__end',
+                    array( 'EED_Mailchimp', 'espresso_mailchimp_submit_to_mc' )
+                ) === false
+            )
+	    );
     }
 }
