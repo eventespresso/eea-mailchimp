@@ -426,7 +426,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_users_lists() {
 		do_action('AHEE__EE_MCI_Controller__mci_get_users_lists__start');
-		$reply = $this->MailChimp->call('lists/list', array('apikey' => $this->_api_key));
+		$reply = $this->MailChimp->call('lists/list', apply_filters( 'FHEE__EE_MCI_Controller__mci_get_users_lists__list_params', array('apikey' => $this->_api_key), $this ) );
 		if ( ($reply != false) && isset($reply['data']) && ! empty($reply['data'])  ) {
 			return $reply['data'];
 		} else {
