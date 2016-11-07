@@ -104,7 +104,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 
 		$config = EED_Mailchimp::get_config();
 		//d( $config );
-		$this->_template_args['mailchimp_double_opt_check'] =  isset( $config->api_settings->skip_double_optin ) && $config->api_settings->skip_double_optin === FALSE ? 'checked="checked"' : '';
+		$this->_template_args['mailchimp_double_opt_check'] =  isset( $config->api_settings->skip_double_optin ) && $config->api_settings->skip_double_optin === false ? 'checked="checked"' : '';
 
 		$this->_template_args['submit_to_mc_end'] = $this->_template_args['submit_to_mc_complete'] = $this->_template_args['submit_to_mc_approved'] = '';
 		switch ( $config->api_settings->submit_to_mc_when ) {
@@ -162,7 +162,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 				$key_valid = TRUE;
 				$config->api_settings->mc_active = 1;
 				$config->api_settings->api_key = $mailchimp_api_key;
-				$config->api_settings->skip_double_optin = empty( $_POST['mailchimp_double_opt'] ) ? TRUE : FALSE;
+				$config->api_settings->skip_double_optin = empty( $_POST['mailchimp_double_opt'] ) ? true : false;
 				$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-approved' : $_POST['submit_to_mc_when'];
 			} else {
 				$key_valid = FALSE;
