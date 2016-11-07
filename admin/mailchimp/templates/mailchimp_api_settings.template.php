@@ -41,6 +41,21 @@
 				</td>
 			</tr>
 			<tr valign="top">
+				<th><?php _e( 'Email content type:', 'event_espresso' ); ?></th>
+				<td>
+					<select name="emails_type">
+						<option value="html" <?php echo $mailchimp_html_emails; ?> >HTML</option>
+						<option value="text" <?php echo $mailchimp_text_emails; ?> >Text</option>
+					</select>
+
+					<p class="description">
+						<?php
+							_e( '* Type of emails to send to the subscriber.', 'event_espresso' );
+						?>
+					</p>
+				</td>
+			</tr>
+			<tr valign="top">
 				<th><?php _e( 'Submit to MailChimp when ...', 'event_espresso' ); ?></th>
 				<td>
 					<select name="submit_to_mc_when">

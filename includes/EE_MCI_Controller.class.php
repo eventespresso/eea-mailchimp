@@ -227,6 +227,7 @@ class EE_MCI_Controller {
 							// If no list selected for this event than skip the subscription.
 							if ( ! empty( $event_list )) {
 								$opt_in = isset( $this->_config->api_settings->skip_double_optin ) ? $this->_config->api_settings->skip_double_optin : true;
+								$emails_type = isset( $this->_config->api_settings->emails_type ) ? $this->_config->api_settings->emails_type : 'text';
 								$subscribe_args = array(
 									'email_address' => $att_email
 								);
@@ -249,6 +250,8 @@ class EE_MCI_Controller {
 									} else {
 										$subscribe_args['status_if_new'] = 'subscribed';
 									}
+									// What type of emails we want to send ?
+									$subscribe_args['email_type'] = $emails_type;
 									// Add/update member.
 									$put_member = $this->MailChimp->put( '/lists/'.$event_list.'/members/'.$this->MailChimp->subscriberHash($att_email), $subscribe_args );
 								} catch (Exception $e) {

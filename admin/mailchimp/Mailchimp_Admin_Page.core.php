@@ -105,7 +105,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 		$config = EED_Mailchimp::get_config();
 		//d( $config );
 		$this->_template_args['mailchimp_double_opt_check'] =  isset( $config->api_settings->skip_double_optin ) && $config->api_settings->skip_double_optin === false ? 'checked="checked"' : '';
-
+		// When do we want to submit the registrant to the MC.
 		$this->_template_args['submit_to_mc_end'] = $this->_template_args['submit_to_mc_complete'] = $this->_template_args['submit_to_mc_approved'] = '';
 		switch ( $config->api_settings->submit_to_mc_when ) {
 			case 'attendee-information-end':
@@ -119,6 +119,19 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 				break;
 			default:
 				$this->_template_args['submit_to_mc_approved'] = 'selected';
+				break;
+		}
+		// What type of emails do we want to send to the subscriber.
+		$this->_template_args['mailchimp_html_emails'] = $this->_template_args['mailchimp_text_emails'] = '';
+		switch ( $config->api_settings->emails_type ) {
+			case 'html':
+				$this->_template_args['mailchimp_html_emails'] = 'selected';
+				break;
+			case 'text':
+				$this->_template_args['mailchimp_text_emails'] = 'selected';
+				break;
+			default:
+				$this->_template_args['mailchimp_html_emails'] = 'selected';
 				break;
 		}
 
@@ -163,6 +176,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 				$config->api_settings->mc_active = 1;
 				$config->api_settings->api_key = $mailchimp_api_key;
 				$config->api_settings->skip_double_optin = empty( $_POST['mailchimp_double_opt'] ) ? true : false;
+				$config->api_settings->emails_type = empty( $_POST['emails_type'] ) ? 'html' : $_POST['emails_type'];
 				$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-approved' : $_POST['submit_to_mc_when'];
 			} else {
 				$key_valid = FALSE;
@@ -172,6 +186,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 				$query_args['mcapi_error'] = $error_msg;
 				$config->api_settings->mc_active = FALSE;
 				$config->api_settings->api_key = '';
+				$config->api_settings->emails_type = empty( $_POST['emails_type'] ) ? 'html' : $_POST['emails_type'];
 				$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-approved' : $_POST['submit_to_mc_when'];
 			}
 		} else {
@@ -181,6 +196,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 			$query_args['mcapi_error'] = $error_msg;
 			$config->api_settings->mc_active = FALSE;
 			$config->api_settings->api_key = '';
+			$config->api_settings->emails_type = empty( $_POST['emails_type'] ) ? 'html' : $_POST['emails_type'];
 			$config->api_settings->submit_to_mc_when = empty( $_POST['submit_to_mc_when'] ) ? 'reg-step-approved' : $_POST['submit_to_mc_when'];
 		}
 		EED_Mailchimp::update_config( $config );
