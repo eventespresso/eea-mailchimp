@@ -555,76 +555,19 @@ class EE_MCI_Controller {
 
 
 	/**
-	 * mci_ajax_loading
-	 *
-	 * @access public
-	 * @param string $id  extra css id tag to be appended to existing
-	 * @return void
-	 */
-	public function mci_ajax_loading( $id = '' ) {
-		$id = ! empty( $id ) ? 'id="ee-mailchimp-ajax-loading-' . $id . '" ' : '';
-		?>
-		<div <?php echo $id; ?>class="ee-mailchimp-ajax-loading" style="display:none;">
-			<span class="ee-spinner ee-spin"></span>
-			<span class="ee-loading-txt small-text"><?php _e( 'loading...', 'event_espresso' );?></span>
-		</div>
-		<?php
-	}
-
-
-
-	/**
 	 * Set up 'MailChimp List Integration' meta-box section contents.
 	 *
 	 * @access public
 	 * @param WP_Post $event  The post object.
-	 * @return void
+	 * @return string
 	 */
 	public function mci_set_metabox_contents( $event ) {
-		// verify api key
-		if ( ! empty( $this->_config->api_settings->api_key )) {
-			// Get saved list for this event (if there's one)
-			$this->list_id = $this->mci_event_list( $event->ID );
-			$this->category_id = $this->mci_event_list_group( $event->ID );
-			?>
-			<div class="espresso_mailchimp_integration_metabox">
-				<div class="espresso_mci_lists_groups">
-					<div id="espresso-mci-lists">
-						<?php
-						// Lists / Groups section
-						$this->mci_list_mailchimp_lists( $this->list_id );
-						?>
-					</div>
-					<?php $this->mci_ajax_loading( 'groups' ); ?>
-					<div id="espresso-mci-groups-list">
-						<?php $this->mci_list_mailchimp_groups( $event->ID, $this->list_id ); ?>
-					</div>
-				</div>
-				<?php $this->mci_ajax_loading( 'fields' ); ?>
-				<div id="espresso-mci-list-fields" class="espresso_mci_list_fields">
-					<?php $this->mci_list_mailchimp_fields( $event->ID, $this->list_id ); ?>
-				</div>
-			</div>
-			<?php
-		} else {
-			?>
-			<div class="espresso_mailchimp_integration_metabox">
-				<p>
-					<?php
-					printf(
-						__( '%1$sInvalid MailChimp API%2$s%3$sPlease visit the %4$sMailChimp Admin Page%5$s to correct the issue.', 'event_espresso' ),
-						'<span class="important-notice">',
-						'</span>',
-						'<br />',
-						'<a href="' . admin_url( 'admin.php?page=mailchimp' ) . '">',
-						'</a>'
-					);
-					?>
-				</p>
-			</div>
-			<?php
-		}
+		ob_start();
+		include( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'mc-metabox-content.template.php' );
+		return ob_get_clean();
 	}
+
+
 
 	/**
 	 * Save the contents of 'MailChimp List Integration' meta-box.
@@ -722,24 +665,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_lists( $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
-		?>
-		<label for="ee-mailchimp-lists"><?php _e( 'Please select a List:', 'event_espresso' );?></label><br />
-		<?php
-		$mc_lists = $this->mci_get_users_lists();
-		array_push( $mc_lists, array( 'id' => '-1', 'name' => __( 'Do not send to MailChimp', 'event_espresso' )));
-		if ( ! empty( $mc_lists )) {
-			?>
-			<select id="ee-mailchimp-lists" name="ee_mailchimp_lists" class="ee_mailchimp_dropdowns">
-				<?php foreach ( $mc_lists as $list ) { ?>
-					<option value="<?php echo $list['id']; ?>" <?php echo ( $list_id == $list['id'] ) ? 'selected="selected"' : ''; ?>><?php echo $list['name']; ?></option>
-				<?php } ?>
-			</select>
-			<?php
-		} else {
-			?>
-			<p class="important-notice"><?php _e( 'No lists found! Please log into your MailChimp account and create at least one mailing list.', 'event_espresso' );?></p>
-			<?php
-		}
+		include( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'mc-lists.template.php' );
 	}
 
 
@@ -758,36 +684,7 @@ class EE_MCI_Controller {
 		$event_list_group = $this->mci_event_list_group( $event_id );
 		$user_groups = $this->mci_get_users_groups( $list_id );
 
-		?>
-		<div id="ee-mailchimp-groups-list">
-			<label for="ee-mailchimp-groups"><?php _e( 'Please select a Group:', 'event_espresso' );?></label>
-			<dl id="ee-mailchimp-groups" class="ee_mailchimp_dropdowns">
-				<?php
-				if ( ! empty( $user_groups ) ) {
-					foreach ( $user_groups as $user_group ) {
-						$category_interests = $this->mci_get_interests( $list_id, $user_group['id'] );
-						?>
-						<dt><b><?php echo $user_group['title']; ?></b></dt>
-						<?php
-						foreach ( $category_interests as $interest ) {
-							$group_id = $interest['id'] . '-' . $interest['category_id'] . '-' . base64_encode($interest['name']);
-							?>
-							<dd>
-								<input type="checkbox" id="<?php echo $group_id; ?>" value="<?php echo $group_id; ?>" name="ee_mailchimp_groups[]" <?php echo ( in_array( $group_id, $event_list_group )) ? 'checked' : ''; ?>>
-								<label for="<?php echo $group_id; ?>"><?php echo $interest['name']; ?></label>
-							</dd>
-							<?php
-						}
-					}
-				} else {
-					?>
-					<p class="important-notice"><?php _e( 'No groups found for this List.', 'event_espresso' );?></p>
-					<?php
-				}
-				?>
-			</dl>
-		</div>
-		<?php
+		include( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'mc-interest-categories.template.php' );
 	}
 
 
@@ -800,70 +697,19 @@ class EE_MCI_Controller {
 	 * @param int $list_id
 	 * @return void
 	 */
-	public function mci_list_mailchimp_fields( $event_id = 0, $list_id = 0  ) {
+	public function mci_list_mailchimp_fields( $event_id = 0, $list_id = 0 ) {
 		$list_fields = $this->mci_get_list_merge_vars( $list_id );
 		$selected_fields = $this->mci_event_list_question_fields( $event_id );
-		$evt_questions = $this->mci_get_event_all_questions($event_id);
+		$evt_questions = $this->mci_get_event_all_questions( $event_id );
 
-		// To save the list of mailchimp Fields for the future use.
+		// To save the list of Mailchimp Fields for the future use.
 		$hide_fields = array();
 		if ( ! empty($list_fields) ) {
-			?>
-			<div id="espresso-mci-list-merge-fields">
-				<table class="espresso_mci_merge_fields_tb">
-					<thead>
-						<tr class="ee_mailchimp_field_heads">
-							<th><b><?php _e( 'List Fields', 'event_espresso' );?></b></th>
-							<th><b><?php _e( 'Form Fields', 'event_espresso' );?></b></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php
-						foreach ($list_fields as $l_field) {
-							$starred = '*';
-							// Skip if field is not public.
-							if ( $l_field['public'] === false ) continue;
-							?>
-							<tr>
-								<td>
-									<p id="mci-field-<?php echo base64_encode($l_field['name']); ?>" class="ee_mci_list_fields">
-										<?php echo $l_field['name']; echo ( $l_field['required'] ) ? '<span class="nci_asterisk">' . $starred . '</span>' : ''; ?>
-									</p>
-								</td>
-								<td>
-									<select id="event-question-<?php echo base64_encode($l_field['name']); ?>" name="<?php echo base64_encode($l_field['tag']); ?>" class="ee_event_fields_selects" >
-										<option value="-1"><?php _e( 'none', 'event_espresso' );?></option>
-											<?php foreach ($evt_questions as $q_field) { ?>
-												<option value="<?php echo $q_field['QST_ID']; ?>"
-													<?php
-													// Default to main fields if exist:
-													if (
-														( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] )
-														&& ( $selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || ( isset($this->_question_list_id[$q_field['QST_ID']]) && $selected_fields[ $l_field['tag'] ] == $this->_question_list_id[$q_field['QST_ID']] ) ) )
-														|| ( ($q_field['QST_ID'] == 3 || $q_field['QST_ID'] == 'email') && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
-														|| ( ($q_field['QST_ID'] == 2 || $q_field['QST_ID'] == 'lname') && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
-														|| ( ($q_field['QST_ID'] == 1 || $q_field['QST_ID'] == 'fname') && $l_field['tag'] == 'FNAME' && ! array_key_exists( 'FNAME', $selected_fields ))
-													) {
-														echo 'selected';
-													}
-													?>>
-													<?php echo $q_field['QST_Name']; ?>
-												</option>
-											<?php } ?>
-									</select>
-								</td>
-							</tr>
-							<?php
-							$hide_fields[] = $l_field['tag'];
-						}
-						?>
-					</tbody>
-				</table>
-				<input type="hidden" name="ee_mailchimp_qfields" value="<?php echo base64_encode(serialize($hide_fields)); ?>" />
-			</div>
-			<?php
+			include( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'mc-merge-fields.template.php' );
 		}
 	}
+
+
 
 	/**
 	 * Get the list of question groups (EQG_primary) of the Event.
@@ -878,7 +724,7 @@ class EE_MCI_Controller {
 				'Event.EVT_ID' => $event_id,
 				'Event_Question_Group.EQG_primary' => TRUE
 			),
-			'order_by'=>array( 'QSG_order'=>'ASC' )
+			'order_by'=>array( 'QSG_order' => 'ASC' )
 		));
 	}
 

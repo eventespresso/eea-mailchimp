@@ -245,7 +245,7 @@ class EED_Mailchimp extends EED_Module {
 		$mci_controller = new EE_MCI_Controller();
 		// Add an nonce field.
 		wp_nonce_field( 'espresso_mailchimp_list_box', 'espresso_mailchimp_list_box_nonce' );
-		$mci_controller->mci_set_metabox_contents($event);
+		echo $mci_controller->mci_set_metabox_contents($event);
 	}
 
 	/**
