@@ -302,15 +302,20 @@ class EE_MCI_Controller {
      */
 	protected function _process_event_group_subscribe_args( $event_group = array(),  $subscribe_args = array() ) {
 		$grouping = explode( '-', $event_group );
+		// Is this interest selected.
+		$selected = false;
+		if ( isset($grouping[3]) && $grouping[3] === 'true' ) {
+			$selected = true;
+		}
 		// Just add the interests.
 		if ( isset( $subscribe_args['interests'] )) {
 			foreach ( $subscribe_args['interests'] as $interest => $value ) {
 				if ( $interest != $grouping[0] ) {
-					$subscribe_args['interests'][$grouping[0]] = true;
+					$subscribe_args['interests'][$grouping[0]] = $selected;
 				}
 			}
 		} else {
-			$subscribe_args['interests'][$grouping[0]] = true;
+			$subscribe_args['interests'][$grouping[0]] = $selected;
 		}
 		return $subscribe_args;
 	}
@@ -587,14 +592,22 @@ class EE_MCI_Controller {
 
 		// Lists and Groups
 		$list_id = $_POST['ee_mailchimp_lists'];
-		if ( ! empty($_POST['ee_mailchimp_groups']) ) {
+		if ( ! empty($_POST['ee_mailchimp_groups']) && ! empty($_POST['ee_mc_list_all_interests']) ) {
+			$all_interests = $_POST['ee_mc_list_all_interests'];
 			$group_ids = $_POST['ee_mailchimp_groups'];
-			foreach ($group_ids as $group) {
+			// We need to save the list of all interests for the current MC List.
+			foreach ( $all_interests as $interest ) {
+				// Mark what lists were selected and not.
+				if ( in_array($interest, $group_ids) ) {
+					$interest .= '-true';
+				} else {
+					$interest .= '-false';
+				}
 				$new_list_group = EE_Event_Mailchimp_List_Group::new_instance(
 					array(
 						'EVT_ID' => $event_id,
 						'AMC_mailchimp_list_id' => $list_id,
-						'AMC_mailchimp_group_id' => $group
+						'AMC_mailchimp_group_id' => $interest
 					)
 				);
 				$new_list_group->save();
@@ -681,7 +694,7 @@ class EE_MCI_Controller {
 	public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
 		// Get saved group for this event (if there's one)
-		$event_list_group = $this->mci_event_list_group( $event_id );
+		$event_list_group = $this->mci_event_selected_interests( $event_id );
 		$user_groups = $this->mci_get_users_groups( $list_id );
 
 		include( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'mc-interest-categories.template.php' );
@@ -795,6 +808,26 @@ class EE_MCI_Controller {
 			}
 		}
 		return $event_list_groups;
+	}
+
+
+
+	/**
+	 * Get a list of selected Interests.
+	 *
+	 * @access public
+	 * @param int $EVT_ID  The ID of the Event.
+	 * @return EE_Event_Mailchimp_List_Group[]
+	 */
+	public function mci_event_selected_interests( $EVT_ID ) {
+		$selected = array();
+		$all_interests = $this->mci_event_list_group( $EVT_ID );
+		foreach ( $all_interests as $interest ) {
+			if ( strpos($interest, '-true') !== false ) {
+				$selected[] = str_replace('-true', '', $interest);
+			}
+		}
+		return $selected;
 	}
 
 

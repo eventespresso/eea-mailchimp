@@ -9,6 +9,7 @@ if ( $list_id === '-1' || $list_id === NULL ) {
 	<dl id="ee-mailchimp-groups" class="ee_mailchimp_dropdowns">
 		<?php
 		if ( ! empty( $user_groups ) ) {
+			$all_interests = array();
 			foreach ( $user_groups as $category ) {
 				$category_interests = $this->mci_get_interests( $list_id, $category['id'] );
 				$type = $category['type'];
@@ -24,7 +25,7 @@ if ( $list_id === '-1' || $list_id === NULL ) {
 					?> <dd> <select id="<?php echo $category['id']; ?>" name="ee_mailchimp_groups[]"> <?php
 				}
 				foreach ( $category_interests as $interest ) {
-					$interest_id = $interest['id'] . '-' . $interest['category_id'] . '-' . base64_encode($interest['name']);
+					$all_interests[] = $interest_id = $interest['id'] . '-' . $interest['category_id'] . '-' . base64_encode($interest['name']);
 					switch ( $type ) {
 						case 'checkboxes':
 							?><dd>
@@ -55,6 +56,11 @@ if ( $list_id === '-1' || $list_id === NULL ) {
 				if ( $type === 'dropdown' ) {
 					?> </select> </dd> <?php
 				}
+			}
+			foreach ( $all_interests as $key => $intr ) {
+				?>
+				<input id="ee-mc-intr-list-<?php echo $key;?>" name="ee_mc_list_all_interests[]" value="<?php echo $intr; ?>" type="hidden" >
+				<?php
 			}
 		} else {
 			?>
