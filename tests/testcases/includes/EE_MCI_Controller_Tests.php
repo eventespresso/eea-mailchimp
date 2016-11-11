@@ -64,7 +64,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
 	 * @return mixed
 	 */
 	public static function notatest_apply_mci_error_filter( $error ) {
-        $error['code'] = '7000';
+        $error['code'] = '404';
         return $error;
     }
 
@@ -100,7 +100,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         if ( $result === false ) {
             $mci_error = $this->_mci_controller->mci_get_response_error();
             // Was the code changed through the filter?
-            $this->assertEquals( $mci_error['code'], '7000' );
+            $this->assertEquals( $mci_error['code'], '404' );
             $this->assertEquals( $mci_error['msg'], 'Invalid MailChimp API Key.' );
         }
     }
@@ -111,11 +111,12 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
     public function mc_test_keys_provider() {
         return array(
             array('b40528421d083eff83b9b6ba11d8f928-us8', 'b40528421d083eff83b9b6ba11d8f928-us8'),
-            array('b40528421d083eff83b9b6ba11d8f928-us8', false, array(
-                'status' => 'error',
-                'code' => '7000',
-                'name' => 'Invalid MailChimp API Key.',
-                'error' => 'Invalid MailChimp API Key.')
+            array('b40528421d083eff83b9b6ba11d8f928-us', false, array(
+                'status' => '404',
+                'type' => 'API Key',
+                'title' => 'Invalid MailChimp API Key.',
+                'detail' => 'Invalid MailChimp API Key.',
+                'instance' => 'RFC2616')
             ),
             array('b40528421d083eff83-b9b6ba11d8f928u-s8', false),
             array('b40528421d083eff83b9b6ba11d8f928us8', false),
@@ -186,7 +187,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         $this->assertTrue( is_array( $mci_event_subscriptions['groups']) );
 
         // Add a list and a group to the event.
-        $group_id = '16-545-TWFueQ==';
+        $group_id = '907bfaf16d-94127ddbe7-QWxs-true';
         $new_list_group = EE_Event_Mailchimp_List_Group::new_instance(
             array(
                 'EVT_ID' => $this->_ee_event->ID(),
@@ -220,9 +221,12 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      * Test how will mci save metabox contents.
      */
     public function test_mci_saving_metabox_contents() {
-        $list_groups = array('16-545-TWFueQ==', '64-545-Tm9uZQ==');
+        $list_groups = array('907bfaf16d-94127ddbe7-QWxs', 'bceb085d63-94127ddbe7-Tm90IGFsbA==');
+        $all_interests = array('907bfaf16d-94127ddbe7-QWxs', 'bceb085d63-94127ddbe7-Tm90IGFsbA==', 'b28a6191c0-b63bc1efcd-RzI=', '71b296c9dc-d41c360a53-RGcy');
+        $saved_interests = array('907bfaf16d-94127ddbe7-QWxs-true', 'bceb085d63-94127ddbe7-Tm90IGFsbA==-true', 'b28a6191c0-b63bc1efcd-RzI=-false', '71b296c9dc-d41c360a53-RGcy-false');
         $_POST['ee_mailchimp_lists'] = $this->_list_id;
         $_POST['ee_mailchimp_groups'] = $list_groups;
+        $_POST['ee_mc_list_all_interests'] = $all_interests;
         // Set test data for question fields.
         $list_fields = $this->_mci_controller->mci_get_list_merge_vars( $this->_list_id );
         $list_field_tags = array();
@@ -238,7 +242,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         $groups = $mci_event_subscriptions['groups'];
         $q_fields = $mci_event_subscriptions['qfields'];
 	    $this->assertTrue( $list === $this->_list_id );
-        foreach ($list_groups as $group) {
+        foreach ($saved_interests as $group) {
             $this->assertTrue( in_array($group, $groups) );
         }
         foreach ($list_fields as $q_element) {
@@ -268,9 +272,10 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), $this->_list_id);
         $ok_groups_content = ob_get_clean();
         foreach ($mc_gorups as $grouping) {
-            $this->assertTrue( strpos($ok_groups_content, $grouping['name']) !== false );
-            foreach ($grouping['groups'] as $group) {
-                $this->assertTrue( strpos($ok_groups_content, base64_encode($group['name'])) !== false );
+            $this->assertTrue( strpos($ok_groups_content, $grouping['title']) !== false );
+            $category_interests = $this->_mci_controller->mci_get_interests( $this->_list_id, $grouping['id'] );
+            foreach ($category_interests as $interest) {
+                $this->assertTrue( strpos($ok_groups_content, base64_encode($interest['name'])) !== false );
             }
         }
         // If no groups in the list.
@@ -309,17 +314,13 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      * Test mci_set_metabox_contents.
      */
     public function test_mci_metabox_contents() {
-        ob_start();
-        $this->_mci_controller->mci_set_metabox_contents(get_post($this->_ee_event->ID(), 'OBJECT '));
-        $ok_metabox_contents = ob_get_clean();
+        $ok_metabox_contents = $this->_mci_controller->mci_set_metabox_contents(get_post($this->_ee_event->ID(), OBJECT));
         $this->assertTrue( strpos($ok_metabox_contents, 'espresso_mailchimp_integration_metabox') !== false );
 
         // Invalid Key so no contents in the metabox.
         $this->_mci_config->api_settings->api_key = 'b40528421d083eff83b9b6ba11sdsdd8f928-us8';
 	    EED_Mailchimp::update_config( $this->_mci_config );
-        ob_start();
-        $this->_mci_controller->mci_set_metabox_contents(get_post($this->_ee_event->ID(), 'OBJECT '));
-        $metabox_contents = ob_get_clean();
+        $metabox_contents = $this->_mci_controller->mci_set_metabox_contents(get_post($this->_ee_event->ID(), OBJECT));
 	    $this->assertFalse( empty($metabox_contents) );
     }
 }

@@ -45,7 +45,7 @@ class EE_MailChimp_Tests extends EE_UnitTestCase {
      */
     function test_if_the_mailchimp_api_loaded() {
         // MailChimp API.
-        $this->assertTrue( class_exists( '\Drewm\MailChimp' ) );
+        $this->assertTrue( class_exists( '\EEA_MC\MailChimp' ) );
     }
 
     function test_all_the_dms_paths_loaded() {
