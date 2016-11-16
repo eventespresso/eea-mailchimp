@@ -296,11 +296,11 @@ class EE_MCI_Controller {
      * _process_event_group_subscribe_args
      *
      * @access public
-	 * @param array $event_group
+	 * @param string $event_group
 	 * @param array $subscribe_args
      * @return array  List of MailChimp lists.
      */
-	protected function _process_event_group_subscribe_args( $event_group = array(),  $subscribe_args = array() ) {
+	protected function _process_event_group_subscribe_args( $event_group = '',  $subscribe_args = array() ) {
 		$grouping = explode( '-', $event_group );
 		// Is this interest selected.
 		$selected = false;
