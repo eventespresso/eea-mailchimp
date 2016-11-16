@@ -138,9 +138,7 @@ class EE_MCI_Controller {
 		}
 
 		// If a reply is present, then let's process that.
-		if ( $reply === FALSE 
-			|| ( isset( $reply['status'] ) && preg_match('/^(4|5)\d{2}$/', $reply['status']) ) 
-			|| ! empty($reply) && ( ! isset($reply['account_id']) || empty($reply['account_id']) )) {
+		if ( ! $this->MailChimp->success() || ! isset($reply['account_id']) ) {
 				$this->set_error( $reply );
 				do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
 				unset( $this->MailChimp );
@@ -461,7 +459,7 @@ class EE_MCI_Controller {
 			return array();
 		}
 
-		if ( ($reply != false) && isset($reply['lists']) && ! empty($reply['lists']) && ( ! isset($reply['status']) || ! preg_match('/^(4|5)\d{2}$/', $reply['status']) ) ) {
+		if ( $this->MailChimp->success() && isset($reply['lists']) ) {
 			return $reply['lists'];
 		} else {
 			return array();
@@ -490,7 +488,7 @@ class EE_MCI_Controller {
 			$this->set_error($e);
 			return array();
 		}
-		if ( $reply != FALSE && ! empty( $reply ) && ( ! isset($reply['status']) || ! preg_match('/^(4|5)\d{2}$/', $reply['status']) ) ) {
+		if ( $this->MailChimp->success() && isset($reply['categories']) ) {
 			return $reply['categories'];
 		} else {
 			return array();
@@ -522,7 +520,7 @@ class EE_MCI_Controller {
 			$this->set_error($e);
 			return array();
 		}
-		if ( $reply != FALSE && ! empty( $reply ) && ( ! isset($reply['status']) || ! preg_match('/^(4|5)\d{2}$/', $reply['status']) ) ) {
+		if ( $this->MailChimp->success() && isset($reply['interests']) ) {
 			return $reply['interests'];
 		} else {
 			return array();
@@ -550,7 +548,7 @@ class EE_MCI_Controller {
 			$this->set_error($e);
 			return array();
 		}
-		if ( $reply != FALSE && isset( $reply['merge_fields'] ) && ! empty( $reply['merge_fields'] ) && ( ! isset($reply['status']) || ! preg_match('/^(4|5)\d{2}$/', $reply['status']) ) ) {
+		if ( $this->MailChimp->success() && isset($reply['merge_fields']) ) {
 			return $reply['merge_fields'];
 		} else {
 			return array();
