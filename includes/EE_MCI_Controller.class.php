@@ -460,7 +460,7 @@ class EE_MCI_Controller {
 		}
 
 		if ( $this->MailChimp->success() && isset($reply['lists']) ) {
-			return $reply['lists'];
+			return (array)$reply['lists'];
 		} else {
 			return array();
 		}
@@ -489,7 +489,7 @@ class EE_MCI_Controller {
 			return array();
 		}
 		if ( $this->MailChimp->success() && isset($reply['categories']) ) {
-			return $reply['categories'];
+			return (array)$reply['categories'];
 		} else {
 			return array();
 		}
@@ -521,7 +521,7 @@ class EE_MCI_Controller {
 			return array();
 		}
 		if ( $this->MailChimp->success() && isset($reply['interests']) ) {
-			return $reply['interests'];
+			return (array)$reply['interests'];
 		} else {
 			return array();
 		}
@@ -549,7 +549,7 @@ class EE_MCI_Controller {
 			return array();
 		}
 		if ( $this->MailChimp->success() && isset($reply['merge_fields']) ) {
-			return $reply['merge_fields'];
+			return (array)$reply['merge_fields'];
 		} else {
 			return array();
 		}
