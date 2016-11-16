@@ -120,7 +120,7 @@ class EE_MCI_Controller {
 		// Make sure API key only has one '-'
 		$exp_key = explode( '-', $api_key );
 		if ( ! is_array( $exp_key ) || count( $exp_key ) != 2 ) {
-			$this->mci_throw_error( FALSE );
+			$this->set_error( FALSE );
 			do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
 			return FALSE;
 		}
@@ -131,7 +131,7 @@ class EE_MCI_Controller {
 			$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__parameters', array('fields' => 'account_id,account_name,email,username') );
 			$reply = $this->MailChimp->get('');
 		} catch ( Exception $e ) {
-			$this->mci_throw_error( $e );
+			$this->set_error( $e );
 			do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
 			unset( $this->MailChimp );
 			return FALSE;
@@ -141,7 +141,7 @@ class EE_MCI_Controller {
 		if ( $reply === FALSE 
 			|| ( isset( $reply['status'] ) && preg_match('/^(4|5)\d{2}$/', $reply['status']) ) 
 			|| ! empty($reply) && ( ! isset($reply['account_id']) || empty($reply['account_id']) )) {
-				$this->mci_throw_error( $reply );
+				$this->set_error( $reply );
 				do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
 				unset( $this->MailChimp );
 				return FALSE;
@@ -256,7 +256,7 @@ class EE_MCI_Controller {
 									$put_member = $this->MailChimp->put( '/lists/'.$event_list.'/members/'.$this->MailChimp->subscriberHash($att_email), $subscribe_args );
 								} catch (Exception $e) {
 									$member_subscribed = FALSE;
-									$this->mci_throw_error( $e );
+									$this->set_error( $e );
 								}
 								$registered_attendees[] = $att_email;
 							}
@@ -457,7 +457,7 @@ class EE_MCI_Controller {
 		try {
 			$reply = $this->MailChimp->get('lists', $parameters);
 		} catch ( Exception $e ) {
-			$this->mci_throw_error($e);
+			$this->set_error($e);
 			return array();
 		}
 
@@ -487,7 +487,7 @@ class EE_MCI_Controller {
 		try {
 			$reply = $this->MailChimp->get('lists/'.$list_id.'/interest-categories', $parameters);
 		} catch ( Exception $e ) {
-			$this->mci_throw_error($e);
+			$this->set_error($e);
 			return array();
 		}
 		if ( $reply != FALSE && ! empty( $reply ) && ( ! isset($reply['status']) || ! preg_match('/^(4|5)\d{2}$/', $reply['status']) ) ) {
@@ -519,7 +519,7 @@ class EE_MCI_Controller {
 		try {
 			$reply = $this->MailChimp->get('lists/'.$list_id.'/interest-categories/'.$category_id.'/interests', $parameters);
 		} catch ( Exception $e ) {
-			$this->mci_throw_error($e);
+			$this->set_error($e);
 			return array();
 		}
 		if ( $reply != FALSE && ! empty( $reply ) && ( ! isset($reply['status']) || ! preg_match('/^(4|5)\d{2}$/', $reply['status']) ) ) {
@@ -547,7 +547,7 @@ class EE_MCI_Controller {
 		try {
 			$reply = $this->MailChimp->get( 'lists/'.$list_id.'/merge-fields', $parameters );
 		} catch ( Exception $e ) {
-			$this->mci_throw_error($e);
+			$this->set_error($e);
 			return array();
 		}
 		if ( $reply != FALSE && isset( $reply['merge_fields'] ) && ! empty( $reply['merge_fields'] ) && ( ! isset($reply['status']) || ! preg_match('/^(4|5)\d{2}$/', $reply['status']) ) ) {
@@ -936,7 +936,7 @@ class EE_MCI_Controller {
 	 * @param array | Exception | boolean  $reply  An error reply from MailChimp API.
 	 * @return void
 	 */
-	private function mci_throw_error( $reply ) {
+	private function set_error( $reply ) {
 		if ( $reply instanceof Exception ) {
 			$error['code'] = $reply->getCode();
 			$error['msg'] = $reply->getMessage();
