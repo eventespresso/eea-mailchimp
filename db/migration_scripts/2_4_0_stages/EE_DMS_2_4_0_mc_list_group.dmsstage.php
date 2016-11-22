@@ -2,6 +2,12 @@
 
 /**
  * Converts EE3 MailChimp Integration Event - List - Groups data to EE4 MCI.
+ *
+ * Previous integration with the older MC API identified lists by their Names. API v3 requires us to pass interest IDs.
+ * So we need to move from Name identifiers to IDs.
+ * While getting all the interests and their information [...to try to id current data by comparing the Names] from MailChimp with API v3 we need to remember 
+ * that interest Names may Not be unique (and that complicates things).
+ * 
  */
 
 class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage {
