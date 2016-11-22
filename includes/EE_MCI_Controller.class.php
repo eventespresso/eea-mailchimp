@@ -886,66 +886,6 @@ class EE_MCI_Controller {
 			'groups' 	=> $this->mci_event_list_group( $EVT_ID ),
 			'qfields' 	=> $this->mci_event_list_question_fields( $EVT_ID ),
 		);
-		// return array(
-		// 	'list' 		=> isset( $event_list[0], $event_list[0]['ListID'] ) ? $event_list[0]['ListID'] : array(),
-		// 	'groups' 	=> isset( $event_groups[0], $event_groups[0]['GroupID'] ) ? $event_groups[0]['GroupID'] : array(),
-		// 	'qfields' 	=> isset( $question_fields[0], $question_fields[0]['FieldRel'] ) ? $question_fields[0]['FieldRel'] : array(),
-		// );
-	}
-
-	/**
-	 * Get MailChimp list or groups or question fields relationships, set for given event.
-	 *
-	 * @access public
-	 * @param string $evt_id  The ID of the Event.
-	 * @param string $target (pass: 'groups' or 'list' or 'question_fields')  What to get, groups or list or fields relationships. If target = null then both are returned.
-	 * @return array/string  Id of a group/list or an array of 'List fields - Event questions' relationships, or all in an array.
-	 */
-	public function mci_event_subscriptions_OLD( $evt_id, $target = NULL ) {
-		$evt_list = EEM_Event_Mailchimp_List_Group::instance()->get_one( array( array('EVT_ID' => $evt_id) ) );
-		if ( $evt_list != null ) {
-			if ( $evt_list instanceof EE_Event_Mailchimp_List_Group ) {
-				$evt_list = $evt_list->mc_list();
-			}
-		}
-		$evt_groups = array();
-		$mc_list_group = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
-		foreach ($mc_list_group as $mc_group) {
-			if ( $mc_group instanceof EE_Event_Mailchimp_List_Group ) {
-				$evt_groups[] = $mc_group->mc_group();
-			}
-		}
-		$evt_qfields = array();
-		$mc_question_field = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $evt_id) ) );
-		foreach ($mc_question_field as $mc_qfield) {
-			if ( $mc_qfield instanceof EE_Question_Mailchimp_Field ) {
-				$evt_qfields[$mc_qfield->mc_field()] = $mc_qfield->mc_event_question();
-			}
-		}
-
-		$evt_subs = array();
-		switch ( $target ) {
-			case 'list':
-				if ( ! empty($evt_list) ) {
-					$evt_subs = $evt_list;
-				} else {
-					$evt_subs = -1;
-				}
-				break;
-			case 'groups':
-				if ( ! empty($evt_groups) )
-					$evt_subs = $evt_groups;
-				break;
-			case 'question_fields':
-				if ( ! empty($evt_qfields) )
-					$evt_subs = $evt_qfields;
-				break;
-			case NULL:
-				if ( ! empty($evt_groups) && ! empty($evt_list) )
-					$evt_subs = array('list' => $evt_list, 'groups' => $evt_groups, 'qfields' => $evt_qfields);
-				break;
-		}
-		return $evt_subs;
 	}
 
 
