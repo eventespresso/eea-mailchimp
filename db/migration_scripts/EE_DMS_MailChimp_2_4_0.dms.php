@@ -77,17 +77,17 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
         $table_name = 'esp_event_mailchimp_list_group';
         $sql = " EMC_ID int unsigned NOT NULL AUTO_INCREMENT,
                 EVT_ID int unsigned NOT NULL,
-                AMC_mailchimp_list_id TEXT NOT NULL,
-                AMC_mailchimp_group_id TEXT NOT NULL,
-                PRIMARY KEY (EMC_ID)";
+                AMC_mailchimp_list_id text NOT NULL,
+                AMC_mailchimp_group_id text NOT NULL,
+                PRIMARY KEY  (EMC_ID)";
         $this->_table_should_exist_previously($table_name,$sql, 'ENGINE=InnoDB');
 
         $table_name = 'esp_event_question_mailchimp_field';
         $sql = " QMC_ID int unsigned NOT NULL AUTO_INCREMENT,
                 EVT_ID int unsigned NOT NULL,
-                QST_ID TEXT NOT NULL,
-                QMC_mailchimp_field_id TEXT NOT NULL,
-                PRIMARY KEY (QMC_ID)";
+                QST_ID text NOT NULL,
+                QMC_mailchimp_field_id text NOT NULL,
+                PRIMARY KEY  (QMC_ID)";
         $this->_table_should_exist_previously($table_name,$sql, 'ENGINE=InnoDB');
 
 		 // Setting up the config wp option pretty well counts as a 'schema change', or at least should happen here.
