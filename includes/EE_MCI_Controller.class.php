@@ -1,4 +1,4 @@
-<?php
+<?php if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) { exit('NO direct script access allowed'); }
 
 /*
  * Event Espresso
@@ -565,9 +565,26 @@ class EE_MCI_Controller {
 	 * @return string
 	 */
 	public function mci_set_metabox_contents( $event ) {
-		ob_start();
-		include( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'mc-metabox-content.template.php' );
-		return ob_get_clean();
+		// Verify the API key.
+		if ( ! empty( $this->_config->api_settings->api_key ) ) {
+			// Get saved list for this event (if there's one)
+			$this->list_id = $this->mci_event_list( $event->ID );
+			$this->category_id = $this->mci_event_list_group( $event->ID );
+
+			$metabox_obj = new EE_MC_Metabox_Template( $this, $event->ID, $this->list_id, $this->category_id );
+			return $metabox_obj->get_html_and_js();
+		} else {
+			$error_section = new EE_Form_Section_HTML( 
+				EEH_HTML::div( EEH_HTML::span( esc_html__( 'Invalid MailChimp API.', 'event_espresso' ), 'important_mc_notice', 'important-notice' ) .
+					EEH_HTML::br() . 
+					esc_html__( 'Please visit the ', 'event_espresso' ) . 
+					EEH_HTML::link( admin_url( 'admin.php?page=mailchimp' ), esc_html__( 'MailChimp Admin Page ', 'event_espresso' ) ) .
+					esc_html__( 'to correct the issue.', 'event_espresso' ), 
+				'no-lists-found-notice', 'espresso_mailchimp_integration_metabox' ) . EEH_HTML::divx()
+			);
+			return $error_section->get_html_and_js();
+		}
+
 	}
 
 
@@ -592,7 +609,17 @@ class EE_MCI_Controller {
 		$list_id = $_POST['ee_mailchimp_lists'];
 		if ( ! empty($_POST['ee_mailchimp_groups']) && ! empty($_POST['ee_mc_list_all_interests']) ) {
 			$all_interests = $_POST['ee_mc_list_all_interests'];
-			$group_ids = $_POST['ee_mailchimp_groups'];
+			$group_ids = array();
+			// Multidimensional array ? Straighten it up.
+			foreach ( $_POST['ee_mailchimp_groups'] as $g_id ) {
+				if ( is_array($g_id) ) {
+					foreach ($g_id as $l2g_id) {
+						$group_ids[] = $l2g_id;
+					}
+				} else {
+					$group_ids[] = $g_id;
+				}
+			}
 			// We need to save the list of all interests for the current MC List.
 			foreach ( $all_interests as $interest ) {
 				// Mark what lists were selected and not.
@@ -623,14 +650,13 @@ class EE_MCI_Controller {
 
 		$qf_exists = EEM_Question_Mailchimp_Field::instance()->get_all( array( array('EVT_ID' => $event_id) ) );
 		// Question Fields
-		if ( isset($_POST['ee_mailchimp_qfields']) ) {
-			$qfields_list = base64_decode( $_POST['ee_mailchimp_qfields'] );
-			$qfields_list = maybe_unserialize( $qfields_list );
-			$qfields_list = is_array( $qfields_list ) ? $qfields_list : array();
+		if ( isset($_POST['ee_mailchimp_qfields']) && is_array($_POST['ee_mailchimp_qfields']) && ! empty($_POST['ee_mailchimp_qfields']) ) {
+			$qfields_list = $_POST['ee_mailchimp_qfields'];
 			$list_form_rel = array();
 			foreach ($qfields_list as $mc_question) {
-				if ( ($_POST[base64_encode($mc_question)] != '-1') ) {
-					$ev_question = $_POST[base64_encode($mc_question)];
+				$encoded = base64_encode($mc_question);
+				if ( isset($_POST[$encoded]) && $_POST[$encoded] != '-1' ) {
+					$ev_question = $_POST[$encoded];
 					$list_form_rel[$mc_question] = $ev_question;
 
 					$q_found = false;
@@ -676,7 +702,9 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_lists( $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
-		include( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'mc-lists.template.php' );
+		// Load the lists form.
+		$lists_obj = new EE_MC_Lists_Template( $this, $list_id );
+		echo $lists_obj->get_html_and_js();
 	}
 
 
@@ -691,11 +719,11 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
-		// Get saved group for this event (if there's one)
-		$event_list_group = $this->mci_event_selected_interests( $event_id );
-		$user_groups = $this->mci_get_users_groups( $list_id );
-
-		include( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'mc-interest-categories.template.php' );
+		if ( $list_id !== '-1' && $list_id !== NULL ) {
+			// Load the interests form.
+			$interest_categories_obj = new EE_MC_Interest_Categories_Template( $this, $event_id, $list_id );
+			echo $interest_categories_obj->get_html_and_js();
+		}
 	}
 
 
@@ -709,15 +737,9 @@ class EE_MCI_Controller {
 	 * @return void
 	 */
 	public function mci_list_mailchimp_fields( $event_id = 0, $list_id = 0 ) {
-		$list_fields = $this->mci_get_list_merge_vars( $list_id );
-		$selected_fields = $this->mci_event_list_question_fields( $event_id );
-		$evt_questions = $this->mci_get_event_all_questions( $event_id );
-
-		// To save the list of Mailchimp Fields for the future use.
-		$hide_fields = array();
-		if ( ! empty($list_fields) ) {
-			include( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'mc-merge-fields.template.php' );
-		}
+		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_fields__start');
+		$fields_obj = new EE_MC_Merge_Fields_Template( $this, $event_id, $list_id );
+		echo $fields_obj->get_html_and_js();
 	}
 
 

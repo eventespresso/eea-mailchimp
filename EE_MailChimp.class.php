@@ -64,10 +64,15 @@ class EE_MailChimp extends EE_Addon {
 				'config_class' 		=> EE_MailChimp::CONFIG_CLASS,
 				'config_name' 		=> EE_MailChimp::CONFIG_NAME,
 				'autoloader_paths'	=> array(
-					'EE_MCI_Controller' 		=> ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'EE_MCI_Controller.class.php',
-					'Mailchimp_Admin_Page' 		=> ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page.core.php',
-					'Mailchimp_Admin_Page_Init' => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page_Init.core.php',
-                    'EE_Mailchimp_Config' 		=> ESPRESSO_MAILCHIMP_DIR . 'EE_Mailchimp_Config.php'
+					'EE_MCI_Controller' 		         => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'EE_MCI_Controller.class.php',
+					'Mailchimp_Admin_Page' 		         => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page.core.php',
+					'Mailchimp_Admin_Page_Init'          => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page_Init.core.php',
+					'EE_Mailchimp_Config' 		         => ESPRESSO_MAILCHIMP_DIR . 'EE_Mailchimp_Config.php',
+					'EE_Div_Per_Section_Spaced_Layout'   => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_Div_Per_Section_Spaced_Layout.strategy.php',
+					'EE_MC_Metabox_Template'             => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_MC_Metabox_Template.template.php',
+					'EE_MC_Lists_Template'               => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_MC_Lists_Template.template.php',
+					'EE_MC_Merge_Fields_Template'        => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_MC_Merge_Fields_Template.template.php',
+					'EE_MC_Interest_Categories_Template' => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_MC_Interest_Categories_Template.template.php'
 				),
 				'dms_paths' 			=> array( ESPRESSO_MAILCHIMP_DMS_PATH ),
 				'module_paths' 		    => array( ESPRESSO_MAILCHIMP_DIR . 'EED_Mailchimp.module.php' ),
