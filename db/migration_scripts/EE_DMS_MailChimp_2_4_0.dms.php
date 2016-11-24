@@ -113,17 +113,15 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 
 		// Check if key is live/acceptable by API.
 		try {
-			$this->MailChimp = new EEA_MC\MailChimp( $api_key );
-			$reply = $this->MailChimp->get('');
+			$MailChimp = new EEA_MC\MailChimp( $api_key );
+			$reply = $MailChimp->get('');
 		} catch ( Exception $e ) {
-			unset( $this->MailChimp );
 			return FALSE;
 		}
 
 		// If a reply is present, then let's process that.
-		if ( ! $this->MailChimp->success() || ! isset($reply['account_id']) ) {
-				unset( $this->MailChimp );
-				return FALSE;
+		if ( ! $MailChimp->success() || ! isset($reply['account_id']) ) {
+			return FALSE;
 		}
 		return $api_key;
 	}

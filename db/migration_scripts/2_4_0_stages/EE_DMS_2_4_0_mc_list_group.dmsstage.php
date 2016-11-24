@@ -70,9 +70,17 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 	protected function _setup_before_migration() {
 		global $wpdb;
 		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
-
+		$key_ok = false;
 		$config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
-		$api_key = $config->api_settings->api_key;
+		if ( $config instanceof EE_Mailchimp_Config ) {
+			$api_key = $config->api_settings->api_key;
+			if ( $api_key && ! empty($api_key) ) {
+				$key_ok = $this->mc_api_key_valid($api_key);
+			}
+		}
+		if ( ! $key_ok ) {
+			return;
+		}
 
 		$this->MailChimp = new EEA_MC\MailChimp( $api_key );
 
@@ -230,6 +238,37 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 				}
 			}
 		}
+	}
+
+
+    /**
+	 * Validate the MailChimp API key.
+	 *
+	 * @access public
+	 * @param string $api_key MailChimp API Key.
+	 * @return mixed  If key valid then return the key. If not valid - return FALSE.
+	 */
+	public function mc_api_key_valid( $api_key = NULL ) {
+		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
+		// Make sure API key only has one '-'
+		$exp_key = explode( '-', $api_key );
+		if ( ! is_array( $exp_key ) || count( $exp_key ) != 2 ) {
+			return FALSE;
+		}
+
+		// Check if key is live/acceptable by API.
+		try {
+			$this->MailChimp = new EEA_MC\MailChimp( $api_key );
+			$reply = $this->MailChimp->get('');
+		} catch ( Exception $e ) {
+			return FALSE;
+		}
+
+		// If a reply is present, then let's process that.
+		if ( ! $this->MailChimp->success() || ! isset($reply['account_id']) ) {
+			return FALSE;
+		}
+		return $api_key;
 	}
 
 
