@@ -87,19 +87,17 @@ class EE_MC_Metabox_Form extends EE_Form_Section_Proper {
 
 		// Form the meta-box.
 		$subsactions['mc_meta_box'] = new EE_Form_Section_HTML(
+			EEH_HTML::div($this->_mc_controller->mci_list_mailchimp_lists( $this->_list_id ), 'espresso-mci-lists', 'espresso-mci-lists-class') .
+			EEH_HTML::div($this->_mc_controller->mci_list_mailchimp_groups( $this->_event_id, $this->_list_id ), 'espresso-mci-groups-list', 'espresso-mci-groups-list-class') .
 			EEH_HTML::div(
-				EEH_HTML::div($this->_mc_controller->mci_list_mailchimp_lists( $this->_list_id ), 'espresso-mci-lists', 'espresso-mci-lists-class') .
-				EEH_HTML::div(
-					EEH_HTML::span('', 'ee_spinner_groups', 'ee-spinner ee-spin') .
-					EEH_HTML::span(esc_html__( 'loading...', 'event_espresso' ), 'ee_spinner_groups_id', 'ee-loading-txt small-text'),
-				'ee-mailchimp-ajax-loading-groups', 'ee-mailchimp-ajax-loading', 'display:none;') .
-				EEH_HTML::div($this->_mc_controller->mci_list_mailchimp_groups( $this->_event_id, $this->_list_id ), 'espresso-mci-groups-list', 'espresso-mci-groups-list-class') . EEH_HTML::divx(),
-			'espresso-mci-lists-groups', 'espresso_mci_lists_groups' ) . EEH_HTML::divx() .
+				EEH_HTML::span('', 'ee_spinner_groups', 'ee-spinner ee-spin') .
+				EEH_HTML::span(esc_html__( 'loading...', 'event_espresso' ), 'ee_spinner_groups_id', 'ee-loading-txt small-text'),
+			'ee-mailchimp-ajax-loading-groups', 'ee-mailchimp-ajax-loading', 'display:none;') .
+			EEH_HTML::div($this->_mc_controller->mci_list_mailchimp_fields( $this->_event_id, $this->_list_id ), 'espresso-mci-list-fields', 'espresso_mci_list_fields') . 
 			EEH_HTML::div(
 				EEH_HTML::span('', 'ee_spinner_fields', 'ee-spinner ee-spin') .
 				EEH_HTML::span(esc_html__( 'loading...', 'event_espresso' ), 'ee_spinner_fields_id', 'ee-loading-txt small-text'),
-			'ee-mailchimp-ajax-loading-fields', 'ee-mailchimp-ajax-loading', 'display:none;') .
-			EEH_HTML::div($this->_mc_controller->mci_list_mailchimp_fields( $this->_event_id, $this->_list_id ), 'espresso-mci-list-fields', 'espresso_mci_list_fields') . EEH_HTML::divx()
+			'ee-mailchimp-ajax-loading-fields', 'ee-mailchimp-ajax-loading', 'display:none;')
 		);
 
 		return $subsactions;
