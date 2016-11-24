@@ -1,7 +1,7 @@
 <?php if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) { exit('NO direct script access allowed'); }
 
 /**
- * Class EE_MC_Lists_Template.
+ * Class EE_MC_Lists_Form.
  *
  * MailChimp Lists section.
  *
@@ -11,7 +11,7 @@
  *
  * ------------------------------------------------------------------------
  */
-class EE_MC_Lists_Template extends EE_Form_Section_Proper {
+class EE_MC_Lists_Form extends EE_Form_Section_Proper {
 
 	/**
      * @access protected

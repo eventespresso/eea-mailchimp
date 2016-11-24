@@ -571,7 +571,7 @@ class EE_MCI_Controller {
 			$this->list_id = $this->mci_event_list( $event->ID );
 			$this->category_id = $this->mci_event_list_group( $event->ID );
 
-			$metabox_obj = new EE_MC_Metabox_Template( $this, $event->ID, $this->list_id, $this->category_id );
+			$metabox_obj = new EE_MC_Metabox_Form( $this, $event->ID, $this->list_id, $this->category_id );
 			return $metabox_obj->get_html_and_js();
 		} else {
 			$error_section = new EE_Form_Section_HTML( 
@@ -703,7 +703,7 @@ class EE_MCI_Controller {
 	public function mci_list_mailchimp_lists( $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
 		// Load the lists form.
-		$lists_obj = new EE_MC_Lists_Template( $this, $list_id );
+		$lists_obj = new EE_MC_Lists_Form( $this, $list_id );
 		echo $lists_obj->get_html_and_js();
 	}
 
@@ -721,7 +721,7 @@ class EE_MCI_Controller {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
 		if ( $list_id !== '-1' && $list_id !== NULL ) {
 			// Load the interests form.
-			$interest_categories_obj = new EE_MC_Interest_Categories_Template( $this, $event_id, $list_id );
+			$interest_categories_obj = new EE_MC_Interest_Categories_Form( $this, $event_id, $list_id );
 			echo $interest_categories_obj->get_html_and_js();
 		}
 	}
@@ -738,7 +738,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_fields( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_fields__start');
-		$fields_obj = new EE_MC_Merge_Fields_Template( $this, $event_id, $list_id );
+		$fields_obj = new EE_MC_Merge_Fields_Form( $this, $event_id, $list_id );
 		echo $fields_obj->get_html_and_js();
 	}
 
