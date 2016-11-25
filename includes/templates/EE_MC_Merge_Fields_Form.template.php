@@ -113,8 +113,8 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper {
 		$subsactions['mc_ql_tbl'] = new EE_Form_Section_HTML(
 			EEH_HTML::no_row( EEH_HTML::br() ) .
 			EEH_HTML::tr(
-				EEH_HTML::th( esc_html__( 'Form Fields', 'event_espresso') ) .
-				EEH_HTML::th( esc_html__( 'List Fields', 'event_espresso') )
+				EEH_HTML::th( esc_html__( 'Mailchimp Fields', 'event_espresso') ) .
+				EEH_HTML::th( esc_html__( 'Event Espresso Questions', 'event_espresso') )
 			)
 		);
 
