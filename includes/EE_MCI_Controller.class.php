@@ -450,7 +450,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_users_lists() {
 		do_action('AHEE__EE_MCI_Controller__mci_get_users_lists__start');
-		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_users_lists__parameters', array('fields' => 'lists.id,lists.name') );
+		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_users_lists__parameters', array('fields' => 'lists.id,lists.name', 'count' => 100) );
 		
 		try {
 			$reply = $this->MailChimp->get('lists', $parameters);
@@ -477,7 +477,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_users_groups( $list_id ) {
 		do_action('AHEE__EE_MCI_Controller__mci_get_users_groups__start');
-		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_users_groups__parameters', array('exclude_fields' => '_links,categories._links') );
+		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_users_groups__parameters', array('exclude_fields' => '_links,categories._links', 'count' => 50) );
 
 		if ( $list_id == NULL )
 			$list_id = $this->list_id;
@@ -507,7 +507,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_interests( $list_id, $category_id ) {
 		do_action('AHEE__EE_MCI_Controller__mci_get_interests__start');
-		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_interests__parameters', array('fields' => 'interests', 'exclude_fields' => 'interests._links') );
+		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_interests__parameters', array('fields' => 'interests', 'exclude_fields' => 'interests._links', 'count' => 100) );
 
 		if ( $list_id == NULL )
 			$list_id = $this->list_id;
@@ -538,7 +538,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_list_merge_vars( $list_id ) {
 		do_action('AHEE__EE_MCI_Controller__mci_get_list_merge_vars__start');
-		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_list_merge_vars__parameters', array('fields' => 'merge_fields', 'exclude_fields' => '_links,merge_fields._links') );
+		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_list_merge_vars__parameters', array('fields' => 'merge_fields', 'exclude_fields' => '_links,merge_fields._links', 'count' => 50) );
 		if ( $list_id == NULL )
 			$list_id = $this->list_id;
 

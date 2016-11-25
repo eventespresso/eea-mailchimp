@@ -166,7 +166,7 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 	 * @return array  List of MailChimp groups of selected List.
 	 */
 	public function _mc_get_users_groups( $list_id ) {
-		$parameters = array('exclude_fields' => '_links,categories._links');
+		$parameters = array('exclude_fields' => '_links,categories._links', 'count' => 200);
 
 		try {
 			$reply = $this->MailChimp->get('lists/'.$list_id.'/interest-categories', $parameters);
@@ -191,7 +191,7 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 	 * @return array  List of MailChimp interests of selected List.
 	 */
 	public function _mc_get_interests( $list_id, $category_id ) {
-		$parameters = array('fields' => 'interests', 'exclude_fields' => 'interests._links');
+		$parameters = array('fields' => 'interests', 'exclude_fields' => 'interests._links', 'count' => 200);
 
 		try {
 			$reply = $this->MailChimp->get('lists/'.$list_id.'/interest-categories/'.$category_id.'/interests', $parameters);
