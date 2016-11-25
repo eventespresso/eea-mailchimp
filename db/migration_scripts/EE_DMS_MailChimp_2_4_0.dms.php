@@ -54,7 +54,8 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 		$table_name = $wpdb->prefix . "esp_event_mailchimp_list_group";
 		$count = 0;
 		// Table exists ?
-		if ( $this->_get_table_analysis()->tableExists( $table_name ) ) {
+		$table_exists = $wpdb->get_results('SHOW TABLES LIKE "' . $table_name . '"');
+		if ( $table_exists ) {
 			$count = $wpdb->get_var( "SELECT COUNT(EMC_ID) FROM $table_name" );
 		}
 

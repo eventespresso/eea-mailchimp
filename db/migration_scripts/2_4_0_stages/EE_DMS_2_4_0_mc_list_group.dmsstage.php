@@ -78,7 +78,9 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 				$key_ok = $this->mc_api_key_valid($api_key);
 			}
 		}
-		if ( ! $key_ok ) {
+		// Table exists ?
+		$table_exists = $wpdb->get_results('SHOW TABLES LIKE "' . $this->_old_table . '"');
+		if ( ! $key_ok || ! $table_exists ) {
 			return;
 		}
 
