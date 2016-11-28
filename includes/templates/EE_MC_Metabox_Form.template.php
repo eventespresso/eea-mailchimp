@@ -93,7 +93,7 @@ class EE_MC_Metabox_Form extends EE_Form_Section_Proper {
 				EEH_HTML::span('', 'ee_spinner_groups', 'ee-spinner ee-spin') .
 				EEH_HTML::span(esc_html__( 'loading...', 'event_espresso' ), 'ee_spinner_groups_id', 'ee-loading-txt small-text'),
 			'ee-mailchimp-ajax-loading-groups', 'ee-mailchimp-ajax-loading', 'display:none;') .
-			EEH_HTML::div($this->_mc_controller->mci_list_mailchimp_fields( $this->_event_id, $this->_list_id ), 'espresso-mci-list-fields', 'espresso_mci_list_fields') . 
+			EEH_HTML::div($this->_mc_controller->mci_list_mailchimp_fields( $this->_event_id, $this->_list_id ), 'espresso-mci-list-fields', 'espresso_mci_list_fields') .
 			EEH_HTML::div(
 				EEH_HTML::span('', 'ee_spinner_fields', 'ee-spinner ee-spin') .
 				EEH_HTML::span(esc_html__( 'loading...', 'event_espresso' ), 'ee_spinner_fields_id', 'ee-loading-txt small-text'),

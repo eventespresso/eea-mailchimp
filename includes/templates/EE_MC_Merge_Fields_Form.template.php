@@ -83,6 +83,9 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper {
 		$m_fields = array();
 		if ( ! empty( $list_fields ) ) {
 			$m_fields = $this->_merge_fields( $list_fields, $selected_fields, $evt_questions );
+		} elseif ( $_GET['action'] === 'create_new' ) {
+			// This is new event so no data.
+			$m_fields['no_data'] = new EE_Form_Section_HTML('');
 		} else {
 			$m_fields['no_lists'] = new EE_Form_Section_HTML( EEH_HTML::p( esc_html__( 'Sorry, no merge fields found!', 'event_espresso' ), 'no-lists-found-notice', 'important-notice' ) );
 		}

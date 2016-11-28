@@ -714,15 +714,13 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
-		// No need to generate any content if no list selected.
-		if ( $list_id === '-1' ) {
-			return EEH_HTML::no_row();
-		}
 		if ( $list_id !== '-1' && $list_id !== NULL ) {
 			// Load the interests form.
 			$interest_categories_obj = new EE_MC_Interest_Categories_Form( $this, $event_id, $list_id );
 			return $interest_categories_obj->get_html_and_js();
 		}
+		// Default to:
+		return EEH_HTML::no_row();
 	}
 
 
