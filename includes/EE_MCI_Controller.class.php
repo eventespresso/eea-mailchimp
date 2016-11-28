@@ -83,7 +83,6 @@ class EE_MCI_Controller {
 		// Verify API key.
 		$api_key = ! empty( $api_key ) ? $api_key : $this->_config->api_settings->api_key;
 		$this->_api_key = $this->mci_is_api_key_valid( $api_key );
-		$this->MailChimp = new MailChimp( $api_key );
 	}
 
 
@@ -110,7 +109,7 @@ class EE_MCI_Controller {
 		try {
 			$this->MailChimp = new MailChimp( $api_key );
 			$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__parameters', array('fields' => 'account_id,account_name,email,username') );
-			$reply = $this->MailChimp->get('');
+			$reply = $this->MailChimp->get('', $parameters);
 		} catch ( Exception $e ) {
 			$this->set_error( $e );
 			do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
