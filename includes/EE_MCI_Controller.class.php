@@ -66,13 +66,6 @@ class EE_MCI_Controller {
 	 */
 	private $category_id = 0;
 
-	/**
-	 * The List of question IDs.
-	 * @access private
-	 * @var array $_question_list_id
-	 */
-	private $_question_list_id = array();
-
 
 
 	/**
@@ -86,18 +79,6 @@ class EE_MCI_Controller {
 		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
 
 		$this->_config = EED_Mailchimp::instance()->config();
-		$this->_question_list_id = array(
-			EEM_Attendee::fname_question_id       => 'fname',
-			EEM_Attendee::lname_question_id       => 'lname',
-			EEM_Attendee::email_question_id       => 'email',
-			EEM_Attendee::address_question_id     => 'address',
-			EEM_Attendee::address2_question_id    => 'address2',
-			EEM_Attendee::city_question_id        => 'city',
-			EEM_Attendee::state_question_id       => 'state',
-			EEM_Attendee::country_question_id     => 'country',
-			EEM_Attendee::zip_question_id         => 'zip',
-			EEM_Attendee::phone_question_id       => 'phone'
-		);
 
 		// Verify API key.
 		$api_key = ! empty( $api_key ) ? $api_key : $this->_config->api_settings->api_key;
@@ -415,17 +396,32 @@ class EE_MCI_Controller {
 		$question_answers = $this->_get_attendee_details_for_registration( $registration );
 		// get the registrant's question answers
 		$question_answers = $this->_get_question_answers_for_registration( $registration, $question_answers );
+		// Get all event questions.
+		$event_questions_list = $this->mci_get_event_all_questions( $EVT_ID );
 		foreach ( $question_fields as $mc_list_field => $question_ID ) {
 			// Older version used names for an IDs (now using int).
-			$q_id = ( is_numeric($question_ID) )? $question_ID : array_search($question_ID, $this->_question_list_id);
+			$q_id = null;
+			if ( is_numeric($question_ID) ) {
+				$q_id = $question_ID;
+			} else {
+				if ( isset($event_questions_list[$question_ID]) ) {
+					$q_id = $event_questions_list[$question_ID]['QST_ID'];
+				}
+			}
 			if ( isset($question_answers[ $q_id ]) && !empty($question_answers[ $q_id ]) ) {
 				// If question field is a State then get the state name not the code.
-				if ( $q_id == EEM_Attendee::state_question_id ) {	// If a state.
-					$state = EEM_State::instance()->get_one_by_ID( $question_answers[ $q_id ] );
-					$subscribe_args['merge_fields'][ $mc_list_field ] = $state->name();
-				} else if ( $q_id == EEM_Attendee::country_question_id ) {	// If a Country (change ISO to a full name).
+				if ( $q_id == $event_questions_list['state']['QST_ID'] ) {	// If a state.
+					$state = $registration->attendee()->state_obj();
+					if ( $state instanceof EE_State ) {
+						$subscribe_args['merge_fields'][ $mc_list_field ] = $state->name();
+					}
+
+				} else if ( $q_id == $event_questions_list['country']['QST_ID'] ) {	// If a Country (change ISO to a full name).
 					$country = $registration->attendee()->country_obj();
-					$subscribe_args['merge_fields'][ $mc_list_field ] = $country->name();
+					if ( $country instanceof EE_Country ) {
+						$subscribe_args['merge_fields'][ $mc_list_field ] = $country->name();
+					}
+
 				} else if ( is_array( $question_answers[ $q_id ] )) {
 					$selected = '';
 					foreach ( $question_answers[ $q_id ] as $q_key => $q_value ) {
@@ -787,10 +783,11 @@ class EE_MCI_Controller {
 					foreach ( $QG_list->questions() as $q_list ) {
 						$qst = array(
 							'QST_Name' => $q_list->get('QST_display_text'),
-							'QST_ID' => $q_list->get('QST_ID')
+							'QST_ID' => $q_list->get('QST_ID'),
+							'QST_system' => $q_list->get('QST_system')
 						);
 						if ( ! in_array($qst, $questions) ) {
-							$questions[] = $qst;
+							$questions[$q_list->get('QST_system')] = $qst;
 						}
 					}
 				}

@@ -130,10 +130,10 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper {
 				// Default to main fields if exist.
 				if (
 					( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] )
-					&& ( $selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || ( isset($this->_question_list_id[$q_field['QST_ID']]) && $selected_fields[ $l_field['tag'] ] == $this->_question_list_id[$q_field['QST_ID']] ) ) )
-					|| ( ($q_field['QST_ID'] == 3 || $q_field['QST_ID'] == 'email') && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
-					|| ( ($q_field['QST_ID'] == 2 || $q_field['QST_ID'] == 'lname') && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
-					|| ( ($q_field['QST_ID'] == 1 || $q_field['QST_ID'] == 'fname') && $l_field['tag'] == 'FNAME' && ! array_key_exists( 'FNAME', $selected_fields ))
+					&& ( $selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || $selected_fields[ $l_field['tag'] ] == $q_field['QST_system'] ) )
+					|| ( ($q_field['QST_system'] == 'email' || $q_field['QST_ID'] == 3) && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
+					|| ( ($q_field['QST_system'] == 'lname' || $q_field['QST_ID'] == 2) && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
+					|| ( ($q_field['QST_system'] == 'fname' || $q_field['QST_ID'] == 1) && $l_field['tag'] == 'FNAME' && ! array_key_exists( 'FNAME', $selected_fields ))
 				) {
 					$selected = $q_field['QST_ID'];
 				}
