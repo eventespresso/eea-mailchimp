@@ -24,7 +24,7 @@ EEH_Autoloader::register_autoloader( $class_to_filepath );
 
 class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 
-	public function __construct( TableManager $table_manager = null, TableAnalysis $table_analysis = null ) {
+	public function __construct( EventEspresso\core\services\database\TableManager $table_manager = null, EventEspresso\core\services\database\TableAnalysis $table_analysis = null ) {
 		$this->_pretty_name = __("EE4 MailChimp data Migration to 2.4.0", "event_espresso");
 		$this->_migration_stages = array(
 			new EE_DMS_2_4_0_mc_list_group()
