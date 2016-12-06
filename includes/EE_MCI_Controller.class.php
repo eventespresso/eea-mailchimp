@@ -409,13 +409,13 @@ class EE_MCI_Controller {
 			}
 			if ( isset($question_answers[ $q_id ]) && !empty($question_answers[ $q_id ]) ) {
 				// If question field is a State then get the state name not the code.
-				if ( $q_id == $event_questions_list['state']['QST_ID'] ) {	// If a state.
+				if ( isset($event_questions_list['state']) && $q_id == $event_questions_list['state']['QST_ID'] ) {	// If a state.
 					$state = $registration->attendee()->state_obj();
 					if ( $state instanceof EE_State ) {
 						$subscribe_args['merge_fields'][ $mc_list_field ] = $state->name();
 					}
 
-				} else if ( $q_id == $event_questions_list['country']['QST_ID'] ) {	// If a Country (change ISO to a full name).
+				} else if ( isset($event_questions_list['country']) && $q_id == $event_questions_list['country']['QST_ID'] ) {	// If a Country (change ISO to a full name).
 					$country = $registration->attendee()->country_obj();
 					if ( $country instanceof EE_Country ) {
 						$subscribe_args['merge_fields'][ $mc_list_field ] = $country->name();
