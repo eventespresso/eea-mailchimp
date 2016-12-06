@@ -159,12 +159,8 @@ class EED_Mailchimp extends EED_Module {
 	 */
 	public static function espresso_mailchimp_update_groups() {
 		$mci_controller = new EE_MCI_Controller();
-		ob_start();
 		$mci_data = $_POST['mci_data'];
-		$mci_controller->mci_list_mailchimp_groups($mci_data['event_id'], $mci_data['list_id']);
-		$response = ob_get_contents();
-		ob_end_clean();
-		echo $response;
+		echo $mci_controller->mci_list_mailchimp_groups($mci_data['event_id'], $mci_data['list_id']);
 		exit;
 	}
 
@@ -175,12 +171,8 @@ class EED_Mailchimp extends EED_Module {
 	 */
 	public static function espresso_mailchimp_update_list_fields() {
 		$mci_controller = new EE_MCI_Controller();
-		ob_start();
 		$mci_data = $_POST['mci_data'];
-		$mci_controller->mci_list_mailchimp_fields($mci_data['event_id'], $mci_data['list_id']);
-		$response = ob_get_contents();
-		ob_end_clean();
-		echo $response;
+		echo $mci_controller->mci_list_mailchimp_fields($mci_data['event_id'], $mci_data['list_id']);
 		exit;
 	}
 

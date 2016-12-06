@@ -1,7 +1,7 @@
 <?php if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) { exit('NO direct script access allowed'); }
 
 /**
- * Class EE_MC_Merge_Fields_Template.
+ * Class EE_MC_Merge_Fields_Form.
  *
  * MailChimp Interest Categories section.
  *
@@ -11,7 +11,7 @@
  *
  * ------------------------------------------------------------------------
  */
-class EE_MC_Merge_Fields_Template extends EE_Form_Section_Proper {
+class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper {
 
 	/**
      * @access protected
@@ -83,6 +83,9 @@ class EE_MC_Merge_Fields_Template extends EE_Form_Section_Proper {
 		$m_fields = array();
 		if ( ! empty( $list_fields ) ) {
 			$m_fields = $this->_merge_fields( $list_fields, $selected_fields, $evt_questions );
+		} elseif ( $_GET['action'] === 'create_new' ) {
+			// This is new event so no data.
+			$m_fields['no_data'] = new EE_Form_Section_HTML('');
 		} else {
 			$m_fields['no_lists'] = new EE_Form_Section_HTML( EEH_HTML::p( esc_html__( 'Sorry, no merge fields found!', 'event_espresso' ), 'no-lists-found-notice', 'important-notice' ) );
 		}
@@ -113,8 +116,8 @@ class EE_MC_Merge_Fields_Template extends EE_Form_Section_Proper {
 		$subsactions['mc_ql_tbl'] = new EE_Form_Section_HTML(
 			EEH_HTML::no_row( EEH_HTML::br() ) .
 			EEH_HTML::tr(
-				EEH_HTML::th( esc_html__( 'Form Fields', 'event_espresso') ) .
-				EEH_HTML::th( esc_html__( 'List Fields', 'event_espresso') )
+				EEH_HTML::th( esc_html__( 'Mailchimp Fields', 'event_espresso') ) .
+				EEH_HTML::th( esc_html__( 'Event Espresso Questions', 'event_espresso') )
 			)
 		);
 
@@ -130,10 +133,10 @@ class EE_MC_Merge_Fields_Template extends EE_Form_Section_Proper {
 				// Default to main fields if exist.
 				if (
 					( isset( $l_field['tag'], $selected_fields[ $l_field['tag'] ] )
-					&& ( $selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || ( isset($this->_question_list_id[$q_field['QST_ID']]) && $selected_fields[ $l_field['tag'] ] == $this->_question_list_id[$q_field['QST_ID']] ) ) )
-					|| ( ($q_field['QST_ID'] == 3 || $q_field['QST_ID'] == 'email') && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
-					|| ( ($q_field['QST_ID'] == 2 || $q_field['QST_ID'] == 'lname') && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
-					|| ( ($q_field['QST_ID'] == 1 || $q_field['QST_ID'] == 'fname') && $l_field['tag'] == 'FNAME' && ! array_key_exists( 'FNAME', $selected_fields ))
+					&& ( $selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || $selected_fields[ $l_field['tag'] ] == $q_field['QST_system'] ) )
+					|| ( ($q_field['QST_system'] == 'email' || $q_field['QST_ID'] == 3) && $l_field['tag'] == 'EMAIL' && ! array_key_exists( 'EMAIL', $selected_fields ))
+					|| ( ($q_field['QST_system'] == 'lname' || $q_field['QST_ID'] == 2) && $l_field['tag'] == 'LNAME' && ! array_key_exists( 'LNAME', $selected_fields ))
+					|| ( ($q_field['QST_system'] == 'fname' || $q_field['QST_ID'] == 1) && $l_field['tag'] == 'FNAME' && ! array_key_exists( 'FNAME', $selected_fields ))
 				) {
 					$selected = $q_field['QST_ID'];
 				}

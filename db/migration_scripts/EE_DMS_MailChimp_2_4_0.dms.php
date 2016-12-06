@@ -47,13 +47,17 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 		if ( $config instanceof EE_Mailchimp_Config ) {
 			$the_api_key = $config->api_settings->api_key;
 			if ( $the_api_key && ! empty($the_api_key) ) {
-				$mci_controller = new EE_MCI_Controller();
-				$key_ok = $mci_controller->mci_is_api_key_valid($config->api_settings->api_key);
+				$key_ok = $this->_mc_api_key_valid($the_api_key);
 			}
 		}
 		// Is there anything on the Table we want to update?
 		$table_name = $wpdb->prefix . "esp_event_mailchimp_list_group";
-		$count = $wpdb->get_var( "SELECT COUNT(EMC_ID) FROM $table_name" );
+		$count = 0;
+		// Table exists ?
+		$table_exists = $wpdb->get_results('SHOW TABLES LIKE "' . $table_name . '"');
+		if ( $table_exists ) {
+			$count = $wpdb->get_var( "SELECT COUNT(EMC_ID) FROM $table_name" );
+		}
 
 		if ( version_compare($version_string, '2.3.0', '>=')
 			&& version_compare($version_string, '2.4.0', '<')
@@ -95,6 +99,37 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
         
         return true;
     }
+
+
+    /**
+	 * Validate the MailChimp API key.
+	 *
+	 * @access public
+	 * @param string $api_key MailChimp API Key.
+	 * @return mixed  If key valid then return the key. If not valid - return FALSE.
+	 */
+	public function _mc_api_key_valid( $api_key = NULL ) {
+		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
+		// Make sure API key only has one '-'
+		$exp_key = explode( '-', $api_key );
+		if ( ! is_array( $exp_key ) || count( $exp_key ) != 2 ) {
+			return FALSE;
+		}
+
+		// Check if key is live/acceptable by API.
+		try {
+			$MailChimp = new EEA_MC\MailChimp( $api_key );
+			$reply = $MailChimp->get('');
+		} catch ( Exception $e ) {
+			return FALSE;
+		}
+
+		// If a reply is present, then let's process that.
+		if ( ! $MailChimp->success() || ! isset($reply['account_id']) ) {
+			return FALSE;
+		}
+		return $api_key;
+	}
 
 
 	public function pretty_name() {

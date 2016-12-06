@@ -66,13 +66,6 @@ class EE_MCI_Controller {
 	 */
 	private $category_id = 0;
 
-	/**
-	 * The List of question IDs.
-	 * @access private
-	 * @var array $_question_list_id
-	 */
-	private $_question_list_id = array();
-
 
 
 	/**
@@ -86,23 +79,10 @@ class EE_MCI_Controller {
 		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
 
 		$this->_config = EED_Mailchimp::instance()->config();
-		$this->_question_list_id = array(
-			EEM_Attendee::fname_question_id       => 'fname',
-			EEM_Attendee::lname_question_id       => 'lname',
-			EEM_Attendee::email_question_id       => 'email',
-			EEM_Attendee::address_question_id     => 'address',
-			EEM_Attendee::address2_question_id    => 'address2',
-			EEM_Attendee::city_question_id        => 'city',
-			EEM_Attendee::state_question_id       => 'state',
-			EEM_Attendee::country_question_id     => 'country',
-			EEM_Attendee::zip_question_id         => 'zip',
-			EEM_Attendee::phone_question_id       => 'phone'
-		);
 
 		// Verify API key.
 		$api_key = ! empty( $api_key ) ? $api_key : $this->_config->api_settings->api_key;
 		$this->_api_key = $this->mci_is_api_key_valid( $api_key );
-		$this->MailChimp = new MailChimp( $api_key );
 	}
 
 
@@ -129,7 +109,7 @@ class EE_MCI_Controller {
 		try {
 			$this->MailChimp = new MailChimp( $api_key );
 			$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__parameters', array('fields' => 'account_id,account_name,email,username') );
-			$reply = $this->MailChimp->get('');
+			$reply = $this->MailChimp->get('', $parameters);
 		} catch ( Exception $e ) {
 			$this->set_error( $e );
 			do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
@@ -415,17 +395,32 @@ class EE_MCI_Controller {
 		$question_answers = $this->_get_attendee_details_for_registration( $registration );
 		// get the registrant's question answers
 		$question_answers = $this->_get_question_answers_for_registration( $registration, $question_answers );
+		// Get all event questions.
+		$event_questions_list = $this->mci_get_event_all_questions( $EVT_ID );
 		foreach ( $question_fields as $mc_list_field => $question_ID ) {
 			// Older version used names for an IDs (now using int).
-			$q_id = ( is_numeric($question_ID) )? $question_ID : array_search($question_ID, $this->_question_list_id);
+			$q_id = null;
+			if ( is_numeric($question_ID) ) {
+				$q_id = $question_ID;
+			} else {
+				if ( isset($event_questions_list[$question_ID]) ) {
+					$q_id = $event_questions_list[$question_ID]['QST_ID'];
+				}
+			}
 			if ( isset($question_answers[ $q_id ]) && !empty($question_answers[ $q_id ]) ) {
 				// If question field is a State then get the state name not the code.
-				if ( $q_id == 7 ) {	// If a state.
-					$state = EEM_State::instance()->get_one_by_ID( $question_answers[ $q_id ] );
-					$subscribe_args['merge_fields'][ $mc_list_field ] = $state->name();
-				} else if ( $q_id == 8 ) {	// If a Country (change ISO to a full name).
+				if ( isset($event_questions_list['state']) && $q_id == $event_questions_list['state']['QST_ID'] ) {	// If a state.
+					$state = $registration->attendee()->state_obj();
+					if ( $state instanceof EE_State ) {
+						$subscribe_args['merge_fields'][ $mc_list_field ] = $state->name();
+					}
+
+				} else if ( isset($event_questions_list['country']) && $q_id == $event_questions_list['country']['QST_ID'] ) {	// If a Country (change ISO to a full name).
 					$country = $registration->attendee()->country_obj();
-					$subscribe_args['merge_fields'][ $mc_list_field ] = $country->name();
+					if ( $country instanceof EE_Country ) {
+						$subscribe_args['merge_fields'][ $mc_list_field ] = $country->name();
+					}
+
 				} else if ( is_array( $question_answers[ $q_id ] )) {
 					$selected = '';
 					foreach ( $question_answers[ $q_id ] as $q_key => $q_value ) {
@@ -450,7 +445,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_users_lists() {
 		do_action('AHEE__EE_MCI_Controller__mci_get_users_lists__start');
-		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_users_lists__parameters', array('fields' => 'lists.id,lists.name') );
+		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_users_lists__parameters', array('fields' => 'lists.id,lists.name', 'count' => 100) );
 		
 		try {
 			$reply = $this->MailChimp->get('lists', $parameters);
@@ -477,7 +472,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_users_groups( $list_id ) {
 		do_action('AHEE__EE_MCI_Controller__mci_get_users_groups__start');
-		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_users_groups__parameters', array('exclude_fields' => '_links,categories._links') );
+		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_users_groups__parameters', array('exclude_fields' => '_links,categories._links', 'count' => 50) );
 
 		if ( $list_id == NULL )
 			$list_id = $this->list_id;
@@ -507,7 +502,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_interests( $list_id, $category_id ) {
 		do_action('AHEE__EE_MCI_Controller__mci_get_interests__start');
-		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_interests__parameters', array('fields' => 'interests', 'exclude_fields' => 'interests._links') );
+		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_interests__parameters', array('fields' => 'interests', 'exclude_fields' => 'interests._links', 'count' => 100) );
 
 		if ( $list_id == NULL )
 			$list_id = $this->list_id;
@@ -538,7 +533,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_list_merge_vars( $list_id ) {
 		do_action('AHEE__EE_MCI_Controller__mci_get_list_merge_vars__start');
-		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_list_merge_vars__parameters', array('fields' => 'merge_fields', 'exclude_fields' => '_links,merge_fields._links') );
+		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_list_merge_vars__parameters', array('fields' => 'merge_fields', 'exclude_fields' => '_links,merge_fields._links', 'count' => 50) );
 		if ( $list_id == NULL )
 			$list_id = $this->list_id;
 
@@ -571,7 +566,7 @@ class EE_MCI_Controller {
 			$this->list_id = $this->mci_event_list( $event->ID );
 			$this->category_id = $this->mci_event_list_group( $event->ID );
 
-			$metabox_obj = new EE_MC_Metabox_Template( $this, $event->ID, $this->list_id, $this->category_id );
+			$metabox_obj = new EE_MC_Metabox_Form( $this, $event->ID, $this->list_id, $this->category_id );
 			return $metabox_obj->get_html_and_js();
 		} else {
 			$error_section = new EE_Form_Section_HTML( 
@@ -698,13 +693,13 @@ class EE_MCI_Controller {
 	 *
 	 * @access public
 	 * @param int $list_id
-	 * @return void
+	 * @return string (HTML)
 	 */
 	public function mci_list_mailchimp_lists( $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
 		// Load the lists form.
-		$lists_obj = new EE_MC_Lists_Template( $this, $list_id );
-		echo $lists_obj->get_html_and_js();
+		$lists_obj = new EE_MC_Lists_Form( $this, $list_id );
+		return $lists_obj->get_html_and_js();
 	}
 
 
@@ -715,15 +710,17 @@ class EE_MCI_Controller {
 	 * @access public
 	 * @param int $event_id The ID of the Event.
 	 * @param int $list_id
-	 * @return void
+	 * @return string (HTML)
 	 */
 	public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
 		if ( $list_id !== '-1' && $list_id !== NULL ) {
 			// Load the interests form.
-			$interest_categories_obj = new EE_MC_Interest_Categories_Template( $this, $event_id, $list_id );
-			echo $interest_categories_obj->get_html_and_js();
+			$interest_categories_obj = new EE_MC_Interest_Categories_Form( $this, $event_id, $list_id );
+			return $interest_categories_obj->get_html_and_js();
 		}
+		// Default to:
+		return EEH_HTML::no_row();
 	}
 
 
@@ -734,12 +731,16 @@ class EE_MCI_Controller {
 	 * @access public
 	 * @param int $event_id The ID of the Event.
 	 * @param int $list_id
-	 * @return void
+	 * @return string (HTML)
 	 */
 	public function mci_list_mailchimp_fields( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_fields__start');
-		$fields_obj = new EE_MC_Merge_Fields_Template( $this, $event_id, $list_id );
-		echo $fields_obj->get_html_and_js();
+		// No need to generate any content if no list selected.
+		if ( $list_id === '-1' ) {
+			return EEH_HTML::no_row();
+		}
+		$fields_obj = new EE_MC_Merge_Fields_Form( $this, $event_id, $list_id );
+		return $fields_obj->get_html_and_js();
 	}
 
 
@@ -779,10 +780,11 @@ class EE_MCI_Controller {
 					foreach ( $QG_list->questions() as $q_list ) {
 						$qst = array(
 							'QST_Name' => $q_list->get('QST_display_text'),
-							'QST_ID' => $q_list->get('QST_ID')
+							'QST_ID' => $q_list->get('QST_ID'),
+							'QST_system' => $q_list->get('QST_system')
 						);
 						if ( ! in_array($qst, $questions) ) {
-							$questions[] = $qst;
+							$questions[$q_list->get('QST_system')] = $qst;
 						}
 					}
 				}

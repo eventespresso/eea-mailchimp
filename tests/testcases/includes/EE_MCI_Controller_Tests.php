@@ -234,7 +234,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
             $list_field_tags[] = $element['tag'];
             $_POST[base64_encode($element['tag'])] = $element['tag'];
         }
-        $_POST['ee_mailchimp_qfields'] = base64_encode(serialize($list_field_tags));
+        $_POST['ee_mailchimp_qfields'] = $list_field_tags;
 
         $this->_mci_controller->mci_save_metabox_contents($this->_ee_event->ID());
 	    $mci_event_subscriptions = $this->_mci_controller->mci_event_subscriptions( $this->_ee_event->ID() );
@@ -255,9 +255,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      */
     public function test_mailchimp_lists_content() {
         $mc_lists = $this->_mci_controller->mci_get_users_lists();
-        ob_start();
-        $this->_mci_controller->mci_list_mailchimp_lists($this->_ee_event->ID());
-        $lists_content = ob_get_clean();
+        $lists_content = $this->_mci_controller->mci_list_mailchimp_lists($this->_ee_event->ID());
         foreach ($mc_lists as $list_no => $list) {
             $this->assertTrue( strpos($lists_content, $list['name']) !== false );
         }
@@ -268,9 +266,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      */
     public function test_mailchimp_groups_content() {
         $mc_gorups = $this->_mci_controller->mci_get_users_groups($this->_list_id);
-        ob_start();
-        $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), $this->_list_id);
-        $ok_groups_content = ob_get_clean();
+        $ok_groups_content = $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), $this->_list_id);
         foreach ($mc_gorups as $grouping) {
             $this->assertTrue( strpos($ok_groups_content, $grouping['title']) !== false );
             $category_interests = $this->_mci_controller->mci_get_interests( $this->_list_id, $grouping['id'] );
@@ -279,9 +275,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
             }
         }
         // If no groups in the list.
-        ob_start();
-        $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), 'invalid-list-id');
-        $none_groups_content = ob_get_clean();
+        $none_groups_content = $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), 'invalid-list-id');
         $this->assertTrue( strpos($none_groups_content, 'No groups found for this List.') !== false );
     }
 
@@ -290,24 +284,17 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      */
     public function test_mailchimp_fields_content() {
         $list_fields = $this->_mci_controller->mci_get_list_merge_vars($this->_list_id);
-        $list_field_tags = array();
+        $ok_questions_content = $this->_mci_controller->mci_list_mailchimp_fields($this->_ee_event->ID(), $this->_list_id);
         foreach ($list_fields as $element) {
-            $list_field_tags[] = $element['tag'];
+            $this->assertTrue( strpos($ok_questions_content, "value='".$element['tag']."'") !== false );
         }
-        ob_start();
-            $this->_mci_controller->mci_list_mailchimp_fields($this->_ee_event->ID(), $this->_list_id);
-            $ok_questions_content = ob_get_contents();
-        ob_end_clean();
+
         foreach ($list_fields as $l_field) {
             $this->assertTrue( strpos($ok_questions_content, base64_encode($l_field['name'])) !== false );
         }
-        $this->assertTrue( strpos($ok_questions_content, base64_encode(serialize($list_field_tags))) !== false );
         // If no question fields in the list.
-        ob_start();
-            $this->_mci_controller->mci_list_mailchimp_fields($this->_ee_event->ID(), 'invalid-list-id');
-            $none_questions_content = ob_get_contents();
-        ob_end_clean();
-        $this->assertTrue( empty($none_questions_content) );
+        $none_questions_content = $this->_mci_controller->mci_list_mailchimp_fields($this->_ee_event->ID(), 'invalid-list-id');
+        $this->assertTrue( strpos($none_questions_content, 'Sorry, no merge fields found!') !== false );
     }
 
     /**
