@@ -45,6 +45,9 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 		global $wpdb;
 		$this->_pretty_name = __("Mailchimp List Group", "event_espresso");
 		$this->_old_table = $wpdb->prefix . "esp_event_mailchimp_list_group";
+        //only bother migrating rows which indicate the event is associated with a list and a group
+        $this->_extra_where_sql = 'WHERE AMC_mailchimp_list_id != "-1"
+                                        AND AMC_mailchimp_group_id != "-1"';
 		$this->_list_interests = array();
 		$this->_saved_interests = array();
 		$this->_setup_before_migration();
@@ -89,7 +92,7 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
         $list_id = $old_row['AMC_mailchimp_list_id'];
 
         // No need to migrate "Do not send to MC".
-        if ( $list_id === -1 ) {
+        if ( $list_id === '-1' ) {
             return;
         }
         //don't bother fetching the lists/groups/interests for the event if we've already done it
@@ -189,7 +192,7 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 		$items_actually_migrated = parent::_migration_step($num_items);
 		// Try to catch that moment where all lines were migrated.
 		if ( $this->is_completed() ) {
-			$this->_add_interests();
+			$this->_add_missing_interests();
 		}
 		return $items_actually_migrated;
 	}
@@ -201,13 +204,13 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 	 * @access protected
 	 * @return void
 	 */
-	protected function _add_interests() {
+	protected function _add_missing_interests() {
 		// Need to add the not selected interests as API v3 uses those also.
 		foreach ($this->_list_interests as $event_id => $event) {
 			foreach ($event as $list_id => $list) {
-				foreach ($list as $linterest) {
-					foreach ($linterest as $intr) {
-						$this->_insert_interest($intr, $event_id, $list_id);
+				foreach ($list as $interests) {
+					foreach ($interests as $interest) {
+						$this->_insert_interest($interest, $event_id, $list_id);
 					}
 				}
 			}
@@ -248,14 +251,16 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 
 	/**
 	 * Insert interest data.
-	 *
-	 * @access protected
-	 * @param array $interest Interest information.
-	 * @param string $evnt_id Event ID.
-	 * @param string $lst_id List ID.
+
+*
+*@access protected
+	 * @param array  $interest Interest information.
+	 * @param string $event_id Event ID.
+	 * @param string $list_id  List ID.
 	 * @return void
 	 */
-	protected function _insert_interest( $interest, $evnt_id, $lst_id ) {
+	protected function _insert_interest( $interest, $event_id, $list_id)
+    {
 		global $wpdb;
 		// If not in the DB then add as not selected interest.
 		if ( in_array($interest['id'], $this->_saved_interests) ) {
@@ -263,18 +268,18 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 		}
 		$lg_id = $interest['id'] . '-' . $interest['category_id'] . '-' . base64_encode($interest['name']) . '-false';
 		$cols_n_values = array(
-			'EVT_ID' => $evnt_id,
-			'AMC_mailchimp_list_id' => $lst_id,
-			'AMC_mailchimp_group_id' => $lg_id
+            'EVT_ID' => $event_id,
+            'AMC_mailchimp_list_id' => $list_id,
+            'AMC_mailchimp_group_id' => $lg_id
 		);
 		$data_types = array(
 			'%d',	// EVT_ID
 			'%s',	// AMC_mailchimp_list_id
 			'%s',	// AMC_mailchimp_group_id
 		);
-		$ins_success = $wpdb->insert($this->_old_table, $cols_n_values, $data_types);
+		$insert_success = $wpdb->insert($this->_old_table, $cols_n_values, $data_types);
 
-		if ( $ins_success ) {
+		if ( $insert_success ) {
 			$this->_saved_interests[] = $interest['id'];
 		}
 	}
