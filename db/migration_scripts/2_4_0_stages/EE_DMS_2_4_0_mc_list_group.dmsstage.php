@@ -13,12 +13,6 @@
 class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 
 	/**
-	 * Old table name.
-	 * @access protected
-	 */
-	protected $_old_table;
-
-	/**
 	 * Interests List.
 	 * @var array  {event_id {list_id {category_id {interest_name {interest data {id, name}}}}}}
 	 * @access protected
@@ -78,14 +72,12 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 				$key_ok = $this->mc_api_key_valid($api_key);
 			}
 		}
-		// Table exists ?
-		$table_exists = $wpdb->get_results('SHOW TABLES LIKE "' . $this->_old_table . '"');
-		if ( ! $key_ok || ! $table_exists ) {
+		if ( ! $key_ok  ) {
 			return;
 		}
 
 		$this->MailChimp = new EEA_MC\MailChimp( $api_key );
-
+        //no need to check the table exists, the data migration script for this stage already asserted it did
 		// Get all events that belong to lists Lists.
 		$query = "SELECT EVT_ID AS id, AMC_mailchimp_list_id AS list FROM {$this->_old_table} WHERE AMC_mailchimp_list_id != '-1' GROUP BY EVT_ID";
 		$this->_mc_events = $wpdb->get_results( $query, ARRAY_A );
@@ -97,8 +89,8 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 				continue;
 			}
 			// So we try to get the interests themselves.
-			foreach ($categories as $icategorie) {
-				$interests = $this->_mc_get_interests($ulist['list'], $icategorie['id']);
+			foreach ($categories as $icategory) {
+				$interests = $this->_mc_get_interests($ulist['list'], $icategory['id']);
 				// No interests ? Move on...
 				if ( empty($interests) || ! is_array($interests) ) {
 					continue;
@@ -122,7 +114,7 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 		global $wpdb;
 		if ( ! empty($this->_list_interests) ) {
 			// Need to backup.
-			$interesrs_list = $this->_list_interests;
+			$interests_list = $this->_list_interests;
 
 			// No need to migrate "Do not send to MC".
 			if ( strval($old_row['AMC_mailchimp_list_id']) === '-1' ) {
@@ -133,7 +125,7 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 			$evt_id = $old_row['EVT_ID'];
 			$list_id = $old_row['AMC_mailchimp_list_id'];
 			$intr_name = base64_decode($listgroup[2]);
-			$intr_data = array_shift($interesrs_list[$evt_id][$list_id][$intr_name]);
+			$intr_data = array_shift($interests_list[$evt_id][$list_id][$intr_name]);
 
 			if ( ! empty($intr_data) && is_array($intr_data) ) {
 				// Update current row data.

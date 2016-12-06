@@ -24,12 +24,12 @@ EEH_Autoloader::register_autoloader( $class_to_filepath );
 
 class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 
-	public function __construct() {
+	public function __construct( TableManager $table_manager = null, TableAnalysis $table_analysis = null ) {
 		$this->_pretty_name = __("EE4 MailChimp data Migration to 2.4.0", "event_espresso");
 		$this->_migration_stages = array(
 			new EE_DMS_2_4_0_mc_list_group()
 		);
-		parent::__construct();
+		parent::__construct($table_manager,$table_analysis);
 	}
 
 
@@ -54,8 +54,7 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 		$table_name = $wpdb->prefix . "esp_event_mailchimp_list_group";
 		$count = 0;
 		// Table exists ?
-		$table_exists = $wpdb->get_results('SHOW TABLES LIKE "' . $table_name . '"');
-		if ( $table_exists ) {
+		if ( $this->_get_table_analysis()->tableExists($table_name) ) {
 			$count = $wpdb->get_var( "SELECT COUNT(EMC_ID) FROM $table_name" );
 		}
 
