@@ -777,14 +777,14 @@ class EE_MCI_Controller {
 		if ( is_array($question_groups) && ! empty($question_groups) ) {
 	        foreach ($question_groups as $QG_list) {
 				if ( $QG_list instanceof EE_Question_Group ) {
-					foreach ( $QG_list->questions() as $q_list ) {
+					foreach ( $QG_list->questions() as $question ) {
 						$qst = array(
-							'QST_Name' => $q_list->get('QST_display_text'),
-							'QST_ID' => $q_list->get('QST_ID'),
-							'QST_system' => $q_list->get('QST_system')
+							'QST_Name' => $question->get('QST_display_text'),
+							'QST_ID' => $question->get('QST_ID'),
+							'QST_system' => $question->get('QST_system')
 						);
 						if ( ! in_array($qst, $questions) ) {
-							$questions[$q_list->get('QST_system')] = $qst;
+							$questions[$question->ID()] = $qst;
 						}
 					}
 				}
