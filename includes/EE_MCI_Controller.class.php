@@ -186,6 +186,11 @@ class EE_MCI_Controller {
 			if ( ! empty( $registrations )) {
 				foreach ( $registrations as $registration ) {
 					if ( $registration instanceof EE_Registration ) {
+						$EVT_ID = $registration->event_ID();
+						$event_list = $this->mci_event_list( $EVT_ID );
+						// If no list selected for this event than skip the subscription.
+						if ( empty( $event_list ) || ( ! empty( $event_list ) && intval($event_list) === -1 ) ) continue;
+
 						$need_reg_status = $reg_approved = false;
 						/** @type EE_Mailchimp_Config $mc_config */
 						$mc_config = EED_Mailchimp::get_config();
@@ -200,72 +205,67 @@ class EE_MCI_Controller {
 						$attendee = $registration->attendee();
 						$att_email = $attendee->email();
 						if ( ( $attendee instanceof EE_Attendee ) && ! in_array($att_email, $registered_attendees) && ( ! $need_reg_status || $need_reg_status && $reg_approved ) ) {
-							$EVT_ID = $registration->event_ID();
-							$event_list = $this->mci_event_list( $EVT_ID );
-							// If no list selected for this event than skip the subscription.
-							if ( ! empty( $event_list )) {
-								$opt_in = isset( $this->_config->api_settings->skip_double_optin ) ? $this->_config->api_settings->skip_double_optin : true;
-								$emails_type = isset( $this->_config->api_settings->emails_type ) ? $this->_config->api_settings->emails_type : 'text';
-								$subscribe_args = array(
-									'email_address' => $att_email
-								);
-								// Group vars
-								$subscribe_args = $this->_add_event_group_vars_to_subscribe_args( $EVT_ID, $subscribe_args );
-								// Question fields
-								$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
-								// filter it
-								$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args );
+							$opt_in = isset( $this->_config->api_settings->skip_double_optin ) ? $this->_config->api_settings->skip_double_optin : true;
+							$emails_type = isset( $this->_config->api_settings->emails_type ) ? $this->_config->api_settings->emails_type : 'text';
+							$subscribe_args = array(
+								'email_address' => $att_email
+							);
+							// Group vars
+							$subscribe_args = $this->_add_event_group_vars_to_subscribe_args( $EVT_ID, $subscribe_args );
+							// Question fields
+							$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
+							// filter it
+							$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args );
 
-								try {
-									// Get member info if exists.
-									$member_subscribed = $this->MailChimp->get( '/lists/'.$event_list.'/members/'.$this->MailChimp->subscriberHash($att_email), array('fields' => 'id,email_address,status') );
-									if ( isset($member_subscribed['email_address']) && isset($member_subscribed['status']) && ! preg_match('/^(4|5)\d{2}$/', $member_subscribed['status']) ) {
-										$subscribe_args['status'] = $member_subscribed['status'];
-									}
-									// Send opt-in emails ?
-									if ( $opt_in ) {
-										$subscribe_args['status_if_new'] = 'pending';
-									} else {
-										$subscribe_args['status_if_new'] = 'subscribed';
-									}
-									// What type of emails we want to send ?
-									$subscribe_args['email_type'] = $emails_type;
-									// Add/update member.
-									$put_member = $this->MailChimp->put( '/lists/'.$event_list.'/members/'.$this->MailChimp->subscriberHash($att_email), $subscribe_args );
-									// Log error.
-									if ( ! $this->MailChimp->success() ) {
-										$this->set_error( $put_member );
-										$errors = '';
-										if ( isset($put_member['errors']) && is_array($put_member['errors']) ) {
-											foreach ($put_member['errors'] as $err) {
-												$errors .= (isset($err['field'])) ? $err['field'] . ': ' : '';
-												$errors .= (isset($err['message'])) ? $err['message'] . ', ' : '';
-											}
-										}
-										$evt_obj = $registration->event();
-										$evt_permalink = ( $evt_obj instanceof EE_Event ) ? $evt_obj->get_permalink() : '#';
-										$notice_msg = sprintf(
-											__( 'Registration #%1$s (%2$s %3$s, %4$s) could not be subscribed to a MailChimp List (%5$s). There were errors regarding the following: %6$s. 
-												Please verify that event %7$s has questions for all required MailChimp fields, 
-												and that they\'re of the correct types, and that multi-choice MailChimp fields correspond to EE questions with all the same answer values. 
-												If you have further problems please contact support.', 'event_espresso' ),
-											$registration->ID(),
-											$attendee->fname(),
-											$attendee->lname(),
-											$att_email,
-											$event_list,
-											$errors,
-											'<a href="'.$evt_permalink.'">'.$registration->event_name().'</a>'
-										);
-										// Notify the admin if there was a problem with the subscription.
-										EE_Error::add_persistent_admin_notice( 'eea_mailchimp_subscription_error', $notice_msg, true );
-									}
-								} catch ( Exception $e ) {
-									$member_subscribed = FALSE;
-									$this->set_error( $e );
+							try {
+								// Get member info if exists.
+								$member_subscribed = $this->MailChimp->get( '/lists/'.$event_list.'/members/'.$this->MailChimp->subscriberHash($att_email), array('fields' => 'id,email_address,status') );
+								if ( isset($member_subscribed['email_address']) && isset($member_subscribed['status']) && ! preg_match('/^(4|5)\d{2}$/', $member_subscribed['status']) ) {
+									$subscribe_args['status'] = $member_subscribed['status'];
 								}
-								$registered_attendees[] = $att_email;
+								// Send opt-in emails ?
+								if ( $opt_in ) {
+									$subscribe_args['status_if_new'] = 'pending';
+								} else {
+									$subscribe_args['status_if_new'] = 'subscribed';
+								}
+								// What type of emails we want to send ?
+								$subscribe_args['email_type'] = $emails_type;
+								// Add/update member.
+								$put_member = $this->MailChimp->put( '/lists/'.$event_list.'/members/'.$this->MailChimp->subscriberHash($att_email), $subscribe_args );
+								// Log error.
+								if ( ! $this->MailChimp->success() ) {
+									$this->set_error( $put_member );
+									$errors = '';
+									if ( isset($put_member['errors']) && is_array($put_member['errors']) ) {
+										foreach ($put_member['errors'] as $err) {
+											$errors .= (isset($err['field'])) ? $err['field'] . ': ' : '';
+											$errors .= (isset($err['message'])) ? $err['message'] . ', ' : '';
+										}
+									}
+									$evt_obj = $registration->event();
+									$evt_permalink = ( $evt_obj instanceof EE_Event ) ? $evt_obj->get_permalink() : '#';
+									$notice_msg = sprintf(
+										__( 'Registration #%1$s (%2$s %3$s, %4$s) could not be subscribed to a MailChimp List (%5$s). There were errors regarding the following: %6$s. 
+											Please verify that event %7$s has questions for all required MailChimp fields, 
+											and that they\'re of the correct types, and that multi-choice MailChimp fields correspond to EE questions with all the same answer values. 
+											If you have further problems please contact support.', 'event_espresso' ),
+										$registration->ID(),
+										$attendee->fname(),
+										$attendee->lname(),
+										$att_email,
+										$event_list,
+										$errors,
+										'<a href="'.$evt_permalink.'">'.$registration->event_name().'</a>'
+									);
+									// Notify the admin if there was a problem with the subscription.
+									EE_Error::add_persistent_admin_notice( 'eea_mailchimp_subscription_error', $notice_msg, true );
+								}
+							} catch ( Exception $e ) {
+								$member_subscribed = FALSE;
+								$this->set_error( $e );
 							}
+							$registered_attendees[] = $att_email;
 						}
 					}
 				}
