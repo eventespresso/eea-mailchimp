@@ -189,8 +189,10 @@ class EE_MCI_Controller {
 						$EVT_ID = $registration->event_ID();
 						$event_list = $this->mci_event_list( $EVT_ID );
 						// If no list selected for this event than skip the subscription.
-						if ( empty( $event_list ) || ( ! empty( $event_list ) && intval($event_list) === -1 ) ) continue;
-
+						if ( empty( $event_list ) || ( ! empty( $event_list ) && intval($event_list) === -1 ) ) {
+                            continue;
+                        }
+                        
 						$need_reg_status = $reg_approved = false;
 						/** @type EE_Mailchimp_Config $mc_config */
 						$mc_config = EED_Mailchimp::get_config();
