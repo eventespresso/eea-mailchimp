@@ -248,20 +248,20 @@ class EE_MCI_Controller {
 									$evt_obj = $registration->event();
 									$evt_permalink = ( $evt_obj instanceof EE_Event ) ? $evt_obj->get_permalink() : '#';
 									$notice_msg = sprintf(
-										__( 'Registration #%1$s (%2$s %3$s, %4$s) could not be subscribed to a MailChimp List (%5$s). There were errors regarding the following: %6$s. 
+										__( 'This registration could not be subscribed to a MailChimp List (%5$s). There were errors regarding the following: %6$s. 
 											Please verify that event %7$s has questions for all required MailChimp fields, 
 											and that they\'re of the correct types, and that multi-choice MailChimp fields correspond to EE questions with all the same answer values. 
 											If you have further problems please contact support.', 'event_espresso' ),
-										$registration->ID(),
-										$attendee->fname(),
-										$attendee->lname(),
-										$att_email,
 										$event_list,
 										$errors,
 										'<a href="'.$evt_permalink.'">'.$registration->event_name().'</a>'
 									);
 									// Notify the admin if there was a problem with the subscription.
-									EE_Error::add_persistent_admin_notice( 'eea_mailchimp_subscription_error', $notice_msg, true );
+                                    EEM_Change_Log::instance()->log(
+                                        EED_Mailchimp::log_type,
+                                        $notice_msg,
+                                        $registration
+                                    );
 								}
 							} catch ( Exception $e ) {
 								$member_subscribed = FALSE;
