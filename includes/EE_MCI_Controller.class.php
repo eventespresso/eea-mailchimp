@@ -777,20 +777,39 @@ class EE_MCI_Controller {
 
 
 	/**
-	 * Get the list of question groups (EQG_primary) of the Event.
+	 * Get the list of question groups (EQG_primary) of the Event. If there are non (because it's a new event)
+     * then at least return the main question group
 	 *
 	 * @access public
 	 * @param string $event_id  The ID of the Event.
 	 * @return array  List of all primary QGs fn the Event.
 	 */
 	public function mci_get_event_question_groups( $event_id ) {
-		return EE_Registry::instance()->load_model( 'Question_Group' )->get_all( array(
-			array(
-				'Event.EVT_ID' => $event_id,
-				'Event_Question_Group.EQG_primary' => TRUE
-			),
-			'order_by'=>array( 'QSG_order' => 'ASC' )
-		));
+        $question_groups = array();
+        //only bother querying for question groups related to the evnent if the event exists
+        if( $event_id ) {
+            $question_groups = EEM_Question_Group::instance()->get_all(
+                array(
+                    array(
+                        'Event.EVT_ID'                     => $event_id,
+                        'Event_Question_Group.EQG_primary' => true,
+                    ),
+                    'order_by' => array('QSG_order' => 'ASC'),
+                )
+            );
+        }
+        //if this is a new event, or somehow we didn't find any groups,
+        //then at least grab the primary question group
+        if(empty($question_groups)){
+           $question_groups = EEM_Question_Group::instance()->get_all(
+               array(
+                   array(
+                       'QSG_system' => EEM_Question_Group::system_personal
+                   )
+               )
+           );
+        }
+        return $question_groups;
 	}
 
 
