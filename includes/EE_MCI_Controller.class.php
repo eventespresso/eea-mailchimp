@@ -283,7 +283,7 @@ class EE_MCI_Controller {
 	 * @access public
 	 * @param int $EVT_ID
 	 * @param array $subscribe_args
-	 * @return array
+	 * @return array|StdClass
 	 */
 	protected function _add_event_group_vars_to_subscribe_args( $EVT_ID = 0,  $subscribe_args = array() ) {
 		$event_groups = $this->mci_event_list_group( $EVT_ID );
@@ -315,15 +315,16 @@ class EE_MCI_Controller {
 		if ( isset($grouping[3]) && $grouping[3] === 'true' ) {
 			$selected = true;
 		}
+		if(empty($subscribe_args['interests'])){
+		   $subscribe_args['interests'] = new StdClass();
+        }
 		// Just add the interests.
 		if ( isset( $subscribe_args['interests'] )) {
 			foreach ( $subscribe_args['interests'] as $interest => $value ) {
 				if ( $interest != $grouping[0] ) {
-					$subscribe_args['interests'][$grouping[0]] = $selected;
+					$subscribe_args['interests']->{$grouping[0]} = $selected;
 				}
 			}
-		} else {
-			$subscribe_args['interests'][$grouping[0]] = $selected;
 		}
 		return $subscribe_args;
 	}
@@ -417,7 +418,7 @@ class EE_MCI_Controller {
 			throw new EE_Error( __( 'The MailChimp Subscriber arguments array is malformed!','event_espresso' ));
 		}
 		if ( ! isset( $subscribe_args['merge_fields'] ) ) {
-			$subscribe_args['merge_fields'] = array();
+			$subscribe_args['merge_fields'] = new StdClass();
 		}
 		// get MailChimp question fields
 		$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
@@ -442,13 +443,13 @@ class EE_MCI_Controller {
 				if ( isset($event_questions_list['state']) && $q_id == $event_questions_list['state']['QST_ID'] ) {	// If a state.
 					$state = $registration->attendee()->state_obj();
 					if ( $state instanceof EE_State ) {
-						$subscribe_args['merge_fields'][ $mc_list_field ] = $state->name();
+						$subscribe_args['merge_fields']->{$mc_list_field} = $state->name();
 					}
 
 				} else if ( isset($event_questions_list['country']) && $q_id == $event_questions_list['country']['QST_ID'] ) {	// If a Country (change ISO to a full name).
 					$country = $registration->attendee()->country_obj();
 					if ( $country instanceof EE_Country ) {
-						$subscribe_args['merge_fields'][ $mc_list_field ] = $country->name();
+						$subscribe_args['merge_fields']->{$mc_list_field} = $country->name();
 					}
 
 				} else if ( is_array( $question_answers[ $q_id ] )) {
@@ -456,9 +457,9 @@ class EE_MCI_Controller {
 					foreach ( $question_answers[ $q_id ] as $q_key => $q_value ) {
 						$selected .= $selected == '' ? $q_value : ', ' . $q_value;
 					}
-					$subscribe_args['merge_fields'][$mc_list_field] = $selected;
+					$subscribe_args['merge_fields']->{$mc_list_field} = $selected;
 				} else {
-					$subscribe_args['merge_fields'][$mc_list_field] = $question_answers[ $q_id ];
+					$subscribe_args['merge_fields']->{$mc_list_field} = $question_answers[ $q_id ];
 				}
 			}
 		}
@@ -855,7 +856,8 @@ class EE_MCI_Controller {
 		$mc_list_groups = EEM_Event_Mailchimp_List_Group::instance()->get_all( array( array('EVT_ID' => $EVT_ID) ) );
 		$event_list_groups = array();
 		foreach ( $mc_list_groups as $mc_list_group ) {
-			if ( $mc_list_group instanceof EE_Event_Mailchimp_List_Group ) {
+			if ( $mc_list_group instanceof EE_Event_Mailchimp_List_Group
+                && $mc_list_group->mc_group() !== '-1') {
 				$event_list_groups[] = $mc_list_group->mc_group();
 			}
 		}
