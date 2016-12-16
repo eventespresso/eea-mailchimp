@@ -7,6 +7,11 @@
  */
 class EED_Mailchimp extends EED_Module {
 
+    /**
+     * Constant used in EEM_Change_Log for the value of LOG_type for mailchimp logs
+     */
+    const log_type = 'mailchimp';
+
 	/**
 	 * @return EED_Mailchimp
 	 */
@@ -58,6 +63,8 @@ class EED_Mailchimp extends EED_Module {
 			add_action( 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2 );
 			remove_action( 'AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc') );
 		}
+		//add a different log type
+        add_filter( 'FHEE__EE_Enum_Text_Field___allowed_enum_options', array( 'EED_Mailchimp', 'add_log_type' ), 10, 2 );
 	}
 
 
@@ -258,6 +265,14 @@ class EED_Mailchimp extends EED_Module {
 			return false;
 		return true;
 	}
+
+	public static function add_log_type( $enum_options, EE_Model_Field_Base $field_obj ) {
+	    if( $field_obj instanceof EE_Enum_Text_Field
+            && $field_obj->_name === 'LOG_type' ) {
+	        $enum_options[ EED_Mailchimp::log_type ] = esc_html__('MailChimp', 'event_espresso');
+        }
+        return $enum_options;
+    }
 
 	/**
 	 *  Override other methods

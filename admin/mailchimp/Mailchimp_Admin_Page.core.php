@@ -22,7 +22,11 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 	protected function _define_page_props() {
 		$this->_admin_base_url = EE_MAILCHIMP_ADMIN_URL;
 		$this->_admin_page_title = $this->page_label;
-		$this->_labels = array();
+		$this->_labels = array(
+		    'buttons' => array(
+		        'clear_logs' => esc_html__('Clear All MailChimp Logs', 'event_espresso')
+            )
+        );
 	}
 
 	protected function _set_page_routes() {
@@ -33,7 +37,14 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 			'update_mailchimp'	=> array(
 				'func' => '_update_mailchimp',
 				'noheader' => TRUE
-			)
+			),
+            'log'=> array(
+                'func'=> '_log_overview_list_table',
+            ),
+            'clear_logs' => array(
+                'func' => '_clear_logs',
+                'noheader' => TRUE
+            )
 		);
 	}
 
@@ -45,7 +56,16 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 					'order' => 10
 				),
 				'metaboxes' => array( '_publish_post_box', '_espresso_news_post_box', '_espresso_links_post_box', '_espresso_sponsors_post_box' , '_mailchimp_meta_boxes' )
-			)
+			),
+            'log'=>array(
+                'nav'=> array(
+                    'label' => __("Logs", 'event_espresso'),
+                    'order'=>30,
+                ),
+                'list_table'=>'Mailchimp_Log_Admin_List_Table',
+                'metaboxes' => $this->_default_espresso_metaboxes,
+                'require_nonce'=> FALSE
+            )
 		);
 	}
 
@@ -205,6 +225,53 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 		}
 		$this->_redirect_after_action( $key_valid, 'Mailchimp API Key', 'updated', $query_args );
 	}
+
+    protected function _log_overview_list_table() {
+//		$this->_search_btn_label = __('Payment Log', 'event_espresso');
+        $this->display_admin_list_table_page_with_sidebar();
+    }
+
+    protected function _set_list_table_views_log() {
+        $this->_views = array(
+            'all' => array(
+                'slug' => 'all',
+                'label' => __('View All Logs', 'event_espresso'),
+                'count' => 0,
+            )
+        );
+    }
+
+	public function get_logs( $per_page = 50, $current_page = 0, $count = false){
+	    $query_params = array(
+            array(
+                'LOG_type' => EED_Mailchimp::log_type
+            )
+        );
+        if( $count ) {
+            return EEM_Change_Log::instance()->count( $query_params );
+        } else {
+            $query_params['limit'] =  array( ( $current_page - 1 ) * $per_page, $per_page );
+            return  EEM_Change_Log::instance()->get_all( $query_params );
+        }
+    }
+
+    protected function _clear_logs() {
+        $deleted = EEM_Change_Log::instance()->delete(
+            array(
+                array(
+                    'LOG_type' => EED_Mailchimp::log_type
+                )
+            )
+        );
+        $this->_redirect_after_action(
+            $deleted,
+            esc_html__('MailChimp Log Entries', 'event_espresso'),
+            esc_html__('deleted', 'event_espresso'),
+            array(
+                'action' => 'log'
+            )
+        );
+    }
 
 
 
