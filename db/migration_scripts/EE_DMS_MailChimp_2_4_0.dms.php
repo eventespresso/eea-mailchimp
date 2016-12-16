@@ -58,9 +58,9 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 			$count = $wpdb->get_var( "SELECT COUNT(EMC_ID) FROM $table_name" );
 		}
 
-		if ( version_compare($version_string, '2.3.0', '>=')
-			&& version_compare($version_string, '2.4.0', '<')
-			&& version_compare($core_version, '4.4.0', '>=')
+		if ( version_compare($version_string, '2.3.0.rc.000', '>=')
+			&& version_compare($version_string, '2.4.0.rc.000', '<')
+			&& version_compare($core_version, '4.4.0.rc.000', '>=')
 			&& $count > 0 && $key_ok ) {
 			// Can be migrated.
 			return true;
