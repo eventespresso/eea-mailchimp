@@ -248,8 +248,8 @@ class EE_MCI_Controller {
 									$evt_obj = $registration->event();
 									$evt_permalink = ( $evt_obj instanceof EE_Event ) ? $evt_obj->get_permalink() : '#';
 									$notice_msg = sprintf(
-										__( 'This registration could not be subscribed to a MailChimp List (%5$s). There were errors regarding the following: %6$s. 
-											Please verify that event %7$s has questions for all required MailChimp fields, 
+										__( 'This registration could not be subscribed to a MailChimp List (%1$s). There were errors regarding the following: %2$s. 
+											Please verify that event %3$s has questions for all required MailChimp fields, 
 											and that they\'re of the correct types, and that multi-choice MailChimp fields correspond to EE questions with all the same answer values. 
 											If you have further problems please contact support.', 'event_espresso' ),
 										$event_list,
