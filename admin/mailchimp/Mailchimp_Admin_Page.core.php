@@ -245,6 +245,9 @@ class Mailchimp_Admin_Page extends EE_Admin_Page {
 	    $query_params = array(
             array(
                 'LOG_type' => EED_Mailchimp::log_type
+            ),
+            'order_by' => array(
+                'LOG_time' => 'DESC'
             )
         );
         if( $count ) {
