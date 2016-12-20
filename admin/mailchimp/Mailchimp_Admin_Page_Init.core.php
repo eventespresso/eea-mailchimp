@@ -22,7 +22,7 @@ if ( '4.4.0' > EVENT_ESPRESSO_VERSION ) {
          $this->label = EE_MAILCHIMP_LABEL;
          $this->menu_label = EE_MAILCHIMP_LABEL;
          $this->menu_slug = ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG;
-         $this->capability = 'administrator';
+         $this->capability = 'manage_options';
       }
 
       public function get_menu_map() {
@@ -61,7 +61,7 @@ if ( '4.4.0' > EVENT_ESPRESSO_VERSION ) {
             'parent_slug' => 'espresso_events',
             'menu_slug' => ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG,
             'menu_label' => EE_MAILCHIMP_LABEL,
-            'capability' => 'administrator',
+            'capability' => 'manage_options',
             'admin_init_page' => $this
          ));
       }
