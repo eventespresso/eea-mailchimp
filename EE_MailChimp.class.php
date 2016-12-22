@@ -68,11 +68,11 @@ class EE_MailChimp extends EE_Addon {
 					'Mailchimp_Admin_Page' 		         => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page.core.php',
 					'Mailchimp_Admin_Page_Init'          => ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS . 'Mailchimp_Admin_Page_Init.core.php',
 					'EE_Mailchimp_Config' 		         => ESPRESSO_MAILCHIMP_DIR . 'EE_Mailchimp_Config.php',
-					'EE_Div_Per_Section_Spaced_Layout'   => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_Div_Per_Section_Spaced_Layout.strategy.php',
-					'EE_MC_Metabox_Form'             => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_MC_Metabox_Form.form.php',
-					'EE_MC_Lists_Form'               => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_MC_Lists_Form.form.php',
-					'EE_MC_Merge_Fields_Form'        => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_MC_Merge_Fields_Form.form.php',
-					'EE_MC_Interest_Categories_Form' => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'templates' . DS . 'EE_MC_Interest_Categories_Form.form.php'
+					'EE_Div_Per_Section_Spaced_Layout'   => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'forms' . DS . 'EE_Div_Per_Section_Spaced_Layout.strategy.php',
+					'EE_MC_Metabox_Form'             => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'forms' . DS . 'EE_MC_Metabox_Form.form.php',
+					'EE_MC_Lists_Form'               => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'forms' . DS . 'EE_MC_Lists_Form.form.php',
+					'EE_MC_Merge_Fields_Form'        => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'forms' . DS . 'EE_MC_Merge_Fields_Form.form.php',
+					'EE_MC_Interest_Categories_Form' => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'forms' . DS . 'EE_MC_Interest_Categories_Form.form.php'
 				),
 				'dms_paths' 			=> array( ESPRESSO_MAILCHIMP_DMS_PATH ),
 				'module_paths' 		    => array( ESPRESSO_MAILCHIMP_DIR . 'EED_Mailchimp.module.php' ),
