@@ -242,9 +242,15 @@ class EE_MCI_Controller {
 									if ( isset($put_member['errors']) && is_array($put_member['errors']) ) {
 										$errs = array();
 										foreach ($put_member['errors'] as $err) {
-											$err_msg = (isset($err['field'])) ? $err['field'] : '';
-											$err_msg .= (isset($err['message'])) ? ': '.$err['message'] : '';
-											$errs[] = $err_msg;
+                                            $err_msg = isset($err['field'])
+                                                ? sprintf(
+                                                    esc_html__('MailChimp field taged %1$s had the error: ', 'event_espresso'),
+                                                    $err['field'])
+                                                : '';
+                                            $err_msg .= isset($err['message'])
+                                                ? $err['message']
+                                                : esc_html__('No error mentioned', 'event_espresso');
+                                            $errs[] = $err_msg;
 										}
 										$errors = implode(', ', $errs);
 									}
