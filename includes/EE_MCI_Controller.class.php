@@ -240,17 +240,19 @@ class EE_MCI_Controller {
 									$this->set_error( $put_member );
 									$errors = '';
 									if ( isset($put_member['errors']) && is_array($put_member['errors']) ) {
+										$errs = array();
 										foreach ($put_member['errors'] as $err) {
-											$errors .= (isset($err['field'])) ? $err['field'] . ': ' : '';
-											$errors .= (isset($err['message'])) ? $err['message'] . ', ' : '';
+											$err_msg = (isset($err['field'])) ? $err['field'] : '';
+											$err_msg .= (isset($err['message'])) ? ': '.$err['message'] : '';
+											$errs[] = $err_msg;
 										}
+										$errors = implode(', ', $errs);
 									}
 									$evt_obj = $registration->event();
 									$evt_permalink = ( $evt_obj instanceof EE_Event ) ? $evt_obj->get_permalink() : '#';
 									$notice_msg = sprintf(
-										__( 'This registration could not be subscribed to a MailChimp List (%1$s). There were errors regarding the following: %2$s. 
-											Please verify that event %3$s has questions for all required MailChimp fields, 
-											and that they\'re of the correct types, and that multi-choice MailChimp fields correspond to EE questions with all the same answer values. 
+										__( 'This registration could not be subscribed to a MailChimp List with ID: %1$s. There were errors regarding the following: %2$s. 
+											Any mandatory or multi-choice fields that are in this MailChimp list require to be paired with Event questions (in this case %3$s event) that correspond by type and possibly by having the same answer values. 
 											If you have further problems please contact support.', 'event_espresso' ),
 										$event_list,
 										$errors,
