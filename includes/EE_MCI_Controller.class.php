@@ -317,16 +317,18 @@ class EE_MCI_Controller {
 		if ( isset($grouping[3]) && $grouping[3] === 'true' ) {
 			$selected = true;
 		}
-		if(empty($subscribe_args['interests'])){
+		if ( empty($subscribe_args['interests']) ) {
 		   $subscribe_args['interests'] = new StdClass();
         }
 		// Just add the interests.
-		if ( isset( $subscribe_args['interests'] )) {
+		if ( ! empty((array) $subscribe_args['interests']) ) {
 			foreach ( $subscribe_args['interests'] as $interest => $value ) {
 				if ( $interest != $grouping[0] ) {
 					$subscribe_args['interests']->{$grouping[0]} = $selected;
 				}
 			}
+		} else {
+			$subscribe_args['interests']->{$grouping[0]} = $selected;
 		}
 		return $subscribe_args;
 	}
