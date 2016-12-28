@@ -82,15 +82,14 @@ class EE_MC_Lists_Form extends EE_Form_Section_Proper {
 		$subsactions = $l_list = array();
 		$selected = '-1';
 		// Add a default value.
-		array_push( $mc_lists, array( 'id' => '-1', 'name' => esc_html__( 'Do not send to MailChimp', 'event_espresso' )));
-		
+        $l_list['-1'] = esc_html__( 'Do not send to MailChimp', 'event_espresso' );
 		foreach ( $mc_lists as $list ) {
 			// Find selected.
 			if ( $this->_list_id === $list['id'] || ( ! $selected_found && $list['id'] === '-1') ) {
 				$selected = $list['id'];
 				$selected_found = true;
 			}
-			$l_list[$list['id']] = $list['name'];
+			$l_list[$list['id']] = sprintf(esc_html__('%1$s (ID: %2$s)', 'event_espresso'), $list['name'], $list['id'] );
 		}
 
 		$subsactions['mc_lists'] = new EE_Select_Input(

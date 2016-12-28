@@ -244,7 +244,7 @@ class EE_MCI_Controller {
 										foreach ($put_member['errors'] as $err) {
                                             $err_msg = isset($err['field'])
                                                 ? sprintf(
-                                                    esc_html__('MailChimp field taged %1$s had the error: ', 'event_espresso'),
+                                                    esc_html__('MailChimp field tagged %1$s had the error: ', 'event_espresso'),
                                                     $err['field'])
                                                 : '';
                                             $err_msg .= isset($err['message'])
