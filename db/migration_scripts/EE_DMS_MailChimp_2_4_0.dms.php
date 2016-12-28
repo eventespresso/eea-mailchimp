@@ -54,7 +54,8 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 		$table_name = $wpdb->prefix . "esp_event_mailchimp_list_group";
 		$count = 0;
 		// Table exists ?
-
+        //for backwards compatibility, make sure activation helper is loaded
+        EE_Registry::instance()->load_helper( 'Activation' );
 		if (
         (
             method_exists( $this, '_get_table_analysis' ) &&
