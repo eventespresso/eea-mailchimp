@@ -60,7 +60,7 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
             method_exists( $this, '_get_table_analysis' ) &&
 		    $this->_get_table_analysis()->tableExists($table_name) )
         || (
-            $this->_old_table_exists( $table_name )
+            EEH_Activation::table_exists( $table_name )
         )
         ) {
 			$count = $wpdb->get_var( "SELECT COUNT(EMC_ID) FROM $table_name" );
