@@ -89,8 +89,8 @@ class EE_MC_Lists_Form extends EE_Form_Section_Proper {
 				$selected = $list['id'];
 				$selected_found = true;
 			}
-			$l_list[$list['id']] = sprintf(esc_html__('%1$s (ID: %2$s)', 'event_espresso'), $list['name'], $list['id'] );
-		}
+            $l_list[$list['id']] = $list['name'];
+        }
 
 		$subsactions['mc_lists'] = new EE_Select_Input(
 			$l_list,
