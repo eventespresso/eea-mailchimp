@@ -57,7 +57,7 @@ class EE_MailChimp extends EE_Addon {
 			array(
 				'version' 			=> ESPRESSO_MAILCHIMP_VERSION,
 				'class_name' 		=> 'EE_MailChimp',
-				'min_core_version'  => '4.4.5',
+				'min_core_version'  => '4.4.5',//don't require 4.9.23 (which adds support for mailchimp log items) but it's preferred
 				'main_file_path' 	=> ESPRESSO_MAILCHIMP_MAIN_FILE,
 				'admin_path' 		=> ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS,
 				'admin_callback' 	=> 'additional_mailchimp_admin_hooks',
