@@ -483,7 +483,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_get_users_lists() {
 		do_action('AHEE__EE_MCI_Controller__mci_get_users_lists__start');
-		$parameters = apply_filters( 'AHEE__EE_MCI_Controller__mci_get_users_lists__parameters', array('fields' => 'lists.id,lists.name', 'count' => 100) );
+		$parameters = apply_filters( 'FHEE__EE_MCI_Controller__mci_get_users_lists__list_params', array('fields' => 'lists.id,lists.name', 'count' => 100, 'apikey' => $this->_api_key ), $this );
 		
 		try {
 			$reply = $this->MailChimp->get('lists', $parameters);
