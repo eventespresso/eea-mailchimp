@@ -76,7 +76,6 @@ class EE_MCI_Controller {
 	 */
 	function __construct( $api_key = '' ) {
 		do_action( 'AHEE__EE_MCI_Controller__class_constructor__init_controller' );
-		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
 
 		$this->_config = EED_Mailchimp::instance()->config();
 

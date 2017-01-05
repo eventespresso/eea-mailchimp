@@ -9,6 +9,7 @@
  * that interest Names may Not be unique (and that complicates things).
  * 
  */
+use EEA_MC\MailChimp;
 
 class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 
@@ -226,7 +227,6 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 	 * @return mixed  If key valid then return the key. If not valid - return FALSE.
 	 */
 	public function mc_api_key_valid( $api_key = NULL ) {
-		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
 		// Make sure API key only has one '-'
 		$exp_key = explode( '-', $api_key );
 		if ( ! is_array( $exp_key ) || count( $exp_key ) != 2 ) {

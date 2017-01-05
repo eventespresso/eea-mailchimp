@@ -117,7 +117,6 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 	 * @return mixed  If key valid then return the key. If not valid - return FALSE.
 	 */
 	public function _mc_api_key_valid( $api_key = NULL ) {
-		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
 		// Make sure API key only has one '-'
 		$exp_key = explode( '-', $api_key );
 		if ( ! is_array( $exp_key ) || count( $exp_key ) != 2 ) {
