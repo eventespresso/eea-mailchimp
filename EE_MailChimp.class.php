@@ -94,6 +94,7 @@ class EE_MailChimp extends EE_Addon {
 			    )
 		    );
 	    }
+	    require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
     }
 
     /**
