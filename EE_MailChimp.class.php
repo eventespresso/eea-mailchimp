@@ -33,21 +33,15 @@ class EE_MailChimp extends EE_Addon {
      */
     const CONFIG_CLASS = 'EE_Mailchimp_Config';
 
-	/**
-	 * Class constructor
-	 *
-	 * @access public
-	 * @return \EE_MailChimp
-	 */
-    public function __construct() {
 
-    }
+
 
     /**
      * Register our add-on in EE.
      *
      * @access public
      * @return void
+     * @throws \EE_Error
      */
     public static function register_addon() {
 
@@ -74,7 +68,9 @@ class EE_MailChimp extends EE_Addon {
 					'EE_MC_Merge_Fields_Form'        => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'forms' . DS . 'EE_MC_Merge_Fields_Form.form.php',
 					'EE_MC_Interest_Categories_Form' => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'forms' . DS . 'EE_MC_Interest_Categories_Form.form.php'
 				),
-				'dms_paths' 			=> array( ESPRESSO_MAILCHIMP_DMS_PATH ),
+                'model_paths'           => array(ESPRESSO_MAILCHIMP_MODELS_PATH),
+                'class_paths'           => array(ESPRESSO_MAILCHIMP_CLASSES_PATH),
+                'dms_paths' 			=> array( ESPRESSO_MAILCHIMP_DMS_PATH ),
 				'module_paths' 		    => array( ESPRESSO_MAILCHIMP_DIR . 'EED_Mailchimp.module.php' ),
 				'pue_options'			=> array(
 					'pue_plugin_slug' 	=> 'eea-mailchimp',
@@ -84,16 +80,6 @@ class EE_MailChimp extends EE_Addon {
 			)
 		);
 
-        // Register db models.
-	    if ( ! did_action( 'activate_plugin' ) ) {
-		    EE_Register_Model::register(
-			    'MailChimp',
-			    array(
-				    'model_paths' => array( ESPRESSO_MAILCHIMP_MODELS_PATH ),
-				    'class_paths' => array( ESPRESSO_MAILCHIMP_CLASSES_PATH ),
-			    )
-		    );
-	    }
     }
 
     /**
@@ -117,7 +103,7 @@ class EE_MailChimp extends EE_Addon {
      * @return array  Updated Links list
      */
     public static function espresso_mailchimp_plugin_settings( $links, $file ) {
- 		if ( $file == ESPRESSO_MAILCHIMP_BASE_NAME ) {
+ 		if ( $file === ESPRESSO_MAILCHIMP_BASE_NAME ) {
 			// before other links
 			array_unshift( $links, '<a href="admin.php?page='. ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG .'">' . __('Settings', 'event_espresso') . '</a>' );
 		}
