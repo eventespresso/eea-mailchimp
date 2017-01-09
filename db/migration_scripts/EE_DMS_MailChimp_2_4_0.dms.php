@@ -128,11 +128,13 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 			$MailChimp = new EEA_MC\MailChimp( $api_key );
 			$reply = $MailChimp->get('');
 		} catch ( Exception $e ) {
+		    error_log(sprintf(esc_html__('Error communicating with MailChimp: %1$s', 'event_espresso'), $e->getMessage()));
 			return FALSE;
 		}
 
 		// If a reply is present, then let's process that.
 		if ( ! $MailChimp->success() || ! isset($reply['account_id']) ) {
+		    error_log(sprintf(esc_html__('Error communicating with MailChimp: $1$s', 'event_espresso'),$MailChimp->getLastError()));
 			return FALSE;
 		}
 		return $api_key;
