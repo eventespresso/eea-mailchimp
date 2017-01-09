@@ -63,7 +63,6 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 	 * @return void
 	 */
 	protected function _setup_before_migration() {
-		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
 		$key_ok = false;
 		$config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
 		if ( $config instanceof EE_Mailchimp_Config ) {
@@ -190,7 +189,9 @@ class EE_DMS_2_4_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table {
 	 * @return int number of items ACTUALLY migrated
 	 */
 	function _migration_step( $num_items = 50 ) {
-		$items_actually_migrated = parent::_migration_step($num_items);
+	    //slow the migration down. We need to send API calls to MailChimp, so the default of
+        //migrating 50 rows per AJAX request is probably too much. Let's do more like 10
+		$items_actually_migrated = parent::_migration_step($num_items/5);
 		// Try to catch that moment where all lines were migrated.
 		if ( $this->is_completed() ) {
 			$this->_add_missing_interests();
