@@ -41,45 +41,44 @@ class EE_DMS_MailChimp_2_4_0 extends EE_Data_Migration_Script_Base {
 		if ( isset($version_array['MailChimp']) ) {
 			$version_string = $version_array['MailChimp'];
 		}
-		// Try to get the API Key.
-		$key_ok = false;
-		$config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
-		if ( $config instanceof EE_Mailchimp_Config ) {
-			$the_api_key = $config->api_settings->api_key;
-			if ( $the_api_key && ! empty($the_api_key) ) {
-				$key_ok = $this->_mc_api_key_valid($the_api_key);
-			}
-		}
-		// Is there anything on the Table we want to update?
-		$table_name = $wpdb->prefix . "esp_event_mailchimp_list_group";
-		$count = 0;
-		// Table exists ?
-        //for backwards compatibility, make sure activation helper is loaded
-        EE_Registry::instance()->load_helper( 'Activation' );
-		if (
-        (
-            method_exists( $this, '_get_table_analysis' ) &&
-		    $this->_get_table_analysis()->tableExists($table_name) )
-        || (
-            EEH_Activation::table_exists( $table_name )
-        )
-        ) {
-			$count = $wpdb->get_var( "SELECT COUNT(EMC_ID) FROM $table_name" );
-		}
 
 		if ( version_compare($version_string, '2.3.0.rc.000', '>=')
 			&& version_compare($version_string, '2.4.0.rc.000', '<')
 			&& version_compare($core_version, '4.4.0.rc.000', '>=')
-			&& $count > 0 && $key_ok ) {
-			// Can be migrated.
-			return true;
-		} elseif ( ! $version_string ) {
-			// No version string provided.
-			return false;
-		} else {
-			// Version doesn't apply for this migration.
-			return false;
+        ) {
+		    //ok so this is of a version where we think we can migrate. Now let's do the slightly-more expensive job
+            //of actually looking in the DB and checking our MailChimp API keys are working
+            // Try to get the API Key.
+            $key_ok = false;
+            $config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+            if ( $config instanceof EE_Mailchimp_Config ) {
+                $the_api_key = $config->api_settings->api_key;
+                if ( $the_api_key && ! empty($the_api_key) ) {
+                    $key_ok = $this->_mc_api_key_valid($the_api_key);
+                }
+            }
+            // Is there anything on the Table we want to update?
+            $table_name = $wpdb->prefix . "esp_event_mailchimp_list_group";
+            $count = 0;
+            // Table exists ?
+            //for backwards compatibility, make sure activation helper is loaded
+            EE_Registry::instance()->load_helper( 'Activation' );
+            if (
+                (
+                    method_exists( $this, '_get_table_analysis' ) &&
+                    $this->_get_table_analysis()->tableExists($table_name) )
+                || (
+                EEH_Activation::table_exists( $table_name )
+                )
+            ) {
+                $count = $wpdb->get_var( "SELECT COUNT(EMC_ID) FROM $table_name" );
+            }
+            if( $count > 0 && $key_ok ){
+                // Can be migrated.
+                return true;
+            }
 		}
+		return false;
 	}
 
 
