@@ -217,7 +217,13 @@ class EE_MCI_Controller {
 							$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
 							// filter it
 							$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args, $registration, $EVT_ID );
-
+                            //verify merge_fields and interests aren't empty, and if they are they need to be stdClasses so that they become JSON objects still
+                            if(empty($subscribe_args['merge_fields'])){
+                               $subscribe_args['merge_fields']= new \stdClass();
+                            }
+                            if(empty($subscribe_args['interests'])){
+                                $subscribe_args['interests']= new \stdClass();
+                            }
 							try {
 								// Get member info if exists.
 								$member_subscribed = $this->MailChimp->get( '/lists/'.$event_list.'/members/'.$this->MailChimp->subscriberHash($att_email), array('fields' => 'id,email_address,status') );
@@ -323,12 +329,12 @@ class EE_MCI_Controller {
 			$selected = true;
 		}
 		if ( empty((array)$subscribe_args['interests']) ) {
-		    $subscribe_args['interests'] = new StdClass();
-            $subscribe_args['interests']->{$grouping[0]} = $selected;
+		    $subscribe_args['interests'] = array();
+            $subscribe_args['interests'][$grouping[0]] = $selected;
         } else {
 			foreach ( $subscribe_args['interests'] as $interest => $value ) {
 				if ( $interest != $grouping[0] ) {
-					$subscribe_args['interests']->{$grouping[0]} = $selected;
+					$subscribe_args['interests'][$grouping[0]] = $selected;
 				}
 			}
 		}
@@ -424,7 +430,7 @@ class EE_MCI_Controller {
 			throw new EE_Error( __( 'The MailChimp Subscriber arguments array is malformed!','event_espresso' ));
 		}
 		if ( ! isset( $subscribe_args['merge_fields'] ) ) {
-			$subscribe_args['merge_fields'] = new StdClass();
+			$subscribe_args['merge_fields'] = array();
 		}
 		// get MailChimp question fields
 		$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
@@ -449,13 +455,13 @@ class EE_MCI_Controller {
 				if ( isset($event_questions_list['state']) && $q_id == $event_questions_list['state']['QST_ID'] ) {	// If a state.
 					$state = $registration->attendee()->state_obj();
 					if ( $state instanceof EE_State ) {
-						$subscribe_args['merge_fields']->{$mc_list_field} = $state->name();
+						$subscribe_args['merge_fields'][$mc_list_field] = $state->name();
 					}
 
 				} else if ( isset($event_questions_list['country']) && $q_id == $event_questions_list['country']['QST_ID'] ) {	// If a Country (change ISO to a full name).
 					$country = $registration->attendee()->country_obj();
 					if ( $country instanceof EE_Country ) {
-						$subscribe_args['merge_fields']->{$mc_list_field} = $country->name();
+						$subscribe_args['merge_fields'][$mc_list_field] = $country->name();
 					}
 
 				} else if ( is_array( $question_answers[ $q_id ] )) {
@@ -463,9 +469,9 @@ class EE_MCI_Controller {
 					foreach ( $question_answers[ $q_id ] as $q_key => $q_value ) {
 						$selected .= $selected == '' ? $q_value : ', ' . $q_value;
 					}
-					$subscribe_args['merge_fields']->{$mc_list_field} = $selected;
+					$subscribe_args['merge_fields'][$mc_list_field] = $selected;
 				} else {
-					$subscribe_args['merge_fields']->{$mc_list_field} = $question_answers[ $q_id ];
+					$subscribe_args['merge_fields'][$mc_list_field] = $question_answers[ $q_id ];
 				}
 			}
 		}
