@@ -268,7 +268,7 @@ class EED_Mailchimp extends EED_Module {
 
 	public static function add_log_type( $enum_options, EE_Model_Field_Base $field_obj ) {
 	    if( $field_obj instanceof EE_Enum_Text_Field
-            && $field_obj->_name === 'LOG_type' ) {
+            && $field_obj->get_name() === 'LOG_type' ) {
 	        $enum_options[ EED_Mailchimp::log_type ] = esc_html__('MailChimp', 'event_espresso');
         }
         return $enum_options;

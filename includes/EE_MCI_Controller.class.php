@@ -216,7 +216,7 @@ class EE_MCI_Controller {
 							// Question fields
 							$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
 							// filter it
-							$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args );
+							$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args, $registration, $EVT_ID );
 
 							try {
 								// Get member info if exists.
