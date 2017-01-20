@@ -215,14 +215,22 @@ class EE_MCI_Controller {
 							$subscribe_args = $this->_add_event_group_vars_to_subscribe_args( $EVT_ID, $subscribe_args );
 							// Question fields
 							$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
+							
+							// For backwards compatibility reasons only (for this next filter below)
+							$subscribe_args['merge_vars'] = $subscribe_args['merge_fields'];
+							unset($subscribe_args['merge_fields']);
 							// filter it
 							$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args, $registration, $EVT_ID );
-                            //verify merge_fields and interests aren't empty, and if they are they need to be stdClasses so that they become JSON objects still
-                            if(empty($subscribe_args['merge_fields'])){
-                               $subscribe_args['merge_fields']= new \stdClass();
+							// Old version used 'merge_vars' but API v3 calls them 'merge_fields'
+							$subscribe_args['merge_fields'] = $subscribe_args['merge_vars'];
+							unset($subscribe_args['merge_vars']);
+
+                            // Verify merge_fields and interests aren't empty, and if they are they need to be stdClasses so that they become JSON objects still
+                            if ( empty($subscribe_args['merge_fields']) ) {
+                               $subscribe_args['merge_fields'] = new \stdClass();
                             }
-                            if(empty($subscribe_args['interests'])){
-                                $subscribe_args['interests']= new \stdClass();
+                            if ( empty($subscribe_args['interests']) ) {
+                                $subscribe_args['interests'] = new \stdClass();
                             }
 							try {
 								// Get member info if exists.
