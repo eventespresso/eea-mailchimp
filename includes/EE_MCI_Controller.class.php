@@ -1025,12 +1025,8 @@ class EE_MCI_Controller {
 		if ( $old_structure ) {
 			// If we are here the data was not updated yet.
 			// Clear MailChimp data on the current event and then save the updated data.
-			$lg_exists = EEM_Event_Mailchimp_List_Group::instance()->get_all(array(array('EVT_ID' => $EVT_ID)));
-			if ( ! empty($lg_exists) ) {
-				foreach ($lg_exists as $list_group) {
-					$list_group->delete();
-				}
-			}
+			EEM_Event_Mailchimp_List_Group::instance()->delete(array(array('EVT_ID' => $EVT_ID)));
+			
 			$list_interests = array();
 			// Fetch the lists/groups/interests for this event.
 			$categories = $this->mci_get_users_groups($list_id);
