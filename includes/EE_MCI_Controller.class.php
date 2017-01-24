@@ -27,6 +27,12 @@ use EEA_MC\MailChimp;
 class EE_MCI_Controller {
 
 	/**
+	 * Key of the extra meta row that stores whether or not the event has been verified to work with MC API v3.
+	 * @const string
+	 */
+	const UPDATED_TO_API_V3 = 'updated_to_v3_of_mc_api_extra_meta_key';
+
+	/**
      * @access private
 	 * @var EE_Mailchimp_Config $_config
      */
@@ -692,7 +698,7 @@ class EE_MCI_Controller {
 			// This info was saved in a new format so we set a flag for this event.
 			$event = EEM_Event::instance()->get_one_by_ID($event_id);
 			if ( $event instanceof EE_Event ) {
-				$event->update_extra_meta('EEA_MC_updated_to_apiv3', TRUE);
+				$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, TRUE);
 			}
 		} else {
 			$new_list_group = EE_Event_Mailchimp_List_Group::new_instance(
@@ -988,7 +994,7 @@ class EE_MCI_Controller {
 		if ( ! $event instanceof EE_Event ) {
 			return;
 		}
-		$event_checked = $event->get_extra_meta('EEA_MC_updated_to_apiv3', TRUE, FALSE);
+		$event_checked = $event->get_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, TRUE, FALSE);
 		// This event already checked before ? no need to do this again then.
 		if ( $event_checked ) {
 			return;
@@ -1090,7 +1096,7 @@ class EE_MCI_Controller {
 			}
 			// Mark that this event List data was saved correctly.
 			if ( ! empty($event_groups) && count($event_groups) <= count($saved_interests) ) {
-				$event->update_extra_meta('EEA_MC_updated_to_apiv3', TRUE);
+				$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, TRUE);
 			}
 		}
 	}
