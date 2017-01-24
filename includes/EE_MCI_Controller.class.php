@@ -1026,7 +1026,7 @@ class EE_MCI_Controller {
 			// If we are here the data was not updated yet.
 			// Clear MailChimp data on the current event and then save the updated data.
 			EEM_Event_Mailchimp_List_Group::instance()->delete(array(array('EVT_ID' => $EVT_ID)));
-			
+
 			$list_interests = array();
 			// Fetch the lists/groups/interests for this event.
 			$categories = $this->mci_get_users_groups($list_id);
@@ -1091,9 +1091,7 @@ class EE_MCI_Controller {
 				}
 			}
 			// Mark that this event List data was saved correctly.
-			if ( ! empty($event_groups) && count($event_groups) <= count($saved_interests) ) {
-				$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
-			}
+			$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
 		}
 	}
 
