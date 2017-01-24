@@ -1005,6 +1005,8 @@ class EE_MCI_Controller {
 
 		// Also no need to migrate "Do not send to MC".
 		if ( $list_id === '-1' || $list_id === null ) {
+            //Although there is no MC data to migrate, let's at least remember we already checked
+            $event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
 			return;
 		}
 
@@ -1090,9 +1092,9 @@ class EE_MCI_Controller {
 					$saved_interests[] = $mss_interest['id'];
 				}
 			}
-			// Mark that this event List data was saved correctly.
-			$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
 		}
+        //Remember this event's MailChimp list data has been verified. No need to do it again
+        $event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
 	}
 
 
