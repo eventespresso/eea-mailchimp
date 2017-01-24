@@ -698,7 +698,7 @@ class EE_MCI_Controller {
 			// This info was saved in a new format so we set a flag for this event.
 			$event = EEM_Event::instance()->get_one_by_ID($event_id);
 			if ( $event instanceof EE_Event ) {
-				$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, TRUE);
+				$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
 			}
 		} else {
 			$new_list_group = EE_Event_Mailchimp_List_Group::new_instance(
@@ -988,13 +988,13 @@ class EE_MCI_Controller {
 	 * @param int $list_id  MC List ID the Event in "subscribed" for.
 	 * @return void
 	 */
-	public function is_db_data_api_compatible( $EVT_ID, $list_id = FALSE ) {
+	public function is_db_data_api_compatible( $EVT_ID, $list_id = false ) {
 		$event = EEM_Event::instance()->get_one_by_ID($EVT_ID);
 		// Make sure there is an event with this ID.
 		if ( ! $event instanceof EE_Event ) {
 			return;
 		}
-		$event_checked = $event->get_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, TRUE, FALSE);
+		$event_checked = $event->get_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true, false);
 		// This event already checked before ? no need to do this again then.
 		if ( $event_checked ) {
 			return;
@@ -1004,7 +1004,7 @@ class EE_MCI_Controller {
 		}
 
 		// Also no need to migrate "Do not send to MC".
-		if ( $list_id === '-1' || $list_id === NULL ) {
+		if ( $list_id === '-1' || $list_id === null ) {
 			return;
 		}
 
@@ -1096,7 +1096,7 @@ class EE_MCI_Controller {
 			}
 			// Mark that this event List data was saved correctly.
 			if ( ! empty($event_groups) && count($event_groups) <= count($saved_interests) ) {
-				$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, TRUE);
+				$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
 			}
 		}
 	}
