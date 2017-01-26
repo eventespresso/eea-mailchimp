@@ -345,7 +345,7 @@ class EE_MCI_Controller {
 		if ( isset($grouping[3]) && $grouping[3] === 'true' ) {
 			$selected = true;
 		}
-		if ( empty((array)$subscribe_args['interests']) ) {
+		if ( ! isset($subscribe_args['interests']) || empty((array)$subscribe_args['interests']) ) {
 		    $subscribe_args['interests'] = array();
             $subscribe_args['interests'][$grouping[0]] = $selected;
         } else {
