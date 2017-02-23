@@ -782,13 +782,10 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
-		if ( $list_id !== '-1' && $list_id !== NULL ) {
-			// Load the interests form.
-			$interest_categories_obj = new EE_MC_Interest_Categories_Form( $this, $event_id, $list_id );
-			return $interest_categories_obj->get_html_and_js();
-		}
-		// Default to:
-		return EEH_HTML::no_row();
+
+		// Load the interests form.
+		$interest_categories_obj = new EE_MC_Interest_Categories_Form( $this, $event_id, $list_id );
+		return $interest_categories_obj->get_html_and_js();
 	}
 
 
@@ -803,10 +800,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_fields( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_fields__start');
-		// No need to generate any content if no list selected.
-		if ( $list_id === '-1' ) {
-			return EEH_HTML::no_row();
-		}
+
 		$fields_obj = new EE_MC_Merge_Fields_Form( $this, $event_id, $list_id );
 		return $fields_obj->get_html_and_js();
 	}
@@ -1045,52 +1039,62 @@ class EE_MCI_Controller {
 						}
 					}
 				}
-			}
-			$saved_interests = array();
-			// Update the old rows.
-			foreach ( $event_groups as $event_interest ) {
-				$list_and_interest = explode('-', $event_interest);
-				// Double check just in case we do get one already updated field.
-				if ( isset($list_and_interest[3]) && ($list_and_interest[3] === 'true' || $list_and_interest[3] === 'false') ) {
-					$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
-						'EVT_ID'                 => $EVT_ID,
-						'AMC_mailchimp_list_id'  => $list_id,
-						'AMC_mailchimp_group_id' => $event_interest
-					));
-					$new_list_interest->save();
-					continue;
-				}
-				$interest_name = base64_decode($list_and_interest[2]);
-				$interest_data = array_shift($list_interests[$interest_name]);
-				if ( ! empty($interest_data) && is_array($interest_data) ) {
-		            // Update current row data.
-					$list_group_id = $interest_data['id'] . '-' . $interest_data['category_id'] . '-' . base64_encode($interest_data['name']) . '-true';
-					$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
-						'EVT_ID'                 => $EVT_ID,
-						'AMC_mailchimp_list_id'  => $list_id,
-						'AMC_mailchimp_group_id' => $list_group_id
-					));
-					$new_list_interest->save();
-					$saved_interests[] = $interest_data['id'];
-				}
-			}
-			// Need to add the not selected interests as API v3 uses those also.
-			foreach ( $list_interests as $all_interests ) {
-				foreach ( $all_interests as $mss_interest ) {
-					// Already saved / updated interest ?
-					if ( in_array($mss_interest['id'], $saved_interests) ) {
+
+				// Update the old rows.
+				$saved_interests = array();
+				foreach ( $event_groups as $event_interest ) {
+					$list_and_interest = explode('-', $event_interest);
+					// Double check just in case we do get one already updated field.
+					if ( isset($list_and_interest[3]) && ($list_and_interest[3] === 'true' || $list_and_interest[3] === 'false') ) {
+						$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
+							'EVT_ID'                 => $EVT_ID,
+							'AMC_mailchimp_list_id'  => $list_id,
+							'AMC_mailchimp_group_id' => $event_interest
+						));
+						$new_list_interest->save();
 						continue;
 					}
-					// Add these as not selected.
-					$lg_id = $mss_interest['id'] . '-' . $mss_interest['category_id'] . '-' . base64_encode($mss_interest['name']) . '-false';
-					$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
-						'EVT_ID'                 => $EVT_ID,
-						'AMC_mailchimp_list_id'  => $list_id,
-						'AMC_mailchimp_group_id' => $lg_id
-					));
-					$new_list_interest->save();
-					$saved_interests[] = $mss_interest['id'];
+					$interest_name = base64_decode($list_and_interest[2]);
+					$interest_data = array_shift($list_interests[$interest_name]);
+					if ( ! empty($interest_data) && is_array($interest_data) ) {
+			            // Update current row data.
+						$list_group_id = $interest_data['id'] . '-' . $interest_data['category_id'] . '-' . base64_encode($interest_data['name']) . '-true';
+						$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
+							'EVT_ID'                 => $EVT_ID,
+							'AMC_mailchimp_list_id'  => $list_id,
+							'AMC_mailchimp_group_id' => $list_group_id
+						));
+						$new_list_interest->save();
+						$saved_interests[] = $interest_data['id'];
+					}
 				}
+				// Need to add the not selected interests as API v3 uses those also.
+				foreach ( $list_interests as $all_interests ) {
+					foreach ( $all_interests as $mss_interest ) {
+						// Already saved / updated interest ?
+						if ( in_array($mss_interest['id'], $saved_interests) ) {
+							continue;
+						}
+						// Add these as not selected.
+						$lg_id = $mss_interest['id'] . '-' . $mss_interest['category_id'] . '-' . base64_encode($mss_interest['name']) . '-false';
+						$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
+							'EVT_ID'                 => $EVT_ID,
+							'AMC_mailchimp_list_id'  => $list_id,
+							'AMC_mailchimp_group_id' => $lg_id
+						));
+						$new_list_interest->save();
+						$saved_interests[] = $mss_interest['id'];
+					}
+				}
+			} else {
+				// Looks like there are no interests for this list.
+				// So we should just add the Event List relation with no interests.
+				$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
+					'EVT_ID'                 => $EVT_ID,
+					'AMC_mailchimp_list_id'  => $list_id,
+					'AMC_mailchimp_group_id' => '-1'
+				));
+				$new_list_interest->save();
 			}
 		}
         //Remember this event's MailChimp list data has been verified. No need to do it again
