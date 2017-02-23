@@ -79,7 +79,7 @@ class EE_MC_Interest_Categories_Form extends EE_Form_Section_Proper {
 			if ( ! empty( $user_groups ) ) {
 				$categories = $this->_list_categories( $event_list_group, $user_groups, $this->_list_id );
 			} else {
-				$categories['no_interests'] = new EE_Form_Section_HTML( EEH_HTML::p( esc_html__( 'No groups found for this List.', 'event_espresso' ), 'no-groups-found-notice', 'important-notice' ) );
+				$categories['no_interests'] = new EE_Form_Section_HTML( EEH_HTML::p( esc_html__( 'No groups in this List.', 'event_espresso' ), 'no-groups-found-notice', 'important-notice' ) );
 			}
 			$options['subsections'] = $categories;
 		} else {
