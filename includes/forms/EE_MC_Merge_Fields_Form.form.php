@@ -80,7 +80,7 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper {
 			'html_class' => 'espresso_mci_merge_fields_tb',
 			'layout_strategy' => new EE_Two_Column_Layout()
 		);
-		if ( $this->_list_id && $this->_list_id !== '-1' && $this->_event_id && $_GET['action'] !== 'create_new' ) {
+		if ( $this->_list_id && $this->_list_id !== '-1' ) {
 			// Get MC list fields.
 			$list_fields = $this->_mc_controller->mci_get_list_merge_vars( $this->_list_id );
 			$selected_fields = $this->_mc_controller->mci_event_list_question_fields( $this->_event_id );
@@ -89,6 +89,9 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper {
 			$m_fields = array();
 			if ( ! empty( $list_fields ) ) {
 				$m_fields = $this->_merge_fields( $list_fields, $selected_fields, $evt_questions );
+			} elseif ( $_GET['action'] === 'create_new' ) {
+				// This is new event so no data.
+				$m_fields['no_data'] = new EE_Form_Section_HTML('');
 			} else {
 				$m_fields['no_lists'] = new EE_Form_Section_HTML( EEH_HTML::p( esc_html__( 'Sorry, no merge fields found!', 'event_espresso' ), 'no-lists-found-notice', 'important-notice' ) );
 			}

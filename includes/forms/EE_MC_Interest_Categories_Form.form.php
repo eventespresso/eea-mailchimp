@@ -71,7 +71,7 @@ class EE_MC_Interest_Categories_Form extends EE_Form_Section_Proper {
 			'html_class' => 'eea_mailchimp_groups_list',
 			'layout_strategy' => new EE_Div_Per_Section_Spaced_Layout()
 		);
-		if ( $this->_list_id && $this->_list_id !== '-1' && $this->_event_id ) {
+		if ( $this->_list_id && $this->_list_id !== '-1' ) {
 			// Get saved group for this event (if there's one)
 			$event_list_group = $this->_mc_controller->mci_event_selected_interests( $this->_event_id );
 			$user_groups = $this->_mc_controller->mci_get_users_groups( $this->_list_id );
