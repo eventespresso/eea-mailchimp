@@ -276,7 +276,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         }
         // If no groups in the list.
         $none_groups_content = $this->_mci_controller->mci_list_mailchimp_groups($this->_ee_event->ID(), 'invalid-list-id');
-        $this->assertTrue( strpos($none_groups_content, 'No groups in this List.') !== false );
+        $this->assertTrue( strpos($none_groups_content, 'No groups found for this List.') !== false );
     }
 
     /**
