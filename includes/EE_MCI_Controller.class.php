@@ -181,7 +181,7 @@ class EE_MCI_Controller {
      */
 	public function mci_submit_to_mailchimp( $spc_obj, $valid_data ) {
 		// Do not submit if the key is not valid or there is no valid submit data.
-		if ( $this->MailChimp instanceof \Drewm\MailChimp && ! empty( $spc_obj )) {
+		if (! empty($this->MailChimp) && $this->MailChimp instanceof \Drewm\MailChimp && ! empty($spc_obj)) {
 			$spco_data = $this->_mci_get_registrations( $spc_obj );
 			$registrations = $spco_data['registrations'];
 			$spco_transaction = $spco_data['transaction'];
@@ -506,7 +506,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_set_metabox_contents( $event ) {
 		// verify api key
-		if ( ! empty( $this->_config->api_settings->api_key )) {
+		if (! empty($this->MailChimp) && $this->MailChimp instanceof \Drewm\MailChimp) {
 			// Get saved list for this event (if there's one)
 			$this->list_id = $this->mci_event_list( $event->ID );
 			?>
@@ -645,23 +645,32 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_lists( $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
-		?>
-		<label for="ee-mailchimp-lists"><?php _e( 'Please select a List:', 'event_espresso' );?></label><br />
-		<?php
-		$mc_lists = $this->mci_get_users_lists();
-		array_push( $mc_lists, array( 'id' => '-1', 'name' => __( 'Do not send to MailChimp', 'event_espresso' )));
-		if ( ! empty( $mc_lists )) {
+		if (! empty($this->MailChimp) && $this->MailChimp instanceof \Drewm\MailChimp) {
 			?>
-			<select id="ee-mailchimp-lists" name="ee_mailchimp_lists" class="ee_mailchimp_dropdowns">
-				<?php foreach ( $mc_lists as $list ) { ?>
-					<option value="<?php echo $list['id']; ?>" <?php echo ( $list_id == $list['id'] ) ? 'selected="selected"' : ''; ?>><?php echo $list['name']; ?></option>
-				<?php } ?>
-			</select>
+			<label for="ee-mailchimp-lists"><?php _e( 'Please select a List:', 'event_espresso' ); ?></label><br/>
 			<?php
-		} else {
-			?>
-			<p class="important-notice"><?php _e( 'No lists found! Please log into your MailChimp account and create at least one mailing list.', 'event_espresso' );?></p>
-			<?php
+			$mc_lists = $this->mci_get_users_lists();
+			array_push(
+				$mc_lists,
+				array( 'id' => '-1', 'name' => __( 'Do not send to MailChimp', 'event_espresso' ) )
+			);
+			if ( ! empty( $mc_lists ) ) {
+				?>
+				<select id="ee-mailchimp-lists" name="ee_mailchimp_lists" class="ee_mailchimp_dropdowns">
+					<?php foreach ( $mc_lists as $list ) { ?>
+						<option value="<?php echo $list['id']; ?>" <?php echo ( $list_id == $list['id'] )
+							? 'selected="selected"' : ''; ?>><?php echo $list['name']; ?></option>
+					<?php } ?>
+				</select>
+				<?php
+			} else {
+				?>
+				<p class="important-notice"><?php _e(
+						'No lists found! Please log into your MailChimp account and create at least one mailing list.',
+						'event_espresso'
+					); ?></p>
+				<?php
+			}
 		}
 	}
 
@@ -677,39 +686,50 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
-		// Get saved group for this event (if there's one)
-		$event_list_group = $this->mci_event_list_group( $event_id );
-		$user_groups = $this->mci_get_users_groups( $list_id );
-
-		?>
-		<div id="ee-mailchimp-groups-list">
-			<label for="ee-mailchimp-groups"><?php _e( 'Please select a Group:', 'event_espresso' );?></label>
-			<dl id="ee-mailchimp-groups" class="ee_mailchimp_dropdowns">
-				<?php
-				if ( ! empty( $user_groups )) {
-					foreach ( $user_groups as $user_group ) {
-						?>
-						<dt><b><?php echo $user_group['name']; ?></b></dt>
-						<?php
-						foreach ( $user_group['groups'] as $group ) {
-							$group_id = $group['bit'] . '-' . $user_group['id'] . '-' . base64_encode($group['name']);
-							?>
-							<dd>
-								<input type="checkbox" id="<?php echo $group_id; ?>" value="<?php echo $group_id; ?>" name="ee_mailchimp_groups[]" <?php echo ( in_array( $group_id, $event_list_group )) ? 'checked' : ''; ?>>
-								<label for="<?php echo $group_id; ?>"><?php echo $group['name']; ?></label>
-							</dd>
-							<?php
-						}
-					}
-				} else {
-					?>
-					<p class="important-notice"><?php _e( 'No groups found for this List.', 'event_espresso' );?></p>
+		if (! empty($this->MailChimp) && $this->MailChimp instanceof \Drewm\MailChimp) {
+			// Get saved group for this event (if there's one)
+			$event_list_group = $this->mci_event_list_group( $event_id );
+			$user_groups = $this->mci_get_users_groups( $list_id );
+			?>
+			<div id="ee-mailchimp-groups-list">
+				<label for="ee-mailchimp-groups"><?php _e( 'Please select a Group:', 'event_espresso' ); ?></label>
+				<dl id="ee-mailchimp-groups" class="ee_mailchimp_dropdowns">
 					<?php
-				}
-				?>
-			</dl>
-		</div>
-		<?php
+					if ( ! empty( $user_groups ) ) {
+						foreach ( $user_groups as $user_group ) {
+							?>
+							<dt><b><?php echo $user_group['name']; ?></b></dt>
+							<?php
+							foreach ( $user_group['groups'] as $group ) {
+								$group_id = $group['bit'] . '-' . $user_group['id'] . '-' . base64_encode(
+										$group['name']
+									);
+								?>
+								<dd>
+									<input type="checkbox" id="<?php echo $group_id; ?>"
+										   value="<?php echo $group_id; ?>"
+										   name="ee_mailchimp_groups[]" <?php echo ( in_array(
+										$group_id,
+										$event_list_group
+									) ) ? 'checked' : ''; ?>>
+									<label for="<?php echo $group_id; ?>"><?php echo $group['name']; ?></label>
+								</dd>
+								<?php
+							}
+						}
+					} else {
+						?>
+						<p class="important-notice"><?php _e(
+								'No groups found for this List.',
+								'event_espresso'
+							); ?></p>
+						<?php
+					}
+					?>
+				</dl>
+			</div>
+			<?php
+		}
 	}
 
 
