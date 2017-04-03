@@ -200,7 +200,7 @@ class EE_MCI_Controller {
 
 						// Check if the DB data can be safely used with current API.
 						$this->is_db_data_api_compatible($EVT_ID, $event_list);
-                        
+
 						$need_reg_status = $reg_approved = false;
 						/** @type EE_Mailchimp_Config $mc_config */
 						$mc_config = EED_Mailchimp::get_config();
@@ -224,7 +224,7 @@ class EE_MCI_Controller {
 							$subscribe_args = $this->_add_event_group_vars_to_subscribe_args( $EVT_ID, $subscribe_args );
 							// Question fields
 							$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
-							
+
 							// For backwards compatibility reasons only (for this next filter below)
 							$subscribe_args['merge_vars'] = $subscribe_args['merge_fields'];
 							unset($subscribe_args['merge_fields']);
@@ -506,7 +506,7 @@ class EE_MCI_Controller {
 	public function mci_get_users_lists() {
 		do_action('AHEE__EE_MCI_Controller__mci_get_users_lists__start');
 		$parameters = apply_filters( 'FHEE__EE_MCI_Controller__mci_get_users_lists__list_params', array('fields' => 'lists.id,lists.name', 'count' => 100, 'apikey' => $this->_api_key ), $this );
-		
+
 		try {
 			$reply = $this->MailChimp->get('lists', $parameters);
 		} catch ( Exception $e ) {
@@ -517,6 +517,10 @@ class EE_MCI_Controller {
 		if ( $this->MailChimp->success() && isset($reply['lists']) ) {
 			return (array)$reply['lists'];
 		} else {
+			// The list of requested items might just be empty or there might be an error response.
+			if (! $this->MailChimp->success()) {
+				$this->set_error($reply);
+			}
 			return array();
 		}
 	}
@@ -546,6 +550,10 @@ class EE_MCI_Controller {
 		if ( $this->MailChimp->success() && isset($reply['categories']) ) {
 			return (array)$reply['categories'];
 		} else {
+			// The list of requested items might just be empty or there might be an error response.
+			if (! $this->MailChimp->success()) {
+				$this->set_error($reply);
+			}
 			return array();
 		}
 	}
@@ -578,6 +586,10 @@ class EE_MCI_Controller {
 		if ( $this->MailChimp->success() && isset($reply['interests']) ) {
 			return (array)$reply['interests'];
 		} else {
+			// The list of requested items might just be empty or there might be an error response.
+			if (! $this->MailChimp->success()) {
+				$this->set_error($reply);
+			}
 			return array();
 		}
 	}
@@ -606,6 +618,10 @@ class EE_MCI_Controller {
 		if ( $this->MailChimp->success() && isset($reply['merge_fields']) ) {
 			return (array)$reply['merge_fields'];
 		} else {
+			// The list of requested items might just be empty or there might be an error response.
+			if (! $this->MailChimp->success()) {
+				$this->set_error($reply);
+			}
 			return array();
 		}
 	}
