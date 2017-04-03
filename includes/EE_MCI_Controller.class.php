@@ -115,7 +115,7 @@ class EE_MCI_Controller {
 		if ( $call_reply === FALSE || ( isset( $call_reply['status'] ) && $call_reply['status'] == 'error' )) {
 			$this->mci_throw_error( $call_reply );
 			do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
-			unset( $this->MailChimp );
+			$this->MailChimp = null;
 			return FALSE;
 		}
 		// MailChimp API does not check for the '-' and throws an error, so let's do the check ourselves.
@@ -181,7 +181,7 @@ class EE_MCI_Controller {
      */
 	public function mci_submit_to_mailchimp( $spc_obj, $valid_data ) {
 		// Do not submit if the key is not valid or there is no valid submit data.
-		if (! empty($this->MailChimp) && $this->MailChimp instanceof \Drewm\MailChimp && ! empty($spc_obj)) {
+		if ($this->MailChimp instanceof \Drewm\MailChimp && ! empty($spc_obj)) {
 			$spco_data = $this->_mci_get_registrations( $spc_obj );
 			$registrations = $spco_data['registrations'];
 			$spco_transaction = $spco_data['transaction'];
@@ -506,7 +506,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_set_metabox_contents( $event ) {
 		// verify api key
-		if (! empty($this->MailChimp) && $this->MailChimp instanceof \Drewm\MailChimp) {
+		if ($this->MailChimp instanceof \Drewm\MailChimp) {
 			// Get saved list for this event (if there's one)
 			$this->list_id = $this->mci_event_list( $event->ID );
 			?>
@@ -645,7 +645,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_lists( $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
-		if (! empty($this->MailChimp) && $this->MailChimp instanceof \Drewm\MailChimp) {
+		if ($this->MailChimp instanceof \Drewm\MailChimp) {
 			?>
 			<label for="ee-mailchimp-lists"><?php _e( 'Please select a List:', 'event_espresso' ); ?></label><br/>
 			<?php
@@ -686,7 +686,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
-		if (! empty($this->MailChimp) && $this->MailChimp instanceof \Drewm\MailChimp) {
+		if ($this->MailChimp instanceof \Drewm\MailChimp) {
 			// Get saved group for this event (if there's one)
 			$event_list_group = $this->mci_event_list_group( $event_id );
 			$user_groups = $this->mci_get_users_groups( $list_id );
