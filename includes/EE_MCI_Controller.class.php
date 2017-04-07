@@ -118,7 +118,7 @@ class EE_MCI_Controller {
 		} catch ( Exception $e ) {
 			$this->set_error( $e );
 			do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
-			unset( $this->MailChimp );
+			$this->MailChimp = null;
 			return FALSE;
 		}
 
@@ -126,7 +126,7 @@ class EE_MCI_Controller {
 		if ( ! $this->MailChimp->success() || ! isset($reply['account_id']) ) {
 				$this->set_error( $reply );
 				do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
-				unset( $this->MailChimp );
+				$this->MailChimp = null;
 				return FALSE;
 		}
 		do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_ok' );
@@ -200,7 +200,7 @@ class EE_MCI_Controller {
 
 						// Check if the DB data can be safely used with current API.
 						$this->is_db_data_api_compatible($EVT_ID, $event_list);
-                        
+
 						$need_reg_status = $reg_approved = false;
 						/** @type EE_Mailchimp_Config $mc_config */
 						$mc_config = EED_Mailchimp::get_config();
@@ -224,7 +224,7 @@ class EE_MCI_Controller {
 							$subscribe_args = $this->_add_event_group_vars_to_subscribe_args( $EVT_ID, $subscribe_args );
 							// Question fields
 							$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
-							
+
 							// For backwards compatibility reasons only (for this next filter below)
 							$subscribe_args['merge_vars'] = $subscribe_args['merge_fields'];
 							unset($subscribe_args['merge_fields']);
@@ -506,7 +506,7 @@ class EE_MCI_Controller {
 	public function mci_get_users_lists() {
 		do_action('AHEE__EE_MCI_Controller__mci_get_users_lists__start');
 		$parameters = apply_filters( 'FHEE__EE_MCI_Controller__mci_get_users_lists__list_params', array('fields' => 'lists.id,lists.name', 'count' => 100, 'apikey' => $this->_api_key ), $this );
-		
+
 		try {
 			$reply = $this->MailChimp->get('lists', $parameters);
 		} catch ( Exception $e ) {
@@ -621,7 +621,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_set_metabox_contents( $event ) {
 		// Verify the API key.
-		if ( ! empty( $this->_config->api_settings->api_key ) ) {
+		if ($this->MailChimp instanceof EEA_MC\MailChimp) {
 			// Check if the DB data can be safely used with current API.
 			$this->is_db_data_api_compatible($event->ID);
 			// Get saved list for this event (if there's one)
@@ -631,13 +631,13 @@ class EE_MCI_Controller {
 			$metabox_obj = new EE_MC_Metabox_Form( $this, $event->ID, $this->list_id, $this->category_id );
 			return $metabox_obj->get_html_and_js();
 		} else {
-			$error_section = new EE_Form_Section_HTML( 
+			$error_section = new EE_Form_Section_HTML(
 				EEH_HTML::div( EEH_HTML::span( esc_html__( 'Invalid MailChimp API.', 'event_espresso' ), 'important_mc_notice', 'important-notice' ) .
-					EEH_HTML::br() . 
-					esc_html__( 'Please visit the ', 'event_espresso' ) . 
+					EEH_HTML::br() .
+					esc_html__( 'Please visit the ', 'event_espresso' ) .
 					EEH_HTML::link( admin_url( 'admin.php?page=mailchimp' ), esc_html__( 'MailChimp Admin Page ', 'event_espresso' ) ) .
-					esc_html__( 'to correct the issue.', 'event_espresso' ), 
-				'no-lists-found-notice', 'espresso_mailchimp_integration_metabox' ) . EEH_HTML::divx()
+					esc_html__( 'to correct the issue.', 'event_espresso' ),
+				'no-lists-found-notice', 'espresso_mailchimp_integration_metabox' )
 			);
 			return $error_section->get_html_and_js();
 		}
@@ -765,9 +765,15 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_lists( $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
-		// Load the lists form.
-		$lists_obj = new EE_MC_Lists_Form( $this, $list_id );
-		return $lists_obj->get_html_and_js();
+
+		if ($this->MailChimp instanceof EEA_MC\MailChimp) {
+			// Load the lists form.
+			$lists_obj = new EE_MC_Lists_Form( $this, $list_id );
+			return $lists_obj->get_html_and_js();
+		} else {
+			// Something is wrong with the API so we return nothing.
+			return new EE_Form_Section_HTML('');
+		}
 	}
 
 
@@ -783,9 +789,14 @@ class EE_MCI_Controller {
 	public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
 
-		// Load the interests form.
-		$interest_categories_obj = new EE_MC_Interest_Categories_Form( $this, $event_id, $list_id );
-		return $interest_categories_obj->get_html_and_js();
+		if ($this->MailChimp instanceof EEA_MC\MailChimp) {
+			// Load the interests form.
+			$interest_categories_obj = new EE_MC_Interest_Categories_Form( $this, $event_id, $list_id );
+			return $interest_categories_obj->get_html_and_js();
+		} else {
+			// Something is wrong with the API so we return nothing.
+			return new EE_Form_Section_HTML('');
+		}
 	}
 
 
@@ -1004,7 +1015,7 @@ class EE_MCI_Controller {
 			return;
 		}
 
-		// Check the data structure. 
+		// Check the data structure.
 		$event_groups = $this->mci_event_list_group($EVT_ID);
 		$old_structure = true;
 		if ( ! empty($event_groups) ) {
