@@ -1141,11 +1141,11 @@ class EE_MCI_Controller {
 			$error['body'] = '';
 		}
 		$this->mcapi_error = apply_filters('FHEE__EE_MCI_Controller__mci_throw_error__mcapi_error', $error);
-		EE_Log::instance()->log(__FILE__, __FUNCTION__, sprintf(
-			__( 'MailChimp error "%1$s" with code: %2$s', 'event_espresso' ),
-			$error['msg'],
-			$error['code']
-		), 'error');
+		EEM_Change_Log::instance()->log(
+			EED_Mailchimp::log_type,
+			$error,
+			$this
+		);
 	}
 
 
