@@ -33,21 +33,15 @@ class EE_MailChimp extends EE_Addon {
      */
     const CONFIG_CLASS = 'EE_Mailchimp_Config';
 
-	/**
-	 * Class constructor
-	 *
-	 * @access public
-	 * @return \EE_MailChimp
-	 */
-    public function __construct() {
 
-    }
+
 
     /**
      * Register our add-on in EE.
      *
      * @access public
      * @return void
+     * @throws \EE_Error
      */
     public static function register_addon() {
 
@@ -57,7 +51,7 @@ class EE_MailChimp extends EE_Addon {
 			array(
 				'version' 			=> ESPRESSO_MAILCHIMP_VERSION,
 				'class_name' 		=> 'EE_MailChimp',
-				'min_core_version'  => '4.4.5',//don't require 4.9.23 (which adds support for mailchimp log items) but it's preferred
+				'min_core_version'  => '4.9.26',
 				'main_file_path' 	=> ESPRESSO_MAILCHIMP_MAIN_FILE,
 				'admin_path' 		=> ESPRESSO_MAILCHIMP_ADMIN_DIR . 'mailchimp' . DS,
 				'admin_callback' 	=> 'additional_mailchimp_admin_hooks',
@@ -74,7 +68,9 @@ class EE_MailChimp extends EE_Addon {
 					'EE_MC_Merge_Fields_Form'        => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'forms' . DS . 'EE_MC_Merge_Fields_Form.form.php',
 					'EE_MC_Interest_Categories_Form' => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'forms' . DS . 'EE_MC_Interest_Categories_Form.form.php'
 				),
-				'dms_paths' 			=> array( ESPRESSO_MAILCHIMP_DMS_PATH ),
+                'model_paths'           => array(ESPRESSO_MAILCHIMP_MODELS_PATH),
+                'class_paths'           => array(ESPRESSO_MAILCHIMP_CLASSES_PATH),
+                'dms_paths' 			=> array( ESPRESSO_MAILCHIMP_DMS_PATH ),
 				'module_paths' 		    => array( ESPRESSO_MAILCHIMP_DIR . 'EED_Mailchimp.module.php' ),
 				'pue_options'			=> array(
 					'pue_plugin_slug' 	=> 'eea-mailchimp',
@@ -84,18 +80,22 @@ class EE_MailChimp extends EE_Addon {
 			)
 		);
 
-        // Register db models.
-	    if ( ! did_action( 'activate_plugin' ) ) {
-		    EE_Register_Model::register(
-			    'MailChimp',
-			    array(
-				    'model_paths' => array( ESPRESSO_MAILCHIMP_MODELS_PATH ),
-				    'class_paths' => array( ESPRESSO_MAILCHIMP_CLASSES_PATH ),
-			    )
-		    );
-	    }
+    }
+
+
+
+    /**
+     * a safe space for addons to add additional logic like setting hooks
+     * that will run immediately after addon registration
+     * making this a great place for code that needs to be "omnipresent"
+     */
+    public function after_registration()
+    {
 	    require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
     }
+
+
+
 
     /**
      *  Additional admin hooks.
@@ -118,7 +118,7 @@ class EE_MailChimp extends EE_Addon {
      * @return array  Updated Links list
      */
     public static function espresso_mailchimp_plugin_settings( $links, $file ) {
- 		if ( $file == ESPRESSO_MAILCHIMP_BASE_NAME ) {
+ 		if ( $file === ESPRESSO_MAILCHIMP_BASE_NAME ) {
 			// before other links
 			array_unshift( $links, '<a href="admin.php?page='. ESPRESSO_MAILCHIMP_SETTINGS_PAGE_SLUG .'">' . __('Settings', 'event_espresso') . '</a>' );
 		}
