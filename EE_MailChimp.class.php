@@ -82,6 +82,21 @@ class EE_MailChimp extends EE_Addon {
 
     }
 
+
+
+    /**
+     * a safe space for addons to add additional logic like setting hooks
+     * that will run immediately after addon registration
+     * making this a great place for code that needs to be "omnipresent"
+     */
+    public function after_registration()
+    {
+	    require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
+    }
+
+
+
+
     /**
      *  Additional admin hooks.
      *

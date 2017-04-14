@@ -75,27 +75,32 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper {
 	 * @return array  section options.
 	 */
 	protected function _template_setup() {
-		// Get MC list fields.
-		$list_fields = $this->_mc_controller->mci_get_list_merge_vars( $this->_list_id );
-		$selected_fields = $this->_mc_controller->mci_event_list_question_fields( $this->_event_id );
-		$evt_questions = $this->_mc_controller->mci_get_event_all_questions( $this->_event_id );
-
-		$m_fields = array();
-		if ( ! empty( $list_fields ) ) {
-			$m_fields = $this->_merge_fields( $list_fields, $selected_fields, $evt_questions );
-		} elseif ( $_GET['action'] === 'create_new' ) {
-			// This is new event so no data.
-			$m_fields['no_data'] = new EE_Form_Section_HTML('');
-		} else {
-			$m_fields['no_lists'] = new EE_Form_Section_HTML( EEH_HTML::p( esc_html__( 'Sorry, no merge fields found!', 'event_espresso' ), 'no-lists-found-notice', 'important-notice' ) );
-		}
-
 		$options = array(
 			'html_id' => 'espresso-mci-list-merge-fields',
 			'html_class' => 'espresso_mci_merge_fields_tb',
-			'layout_strategy' => new EE_Two_Column_Layout(),
-			'subsections' => $m_fields
+			'layout_strategy' => new EE_Two_Column_Layout()
 		);
+		if ( $this->_list_id && $this->_list_id !== '-1' ) {
+			// Get MC list fields.
+			$list_fields = $this->_mc_controller->mci_get_list_merge_vars( $this->_list_id );
+			$selected_fields = $this->_mc_controller->mci_event_list_question_fields( $this->_event_id );
+			$evt_questions = $this->_mc_controller->mci_get_event_all_questions( $this->_event_id );
+
+			$m_fields = array();
+			if ( ! empty( $list_fields ) ) {
+				$m_fields = $this->_merge_fields( $list_fields, $selected_fields, $evt_questions );
+			} elseif ( $_GET['action'] === 'create_new' ) {
+				// This is new event so no data.
+				$m_fields['no_data'] = new EE_Form_Section_HTML('');
+			} else {
+				$m_fields['no_lists'] = new EE_Form_Section_HTML( EEH_HTML::p( esc_html__( 'Sorry, no merge fields found!', 'event_espresso' ), 'no-lists-found-notice', 'important-notice' ) );
+			}
+			$options['subsections'] = $m_fields;
+		} else {
+			// No list - no merge-fields data.
+			$options['subsections']['no_data'] = new EE_Form_Section_HTML('');
+		}
+
 		return $options;
 	}
 

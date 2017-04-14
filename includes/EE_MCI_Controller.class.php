@@ -27,6 +27,12 @@ use EEA_MC\MailChimp;
 class EE_MCI_Controller {
 
 	/**
+	 * Key of the extra meta row that stores whether or not the event has been verified to work with MC API v3.
+	 * @const string
+	 */
+	const UPDATED_TO_API_V3 = 'updated_to_v3_of_mc_api_extra_meta_key';
+
+	/**
      * @access private
 	 * @var EE_Mailchimp_Config $_config
      */
@@ -76,7 +82,6 @@ class EE_MCI_Controller {
 	 */
 	function __construct( $api_key = '' ) {
 		do_action( 'AHEE__EE_MCI_Controller__class_constructor__init_controller' );
-		require_once( ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php' );
 
 		$this->_config = EED_Mailchimp::instance()->config();
 
@@ -113,7 +118,7 @@ class EE_MCI_Controller {
 		} catch ( Exception $e ) {
 			$this->set_error( $e );
 			do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
-			unset( $this->MailChimp );
+			$this->MailChimp = null;
 			return FALSE;
 		}
 
@@ -121,7 +126,7 @@ class EE_MCI_Controller {
 		if ( ! $this->MailChimp->success() || ! isset($reply['account_id']) ) {
 				$this->set_error( $reply );
 				do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_error' );
-				unset( $this->MailChimp );
+				$this->MailChimp = null;
 				return FALSE;
 		}
 		do_action( 'AHEE__EE_MCI_Controller__mci_is_api_key_valid__api_key_ok' );
@@ -188,11 +193,14 @@ class EE_MCI_Controller {
 					if ( $registration instanceof EE_Registration ) {
 						$EVT_ID = $registration->event_ID();
 						$event_list = $this->mci_event_list( $EVT_ID );
-						// If no list selected for this event than skip the subscription.
+						// If no list selected for this event then skip the subscription.
 						if ( empty( $event_list ) || ( ! empty( $event_list ) && intval($event_list) === -1 ) ) {
                             continue;
                         }
-                        
+
+						// Check if the DB data can be safely used with current API.
+						$this->is_db_data_api_compatible($EVT_ID, $event_list);
+
 						$need_reg_status = $reg_approved = false;
 						/** @type EE_Mailchimp_Config $mc_config */
 						$mc_config = EED_Mailchimp::get_config();
@@ -216,9 +224,23 @@ class EE_MCI_Controller {
 							$subscribe_args = $this->_add_event_group_vars_to_subscribe_args( $EVT_ID, $subscribe_args );
 							// Question fields
 							$subscribe_args = $this->_add_registration_question_answers_to_subscribe_args( $registration, $EVT_ID, $subscribe_args );
-							// filter it
-							$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args );
 
+							// For backwards compatibility reasons only (for this next filter below)
+							$subscribe_args['merge_vars'] = $subscribe_args['merge_fields'];
+							unset($subscribe_args['merge_fields']);
+							// filter it
+							$subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args', $subscribe_args, $registration, $EVT_ID );
+							// Old version used 'merge_vars' but API v3 calls them 'merge_fields'
+							$subscribe_args['merge_fields'] = $subscribe_args['merge_vars'];
+							unset($subscribe_args['merge_vars']);
+
+                            // Verify merge_fields and interests aren't empty, and if they are they need to be stdClasses so that they become JSON objects still
+                            if ( empty($subscribe_args['merge_fields']) ) {
+                               $subscribe_args['merge_fields'] = new \stdClass();
+                            }
+                            if ( empty($subscribe_args['interests']) ) {
+                                $subscribe_args['interests'] = new \stdClass();
+                            }
 							try {
 								// Get member info if exists.
 								$member_subscribed = $this->MailChimp->get( '/lists/'.$event_list.'/members/'.$this->MailChimp->subscriberHash($att_email), array('fields' => 'id,email_address,status') );
@@ -323,13 +345,13 @@ class EE_MCI_Controller {
 		if ( isset($grouping[3]) && $grouping[3] === 'true' ) {
 			$selected = true;
 		}
-		if ( empty((array)$subscribe_args['interests']) ) {
-		    $subscribe_args['interests'] = new StdClass();
-            $subscribe_args['interests']->{$grouping[0]} = $selected;
+		if ( ! isset($subscribe_args['interests']) || empty($subscribe_args['interests']) ) {
+		    $subscribe_args['interests'] = array();
+            $subscribe_args['interests'][$grouping[0]] = $selected;
         } else {
 			foreach ( $subscribe_args['interests'] as $interest => $value ) {
 				if ( $interest != $grouping[0] ) {
-					$subscribe_args['interests']->{$grouping[0]} = $selected;
+					$subscribe_args['interests'][$grouping[0]] = $selected;
 				}
 			}
 		}
@@ -425,7 +447,7 @@ class EE_MCI_Controller {
 			throw new EE_Error( __( 'The MailChimp Subscriber arguments array is malformed!','event_espresso' ));
 		}
 		if ( ! isset( $subscribe_args['merge_fields'] ) ) {
-			$subscribe_args['merge_fields'] = new StdClass();
+			$subscribe_args['merge_fields'] = array();
 		}
 		// get MailChimp question fields
 		$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
@@ -450,13 +472,13 @@ class EE_MCI_Controller {
 				if ( isset($event_questions_list['state']) && $q_id == $event_questions_list['state']['QST_ID'] ) {	// If a state.
 					$state = $registration->attendee()->state_obj();
 					if ( $state instanceof EE_State ) {
-						$subscribe_args['merge_fields']->{$mc_list_field} = $state->name();
+						$subscribe_args['merge_fields'][$mc_list_field] = $state->name();
 					}
 
 				} else if ( isset($event_questions_list['country']) && $q_id == $event_questions_list['country']['QST_ID'] ) {	// If a Country (change ISO to a full name).
 					$country = $registration->attendee()->country_obj();
 					if ( $country instanceof EE_Country ) {
-						$subscribe_args['merge_fields']->{$mc_list_field} = $country->name();
+						$subscribe_args['merge_fields'][$mc_list_field] = $country->name();
 					}
 
 				} else if ( is_array( $question_answers[ $q_id ] )) {
@@ -464,9 +486,9 @@ class EE_MCI_Controller {
 					foreach ( $question_answers[ $q_id ] as $q_key => $q_value ) {
 						$selected .= $selected == '' ? $q_value : ', ' . $q_value;
 					}
-					$subscribe_args['merge_fields']->{$mc_list_field} = $selected;
+					$subscribe_args['merge_fields'][$mc_list_field] = $selected;
 				} else {
-					$subscribe_args['merge_fields']->{$mc_list_field} = $question_answers[ $q_id ];
+					$subscribe_args['merge_fields'][$mc_list_field] = $question_answers[ $q_id ];
 				}
 			}
 		}
@@ -484,7 +506,7 @@ class EE_MCI_Controller {
 	public function mci_get_users_lists() {
 		do_action('AHEE__EE_MCI_Controller__mci_get_users_lists__start');
 		$parameters = apply_filters( 'FHEE__EE_MCI_Controller__mci_get_users_lists__list_params', array('fields' => 'lists.id,lists.name', 'count' => 100, 'apikey' => $this->_api_key ), $this );
-		
+
 		try {
 			$reply = $this->MailChimp->get('lists', $parameters);
 		} catch ( Exception $e ) {
@@ -599,7 +621,9 @@ class EE_MCI_Controller {
 	 */
 	public function mci_set_metabox_contents( $event ) {
 		// Verify the API key.
-		if ( ! empty( $this->_config->api_settings->api_key ) ) {
+		if ($this->MailChimp instanceof EEA_MC\MailChimp) {
+			// Check if the DB data can be safely used with current API.
+			$this->is_db_data_api_compatible($event->ID);
 			// Get saved list for this event (if there's one)
 			$this->list_id = $this->mci_event_list( $event->ID );
 			$this->category_id = $this->mci_event_list_group( $event->ID );
@@ -607,13 +631,13 @@ class EE_MCI_Controller {
 			$metabox_obj = new EE_MC_Metabox_Form( $this, $event->ID, $this->list_id, $this->category_id );
 			return $metabox_obj->get_html_and_js();
 		} else {
-			$error_section = new EE_Form_Section_HTML( 
+			$error_section = new EE_Form_Section_HTML(
 				EEH_HTML::div( EEH_HTML::span( esc_html__( 'Invalid MailChimp API.', 'event_espresso' ), 'important_mc_notice', 'important-notice' ) .
-					EEH_HTML::br() . 
-					esc_html__( 'Please visit the ', 'event_espresso' ) . 
+					EEH_HTML::br() .
+					esc_html__( 'Please visit the ', 'event_espresso' ) .
 					EEH_HTML::link( admin_url( 'admin.php?page=mailchimp' ), esc_html__( 'MailChimp Admin Page ', 'event_espresso' ) ) .
-					esc_html__( 'to correct the issue.', 'event_espresso' ), 
-				'no-lists-found-notice', 'espresso_mailchimp_integration_metabox' ) . EEH_HTML::divx()
+					esc_html__( 'to correct the issue.', 'event_espresso' ),
+				'no-lists-found-notice', 'espresso_mailchimp_integration_metabox' )
 			);
 			return $error_section->get_html_and_js();
 		}
@@ -669,6 +693,12 @@ class EE_MCI_Controller {
 					)
 				);
 				$new_list_group->save();
+			}
+
+			// This info was saved in a new format so we set a flag for this event.
+			$event = EEM_Event::instance()->get_one_by_ID($event_id);
+			if ( $event instanceof EE_Event ) {
+				$event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
 			}
 		} else {
 			$new_list_group = EE_Event_Mailchimp_List_Group::new_instance(
@@ -735,9 +765,15 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_lists( $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_lists__start');
-		// Load the lists form.
-		$lists_obj = new EE_MC_Lists_Form( $this, $list_id );
-		return $lists_obj->get_html_and_js();
+
+		if ($this->MailChimp instanceof EEA_MC\MailChimp) {
+			// Load the lists form.
+			$lists_obj = new EE_MC_Lists_Form( $this, $list_id );
+			return $lists_obj->get_html_and_js();
+		} else {
+			// Something is wrong with the API so we return nothing.
+			return new EE_Form_Section_HTML('');
+		}
 	}
 
 
@@ -752,13 +788,15 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_groups( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_groups__start');
-		if ( $list_id !== '-1' && $list_id !== NULL ) {
+
+		if ($this->MailChimp instanceof EEA_MC\MailChimp) {
 			// Load the interests form.
 			$interest_categories_obj = new EE_MC_Interest_Categories_Form( $this, $event_id, $list_id );
 			return $interest_categories_obj->get_html_and_js();
+		} else {
+			// Something is wrong with the API so we return nothing.
+			return new EE_Form_Section_HTML('');
 		}
-		// Default to:
-		return EEH_HTML::no_row();
 	}
 
 
@@ -773,10 +811,7 @@ class EE_MCI_Controller {
 	 */
 	public function mci_list_mailchimp_fields( $event_id = 0, $list_id = 0 ) {
 		do_action('AHEE__EE_MCI_Controller__mci_list_mailchimp_fields__start');
-		// No need to generate any content if no list selected.
-		if ( $list_id === '-1' ) {
-			return EEH_HTML::no_row();
-		}
+
 		$fields_obj = new EE_MC_Merge_Fields_Form( $this, $event_id, $list_id );
 		return $fields_obj->get_html_and_js();
 	}
@@ -947,6 +982,136 @@ class EE_MCI_Controller {
 			'qfields' 	=> $this->mci_event_list_question_fields( $EVT_ID ),
 		);
 	}
+
+
+
+	/**
+	 * Check the MC data in the DB to see if it can be used in the MC API v3 or needs to be updated.
+	 *
+	 * @access public
+	 * @param int $EVT_ID  The ID of the Event.
+	 * @param int $list_id  MC List ID the Event in "subscribed" for.
+	 * @return void
+	 */
+	public function is_db_data_api_compatible( $EVT_ID, $list_id = false ) {
+		$event = EEM_Event::instance()->get_one_by_ID($EVT_ID);
+		// Make sure there is an event with this ID.
+		if ( ! $event instanceof EE_Event ) {
+			return;
+		}
+		$event_checked = $event->get_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true, false);
+		// This event already checked before ? no need to do this again then.
+		if ( $event_checked ) {
+			return;
+		}
+		if ( ! $list_id ) {
+			$list_id = $this->mci_event_list($EVT_ID);
+		}
+
+		// Also no need to migrate "Do not send to MC".
+		if ( $list_id === '-1' || $list_id === null ) {
+            //Although there is no MC data to migrate, let's at least remember we already checked
+            $event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
+			return;
+		}
+
+		// Check the data structure.
+		$event_groups = $this->mci_event_list_group($EVT_ID);
+		$old_structure = true;
+		if ( ! empty($event_groups) ) {
+			if ( is_array($event_groups) ) {
+				// Just get the first element and see if it has the right structure.
+				$event_interest = $event_groups[0];
+				$interest = explode('-', $event_interest);
+				if ( isset($interest[3]) && ($interest[3] === 'true' || $interest[3] === 'false') ) {
+					$old_structure = false;
+				}
+			}
+		}
+
+		if ( $old_structure ) {
+			// If we are here the data was not updated yet.
+			// Clear MailChimp data on the current event and then save the updated data.
+			EEM_Event_Mailchimp_List_Group::instance()->delete(array(array('EVT_ID' => $EVT_ID)));
+
+			$list_interests = array();
+			// Fetch the lists/groups/interests for this event.
+			$categories = $this->mci_get_users_groups($list_id);
+			if ( ! empty($categories) && is_array($categories) ) {
+				// Now we try to get the interests themselves.
+				foreach ( $categories as $category ) {
+					$interests = $this->mci_get_interests($list_id, $category['id']);
+					// No interests ? Move on...
+					if ( ! empty($interests) && is_array($interests) ) {
+						foreach ($interests as $interest) {
+							// ID's in API v2 and v3 are different so we need to go by the interest names.
+							// If there are same names we need to somehow id them so we put those with the same name in an array under that name.
+							$list_interests[$interest['name']][] = $interest;
+						}
+					}
+				}
+
+				// Update the old rows.
+				$saved_interests = array();
+				foreach ( $event_groups as $event_interest ) {
+					$list_and_interest = explode('-', $event_interest);
+					// Double check just in case we do get one already updated field.
+					if ( isset($list_and_interest[3]) && ($list_and_interest[3] === 'true' || $list_and_interest[3] === 'false') ) {
+						$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
+							'EVT_ID'                 => $EVT_ID,
+							'AMC_mailchimp_list_id'  => $list_id,
+							'AMC_mailchimp_group_id' => $event_interest
+						));
+						$new_list_interest->save();
+						continue;
+					}
+					$interest_name = base64_decode($list_and_interest[2]);
+					$interest_data = array_shift($list_interests[$interest_name]);
+					if ( ! empty($interest_data) && is_array($interest_data) ) {
+			            // Update current row data.
+						$list_group_id = $interest_data['id'] . '-' . $interest_data['category_id'] . '-' . base64_encode($interest_data['name']) . '-true';
+						$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
+							'EVT_ID'                 => $EVT_ID,
+							'AMC_mailchimp_list_id'  => $list_id,
+							'AMC_mailchimp_group_id' => $list_group_id
+						));
+						$new_list_interest->save();
+						$saved_interests[] = $interest_data['id'];
+					}
+				}
+				// Need to add the not selected interests as API v3 uses those also.
+				foreach ( $list_interests as $all_interests ) {
+					foreach ( $all_interests as $mss_interest ) {
+						// Already saved / updated interest ?
+						if ( in_array($mss_interest['id'], $saved_interests) ) {
+							continue;
+						}
+						// Add these as not selected.
+						$lg_id = $mss_interest['id'] . '-' . $mss_interest['category_id'] . '-' . base64_encode($mss_interest['name']) . '-false';
+						$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
+							'EVT_ID'                 => $EVT_ID,
+							'AMC_mailchimp_list_id'  => $list_id,
+							'AMC_mailchimp_group_id' => $lg_id
+						));
+						$new_list_interest->save();
+						$saved_interests[] = $mss_interest['id'];
+					}
+				}
+			} else {
+				// Looks like there are no interests for this list.
+				// So we should just add the Event List relation with no interests.
+				$new_list_interest = EE_Event_Mailchimp_List_Group::new_instance( array(
+					'EVT_ID'                 => $EVT_ID,
+					'AMC_mailchimp_list_id'  => $list_id,
+					'AMC_mailchimp_group_id' => '-1'
+				));
+				$new_list_interest->save();
+			}
+		}
+        //Remember this event's MailChimp list data has been verified. No need to do it again
+        $event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
+	}
+
 
 
 	/**

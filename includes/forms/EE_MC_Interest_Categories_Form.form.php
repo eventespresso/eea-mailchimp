@@ -66,22 +66,27 @@ class EE_MC_Interest_Categories_Form extends EE_Form_Section_Proper {
 	 * @return array  List of section options.
 	 */
 	protected function _template_setup() {
-		// Get saved group for this event (if there's one)
-		$event_list_group = $this->_mc_controller->mci_event_selected_interests( $this->_event_id );
-		$user_groups = $this->_mc_controller->mci_get_users_groups( $this->_list_id );
-
-		if ( ! empty( $user_groups ) ) {
-			$categories = $this->_list_categories( $event_list_group, $user_groups, $this->_list_id );
-		} else {
-			$categories['no_interests'] = new EE_Form_Section_HTML( EEH_HTML::p( esc_html__( 'No groups found for this List.', 'event_espresso' ), 'no-groups-found-notice', 'important-notice' ) );
-		}
-
 		$options = array(
 			'html_id' => 'ee-mailchimp-groups-list',
 			'html_class' => 'eea_mailchimp_groups_list',
-			'layout_strategy' => new EE_Div_Per_Section_Spaced_Layout(),
-			'subsections' => $categories
+			'layout_strategy' => new EE_Div_Per_Section_Spaced_Layout()
 		);
+		if ( $this->_list_id && $this->_list_id !== '-1' ) {
+			// Get saved group for this event (if there's one)
+			$event_list_group = $this->_mc_controller->mci_event_selected_interests( $this->_event_id );
+			$user_groups = $this->_mc_controller->mci_get_users_groups( $this->_list_id );
+
+			if ( ! empty( $user_groups ) ) {
+				$categories = $this->_list_categories( $event_list_group, $user_groups, $this->_list_id );
+			} else {
+				$categories['no_interests'] = new EE_Form_Section_HTML( EEH_HTML::p( esc_html__( 'No groups found for this List.', 'event_espresso' ), 'no-groups-found-notice', 'important-notice' ) );
+			}
+			$options['subsections'] = $categories;
+		} else {
+			// No list - no interests data.
+			$options['subsections']['no_data'] = new EE_Form_Section_HTML('');
+		}
+
 		return $options;
 	}
 
