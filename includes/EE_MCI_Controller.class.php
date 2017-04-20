@@ -1155,7 +1155,7 @@ class EE_MCI_Controller {
 		EEM_Change_Log::instance()->log(
 			EED_Mailchimp::log_type,
 			$error,
-			$this
+			null
 		);
 	}
 
