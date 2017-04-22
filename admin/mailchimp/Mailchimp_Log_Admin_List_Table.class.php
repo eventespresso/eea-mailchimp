@@ -164,7 +164,7 @@ class Mailchimp_Log_Admin_List_Table extends EE_Admin_List_Table {
 	 * @return string
 	 */
 	public function column_LOG_message(EE_Change_Log $item){
-		return $item->message();
+		return $item->get_pretty('LOG_message', 'as_table');
 	}
 
 
