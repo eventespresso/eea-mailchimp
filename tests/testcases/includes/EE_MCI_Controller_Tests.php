@@ -44,7 +44,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         $this->_mci_config = EED_Mailchimp::get_config();
 
         // Set a valid MailChimp API Key.
-        $this->_mci_config->api_settings->api_key = 'b40528421d083eff83b9b6ba11d8f928-us8';
+        $this->_mci_config->api_settings->api_key = '9c7871ec32d511936e19115e67454e92-us8';
 	    EED_Mailchimp::update_config( $this->_mci_config );
 
         // MailChimp Controller.
@@ -110,7 +110,7 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      */
     public function mc_test_keys_provider() {
         return array(
-            array('b40528421d083eff83b9b6ba11d8f928-us8', 'b40528421d083eff83b9b6ba11d8f928-us8'),
+            array('9c7871ec32d511936e19115e67454e92-us8', '9c7871ec32d511936e19115e67454e92-us8'),
             array('b40528421d083eff83b9b6ba11d8f928-us', false, array(
                 'status' => '404',
                 'type' => 'API Key',
@@ -283,6 +283,8 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      * Test what is displayed when requesting a list of MC question fields.
      */
     public function test_mailchimp_fields_content() {
+        // Are we updating the post or creating a new one?
+        $_GET['action'] = 'update';
         $list_fields = $this->_mci_controller->mci_get_list_merge_vars($this->_list_id);
         $ok_questions_content = $this->_mci_controller->mci_list_mailchimp_fields($this->_ee_event->ID(), $this->_list_id);
         foreach ($list_fields as $element) {
