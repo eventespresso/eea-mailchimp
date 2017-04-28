@@ -22,7 +22,7 @@ class EED_Mailchimp_Tests extends EE_UnitTestCase {
         $this->_mci_config = EED_Mailchimp::get_config();
 
         // Set a valid MailChimp API Key.
-        $this->_mci_config->api_settings->api_key = '9c7871ec32d511936e19115e67454e92-us8';
+        $this->_mci_config->api_settings->api_key = getenv('EEA_MAILCHIMP_SANDBOX_API_KEY');
 
 	    EED_Mailchimp::update_config( $this->_mci_config );
 

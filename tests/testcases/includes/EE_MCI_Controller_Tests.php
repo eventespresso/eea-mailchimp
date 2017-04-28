@@ -33,6 +33,11 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
 	 */
 	private $_list_id;
 
+	/**
+	 * @var string $_sandbox_key
+	 */
+	private $_sandbox_key;
+
 
 
     public function setUp() {
@@ -43,8 +48,15 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         // MailChimp Settings.
         $this->_mci_config = EED_Mailchimp::get_config();
 
+        // MailChimp sandbox key.
+        // This needs to be set as an environment variable.
+        $this->_sandbox_key = getenv('EEA_MAILCHIMP_SANDBOX_API_KEY');
+        if (! $this->_sandbox_key) {
+            $this->markTestSkipped('Unable to complete test because the MailChimp API Key was not set (env variable)');
+        }
+
         // Set a valid MailChimp API Key.
-        $this->_mci_config->api_settings->api_key = '9c7871ec32d511936e19115e67454e92-us8';
+        $this->_mci_config->api_settings->api_key = $this->_sandbox_key;
 	    EED_Mailchimp::update_config( $this->_mci_config );
 
         // MailChimp Controller.
@@ -93,15 +105,15 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      * @param array $call_reply MC Api call response
      */
     public function test_mc_api_key_validation($key, $result, $call_reply = array() ) {
-        $key_valid = $this->_mci_controller->mci_is_api_key_valid($key, $call_reply);
+        $key_valid = $this->_mci_controller->mci_is_api_key_valid($key);
         $this->assertEquals( $result, $key_valid );
 
         // Test how MC Controller will handle an error and what will we get in the $mcapi_error.
         if ( $result === false ) {
             $mci_error = $this->_mci_controller->mci_get_response_error();
             // Was the code changed through the filter?
-            $this->assertEquals( $mci_error['code'], '404' );
-            $this->assertEquals( $mci_error['msg'], 'Invalid MailChimp API Key.' );
+            $this->assertEquals( $mci_error['code'], $call_reply['code'] );
+            $this->assertEquals( $mci_error['msg'], $call_reply['msg'] );
         }
     }
 
@@ -110,17 +122,26 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
      */
     public function mc_test_keys_provider() {
         return array(
-            array('9c7871ec32d511936e19115e67454e92-us8', '9c7871ec32d511936e19115e67454e92-us8'),
-            array('b40528421d083eff83b9b6ba11d8f928-us', false, array(
-                'status' => '404',
-                'type' => 'API Key',
-                'title' => 'Invalid MailChimp API Key.',
-                'detail' => 'Invalid MailChimp API Key.',
-                'instance' => 'RFC2616')
+            // Key accepted:
+            array($this->_sandbox_key, $this->_sandbox_key),
+            // Not acceptable keys:
+            array(substr($this->_sandbox_key, 0, -1), false, array(
+                'code' => '404',
+                'msg' => 'Invalid MailChimp API Key.')
             ),
-            array('b40528421d083eff83-b9b6ba11d8f928u-s8', false),
-            array('b40528421d083eff83b9b6ba11d8f928us8', false),
-            array('b40528421d083eff83b9b6ba11d8f928us8-', false),
+            array(substr_replace($this->_sandbox_key, '-', 20, 0), false, array(
+                'code' => '404',
+                'msg' => 'Invalid MailChimp API Key.')
+            ),
+            array(str_replace('-', '', $this->_sandbox_key), false, array(
+                'code' => '404',
+                'msg' => 'Invalid MailChimp API Key.')
+            ),
+            // Dummy key:
+            array('12345abcde1234abcde1234abcde12-us1', false, array(
+                'code' => '404',
+                'msg' => 'API Key Invalid')
+            )
         );
     }
 
