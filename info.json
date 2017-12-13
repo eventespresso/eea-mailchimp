@@ -2,8 +2,6 @@
   "versionFile": "ee4-mailchimp.php",
   "slug": "eea-mailchimp",
   "name": "EE4 Mailchimp",
-  "archiveBaseUrl": "http:\/\/build.eventespresso.com\/",
-  "archiveBasePath": "~\/www\/build\/",
   "releaseFilesRemove": [
     "src\/tests\/**",
     "src\/info.json",
@@ -12,9 +10,11 @@
     "src/.travis.yml"
   ],
   "github": true,
-  "demoee": true,
   "awsbucket": "",
   "awsregion": "",
   "srcBuildFolderName": "eea-mailchimp",
-  "textDomain": "event_espresso"
+  "textDomain": "event_espresso",
+  "remoteNamesToPushTo": [
+    "demoee"
+  ]
 }
