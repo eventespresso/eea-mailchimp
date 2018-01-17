@@ -14,7 +14,12 @@
  *
  * ------------------------------------------------------------------------
  */
+
+use EE_Error;
 use EEA_MC\MailChimp;
+use EventEspresso\core\exceptions\InvalidDataTypeException;
+use EventEspresso\core\exceptions\InvalidInterfaceException;
+use InvalidArgumentException;
 
 /**
  * Class  EE_MCI_Controller - Event Espresso MailChimp logic implementing. Intermediary between this integration and the MailChimp API.
@@ -358,90 +363,19 @@ class EE_MCI_Controller {
 		return $subscribe_args;
 	}
 
-
-
-	/**
-	 * _get_attendee_details_for_registration
-	 *
-	 * @access public
-	 * @param EE_Registration $registration
-	 * @return array
-	 */
-	protected function _get_attendee_details_for_registration( EE_Registration $registration ) {
-		// empty array to add stuff to
-		$question_answers = array();
-		if ( $registration instanceof EE_Registration ) {
-			$attendee = $registration->attendee();
-			if ( $attendee instanceof EE_Attendee ) {
-				EE_Registry::instance()->load_model( 'Attendee' );
-				$attendee_properties = array(
-					EEM_Attendee::fname_question_id       => 'ATT_fname',
-					EEM_Attendee::lname_question_id       => 'ATT_lname',
-					EEM_Attendee::email_question_id       => 'ATT_email',
-					EEM_Attendee::address_question_id     => 'ATT_address',
-					EEM_Attendee::address2_question_id    => 'ATT_address2',
-					EEM_Attendee::city_question_id        => 'ATT_city',
-					EEM_Attendee::state_question_id       => 'STA_ID',
-					EEM_Attendee::country_question_id     => 'CNT_ISO',
-					EEM_Attendee::zip_question_id         => 'ATT_zip',
-					EEM_Attendee::phone_question_id       => 'ATT_phone'
-				);
-				foreach ( $attendee_properties as $QST_ID => $attendee_property ) {
-					$question_answers[ $QST_ID ] = $attendee->get( $attendee_property );
-				}
-			}
-		}
-		return $question_answers;
-	}
-
-
-
-	/**
-	 * _get_question_answers_for_registration
-	 *
-	 * @access public
-	 * @param EE_Registration $registration
-	 * @param array           $question_answers
-	 * @return array
-	 */
-	protected function _get_question_answers_for_registration( EE_Registration $registration, $question_answers = array() ) {
-		if ( $registration instanceof EE_Registration ) {
-			// grab the registrant's answers
-			$registration_answers = $registration->answers();
-			if ( ! empty( $registration_answers ) ) {
-				foreach ( $registration_answers as $registration_answer ) {
-					if ( $registration_answer instanceof EE_Answer ) {
-						// get the related question for the answer
-						$registration_question = $registration_answer->question();
-						if ( $registration_question instanceof EE_Question ) {
-							// for system questions
-							if ( $registration_question->is_system_question() ) {
-								// use the system ID for the array key
-								$question_answers[ $registration_question->system_ID() ] = $registration_answer->pretty_value();
-							} else {
-								// or just the regular question ID for non-system questions
-								$question_answers[ $registration_question->ID() ] = $registration_answer->pretty_value();
-							}
-						}
-					}
-				}
-			}
-		}
-		return $question_answers;
-	}
-
-
-
-	/**
-	 * _add_registration_question_answers_to_subscribe_args
-	 *
-	 * @access public
-	 * @param EE_Registration $registration
-	 * @param int           $EVT_ID
-	 * @param array           $subscribe_args
-	 * @throws \EE_Error
-	 * @return array
-	 */
+    /**
+     * _add_registration_question_answers_to_subscribe_args
+     *
+     * @access public
+     * @param EE_Registration $registration
+     * @param int $EVT_ID
+     * @param array $subscribe_args
+     * @throws InvalidArgumentException
+     * @throws InvalidInterfaceException
+     * @throws InvalidDataTypeException
+     * @throws EE_Error
+     * @return array
+     */
 	protected function _add_registration_question_answers_to_subscribe_args( EE_Registration $registration, $EVT_ID = 0,  $subscribe_args = array() ) {
 		if ( ! is_array( $subscribe_args ) ) {
 			throw new EE_Error( __( 'The MailChimp Subscriber arguments array is malformed!','event_espresso' ));
@@ -449,49 +383,13 @@ class EE_MCI_Controller {
 		if ( ! isset( $subscribe_args['merge_fields'] ) ) {
 			$subscribe_args['merge_fields'] = array();
 		}
-		// get MailChimp question fields
-		$question_fields = $this->mci_event_list_question_fields( $EVT_ID );
-		// get the registrant's attendee details
-		$question_answers = $this->_get_attendee_details_for_registration( $registration );
-		// get the registrant's question answers
-		$question_answers = $this->_get_question_answers_for_registration( $registration, $question_answers );
-		// Get all event questions.
-		$event_questions_list = $this->mci_get_event_all_questions( $EVT_ID );
-		foreach ( $question_fields as $mc_list_field => $question_ID ) {
-			// Older version used names for an IDs (now using int).
-			$q_id = null;
-			if ( is_numeric($question_ID) ) {
-				$q_id = $question_ID;
-			} else {
-				if ( isset($event_questions_list[$question_ID]) ) {
-					$q_id = $event_questions_list[$question_ID]['QST_ID'];
-				}
-			}
-			if ( isset($question_answers[ $q_id ]) && !empty($question_answers[ $q_id ]) ) {
-				// If question field is a State then get the state name not the code.
-				if ( isset($event_questions_list['state']) && $q_id == $event_questions_list['state']['QST_ID'] ) {	// If a state.
-					$state = $registration->attendee()->state_obj();
-					if ( $state instanceof EE_State ) {
-						$subscribe_args['merge_fields'][$mc_list_field] = $state->name();
-					}
 
-				} else if ( isset($event_questions_list['country']) && $q_id == $event_questions_list['country']['QST_ID'] ) {	// If a Country (change ISO to a full name).
-					$country = $registration->attendee()->country_obj();
-					if ( $country instanceof EE_Country ) {
-						$subscribe_args['merge_fields'][$mc_list_field] = $country->name();
-					}
-
-				} else if ( is_array( $question_answers[ $q_id ] )) {
-					$selected = '';
-					foreach ( $question_answers[ $q_id ] as $q_key => $q_value ) {
-						$selected .= $selected == '' ? $q_value : ', ' . $q_value;
-					}
-					$subscribe_args['merge_fields'][$mc_list_field] = $selected;
-				} else {
-					$subscribe_args['merge_fields'][$mc_list_field] = $question_answers[ $q_id ];
-				}
-			}
-		}
+		$mc_field_to_ee_q_map = $this->mci_event_list_question_fields($EVT_ID);
+		$ee_q_to_mc_field = array_flip($mc_field_to_ee_q_map);
+		foreach($ee_q_to_mc_field as $qst_id => $mc_field_code) {
+            $value = EEM_Answer::instance()->get_answer_value_to_question($registration, $qst_id, true);
+            $subscribe_args['merge_fields'][$mc_field_code] = $value;
+        }
 		return $subscribe_args;
 	}
 
@@ -887,7 +785,7 @@ class EE_MCI_Controller {
 				if ( $QG_list instanceof EE_Question_Group ) {
 					foreach ( $QG_list->questions() as $question ) {
 						$qst = array(
-							'QST_Name' => $question->get('QST_display_text'),
+							'QST_name' => $question->get('QST_display_text'),
 							'QST_ID' => $question->get('QST_ID'),
 							'QST_system' => $question->get('QST_system')
 						);
