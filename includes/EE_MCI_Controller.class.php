@@ -15,11 +15,9 @@
  * ------------------------------------------------------------------------
  */
 
-use EE_Error;
 use EEA_MC\MailChimp;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
 use EventEspresso\core\exceptions\InvalidInterfaceException;
-use InvalidArgumentException;
 
 /**
  * Class  EE_MCI_Controller - Event Espresso MailChimp logic implementing. Intermediary between this integration and the MailChimp API.
