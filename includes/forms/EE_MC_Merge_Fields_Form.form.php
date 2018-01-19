@@ -133,7 +133,7 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper {
 			if ( $l_field['public'] === false ) continue;
 
 			foreach ( $evt_questions as $q_field ) {
-				$fields_list[$q_field['QST_ID']] = $q_field['QST_Name'];
+				$fields_list[$q_field['QST_ID']] = $q_field['QST_name'];
 
 				// Default to main fields if exist.
 				if (
