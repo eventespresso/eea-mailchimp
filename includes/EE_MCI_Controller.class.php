@@ -383,8 +383,7 @@ class EE_MCI_Controller {
 		}
 
 		$mc_field_to_ee_q_map = $this->mci_event_list_question_fields($EVT_ID);
-		$ee_q_to_mc_field = array_flip($mc_field_to_ee_q_map);
-		foreach($ee_q_to_mc_field as $qst_id => $mc_field_code) {
+		foreach($mc_field_to_ee_q_map as $mc_field_code => $qst_id) {
             $value = EEM_Answer::instance()->get_answer_value_to_question($registration, $qst_id, true);
             $subscribe_args['merge_fields'][$mc_field_code] = $value;
         }
