@@ -51,6 +51,9 @@ class EE_MCI_Controller_Tests extends EE_UnitTestCase {
         // MailChimp sandbox key.
         // This needs to be set as an environment variable.
         $this->_sandbox_key = getenv('EEA_MAILCHIMP_SANDBOX_API_KEY');
+        if( ! $this->_sandbox_key && defined( 'EEA_MAILCHIMP_SANDBOX_API_KEY')) {
+            $this->_sandbox_key = EEA_MAILCHIMP_SANDBOX_API_KEY;
+        }
         if (! $this->_sandbox_key) {
             $this->markTestSkipped('Unable to complete test because the MailChimp API Key was not set (env variable)');
         }
