@@ -40,7 +40,10 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base {
         }
 	    EE_Registry::instance()->load_core( 'Config' );
         $mc_new_config = EE_Config::instance()->get_config( 'addons', 'Mailchimp', 'EE_Mailchimp_Config' );
-        $mc_old_config = EE_Config::instance()->get_config( 'addons', 'EE_Mailchimp', 'EE_Mailchimp_Config' );
+        $mc_old_config = null;
+        if(isset(EE_Config::instance()->addons->EE_Mailchimp)) {
+            $mc_old_config = EE_Config::instance()->get_config('addons', 'EE_Mailchimp', 'EE_Mailchimp_Config');
+        }
 
         if ( ( ( version_compare( $version_string, '2.1.0', '>=' ) && version_compare( $version_string, '2.2.0', '<' ) )
             || ( version_compare( $version_string, '2.2.0', '>=' ) && version_compare( $version_string, '2.3.0', '<' ) && empty($mc_new_config->api_settings->api_key) ) )
@@ -78,8 +81,7 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base {
                 QMC_mailchimp_field_id TEXT NOT NULL ,
                 PRIMARY KEY  (QMC_ID)";
         $this->_table_should_exist_previously($table_name,$sql, 'ENGINE=InnoDB');
-		 // Setting up the config wp option pretty well counts as a 'schema change', or at least should happen here.
-        EE_Config::instance()->update_espresso_config(false, true);
+
         return true;
     }
 
@@ -91,6 +93,10 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base {
      * @return boolean
      */
     public function schema_changes_after_migration() {
+	    // totally remove the old mailchimp config object. kill it! kill it!
+	    EE_Config::instance()->addons->EE_Mailchimp = null;
+	    unset(EE_Config::instance()->addons->EE_Mailchimp);
+	    EE_Config::instance()->update_espresso_config(false, true);
         return true;
     }
 
