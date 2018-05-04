@@ -29,16 +29,18 @@
 
 
 // Define our plugin version and other base stuff.
-define( 'ESPRESSO_MAILCHIMP_VERSION', '2.4.1.rc.012' );
-define( 'ESPRESSO_MAILCHIMP_MAIN_FILE', __FILE__ );
-define( 'ESPRESSO_MAILCHIMP_DIR', plugin_dir_path( __FILE__ ) );
-define( 'ESPRESSO_MAILCHIMP_BASE_NAME', plugin_basename(__FILE__) );
+define('ESPRESSO_MAILCHIMP_VERSION', '2.4.1.rc.012');
+define('ESPRESSO_MAILCHIMP_MAIN_FILE', __FILE__);
+define('ESPRESSO_MAILCHIMP_DIR', plugin_dir_path(__FILE__));
+define('ESPRESSO_MAILCHIMP_BASE_NAME', plugin_basename(__FILE__));
 // Register and run MC Integration if EE4 is Active.
-function load_ee4_espresso_mailchimp_class() {
- 	if ( class_exists( 'EE_Addon' )) {
-		// ...and register our add-on.
-		require_once( plugin_dir_path( __FILE__ ) . 'EE_MailChimp.class.php' );
-		EE_MailChimp::register_addon();
-	}
+function load_ee4_espresso_mailchimp_class()
+{
+    if (class_exists('EE_Addon')) {
+        // ...and register our add-on.
+        require_once(plugin_dir_path(__FILE__) . 'EE_MailChimp.class.php');
+        EE_MailChimp::register_addon();
+    }
 }
-add_action( 'AHEE__EE_System__load_espresso_addons', 'load_ee4_espresso_mailchimp_class', 11 );
+
+add_action('AHEE__EE_System__load_espresso_addons', 'load_ee4_espresso_mailchimp_class', 11);
