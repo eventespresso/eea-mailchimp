@@ -1,18 +1,5 @@
-<?php if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) { exit('No direct script access allowed'); }
+<?php
 /**
- * Event Espresso
- *
- * Event Registration and Management Plugin for WordPress
- *
- * @ package        Event Espresso
- * @ author         Event Espresso
- * @ copyright (c)  2008-2014 Event Espresso  All Rights Reserved.
- * @ license        http://eventespresso.com/support/terms-conditions/   * see Plugin Licensing *
- * @ link           http://www.eventespresso.com
- * @ version        EE4
- *
- * ------------------------------------------------------------------------
- *
  * Class  EEM_Question_Mailchimp_Field
  *
  * @package         Event Espresso
@@ -22,13 +9,14 @@
  */
 
 
-class EEM_Question_Mailchimp_Field extends EEM_Base {
+class EEM_Question_Mailchimp_Field extends EEM_Base
+{
 
     /**
      * Instance of the Attendee object
      * @access private
      */
-    protected static $_instance = NULL;
+    protected static $_instance = null;
 
     /**
      * This funtion is a singleton method used to instantiate the EEM_Question_Mailchimp_Field object
@@ -36,18 +24,20 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
      * @access public
      * @return EEM_Question_Mailchimp_Field instance
      */
-    public static function instance( $timezone = NULL ) {
+    public static function instance($timezone = null)
+    {
         // Check if instance of EEM_Question_Mailchimp_Field already exists.
-        if ( self::$_instance === NULL ) {
+        if (self::$_instance === null) {
             // Instantiate Espresso_model.
-            self::$_instance = new self( $timezone );
+            self::$_instance = new self($timezone);
         }
-		self::$_instance->set_timezone( $timezone );
+        self::$_instance->set_timezone($timezone);
         // EEM_Question_Mailchimp_Field object
         return self::$_instance;
     }
 
-    protected function __construct( $timezone = NULL ) {
+    protected function __construct($timezone = null)
+    {
         $this->singular_item = __('Mailchimp List Group', 'event_espresso');
         $this->plural_item = __('Mailchimp List Groups', 'event_espresso');
         $this->_tables = array(
@@ -64,20 +54,18 @@ class EEM_Question_Mailchimp_Field extends EEM_Base {
         $this->_model_relations = array(
             'Event' => new EE_Belongs_To_Relation()
         );
-        parent::__construct( $timezone );
+        parent::__construct($timezone);
     }
 
 
     /**
      * resets the model and returns it
-     * 
+     *
      * @return EEM_Question_Mailchimp_Field
      */
-    public static function reset( $timezone = NULL ) {
-        self::$_instance = NULL;
+    public static function reset($timezone = null)
+    {
+        self::$_instance = null;
         return self::instance();
     }
-
 }
-
-?>
