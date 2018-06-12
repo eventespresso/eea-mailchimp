@@ -122,8 +122,10 @@ class EE_MCI_Controller
         // Check if key is live/acceptable by API.
         try {
             $this->MailChimp = new MailChimp($api_key);
-            $parameters = apply_filters('AHEE__EE_MCI_Controller__mci_is_api_key_valid__parameters',
-                array('fields' => 'account_id,account_name,email,username'));
+            $parameters = apply_filters(
+                'AHEE__EE_MCI_Controller__mci_is_api_key_valid__parameters',
+                array('fields' => 'account_id,account_name,email,username')
+            );
             $reply = $this->MailChimp->get('', $parameters);
         } catch (Exception $e) {
             $this->set_error($e);
@@ -159,8 +161,10 @@ class EE_MCI_Controller
         if ($spco_obj instanceof EE_SPCO_Reg_Step_Attendee_Information) {
             // for EE versions > 4.6
             if ($spco_obj->checkout instanceof EE_Checkout && $spco_obj->checkout->transaction instanceof EE_Transaction) {
-                $spco_registrations = $spco_obj->checkout->transaction->registrations($spco_obj->checkout->reg_cache_where_params,
-                    true);
+                $spco_registrations = $spco_obj->checkout->transaction->registrations(
+                    $spco_obj->checkout->reg_cache_where_params,
+                    true
+                );
                 $spco_transaction = $spco_obj->checkout->transaction;
             }
         } elseif ($spco_obj instanceof EED_Single_Page_Checkout) {
@@ -227,25 +231,36 @@ class EE_MCI_Controller
 
                         $attendee = $registration->attendee();
                         $att_email = $attendee->email();
-                        if (($attendee instanceof EE_Attendee) && ! in_array($att_email,
-                                $registered_attendees) && (! $need_reg_status || $need_reg_status && $reg_approved)) {
-                            $opt_in = isset($this->_config->api_settings->skip_double_optin) ? $this->_config->api_settings->skip_double_optin : true;
-                            $emails_type = isset($this->_config->api_settings->emails_type) ? $this->_config->api_settings->emails_type : 'text';
+                        if (($attendee instanceof EE_Attendee) && ! in_array(
+                            $att_email,
+                            $registered_attendees
+                        ) && (! $need_reg_status || $need_reg_status && $reg_approved)) {
+                            $opt_in = isset($this->_config->api_settings->skip_double_optin)
+                                ? $this->_config->api_settings->skip_double_optin : true;
+                            $emails_type = isset($this->_config->api_settings->emails_type)
+                                ? $this->_config->api_settings->emails_type : 'text';
                             $subscribe_args = array(
                                 'email_address' => $att_email,
                             );
                             // Group vars
                             $subscribe_args = $this->_add_event_group_vars_to_subscribe_args($EVT_ID, $subscribe_args);
                             // Question fields
-                            $subscribe_args = $this->_add_registration_question_answers_to_subscribe_args($registration,
-                                $EVT_ID, $subscribe_args);
+                            $subscribe_args = $this->_add_registration_question_answers_to_subscribe_args(
+                                $registration,
+                                $EVT_ID,
+                                $subscribe_args
+                            );
 
                             // For backwards compatibility reasons only (for this next filter below)
                             $subscribe_args['merge_vars'] = $subscribe_args['merge_fields'];
                             unset($subscribe_args['merge_fields']);
                             // filter it
-                            $subscribe_args = apply_filters('FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args',
-                                $subscribe_args, $registration, $EVT_ID);
+                            $subscribe_args = apply_filters(
+                                'FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__subscribe_args',
+                                $subscribe_args,
+                                $registration,
+                                $EVT_ID
+                            );
                             // Old version used 'merge_vars' but API v3 calls them 'merge_fields'
                             $subscribe_args['merge_fields'] = $subscribe_args['merge_vars'];
                             unset($subscribe_args['merge_vars']);
@@ -259,10 +274,16 @@ class EE_MCI_Controller
                             }
                             try {
                                 // Get member info if exists.
-                                $member_subscribed = $this->MailChimp->get('/lists/' . $event_list . '/members/' . $this->MailChimp->subscriberHash($att_email),
-                                    array('fields' => 'id,email_address,status'));
-                                if (isset($member_subscribed['email_address']) && isset($member_subscribed['status']) && ! preg_match('/^(4|5)\d{2}$/',
-                                        $member_subscribed['status'])) {
+                                $member_subscribed = $this->MailChimp->get(
+                                    '/lists/' . $event_list . '/members/' . $this->MailChimp->subscriberHash(
+                                        $att_email
+                                    ),
+                                    array('fields' => 'id,email_address,status')
+                                );
+                                if (isset($member_subscribed['email_address']) && isset($member_subscribed['status']) && ! preg_match(
+                                    '/^(4|5)\d{2}$/',
+                                    $member_subscribed['status']
+                                )) {
                                     $subscribe_args['status'] = $member_subscribed['status'];
                                 }
                                 // Send opt-in emails ?
@@ -274,8 +295,12 @@ class EE_MCI_Controller
                                 // What type of emails we want to send ?
                                 $subscribe_args['email_type'] = $emails_type;
                                 // Add/update member.
-                                $put_member = $this->MailChimp->put('/lists/' . $event_list . '/members/' . $this->MailChimp->subscriberHash($att_email),
-                                    $subscribe_args);
+                                $put_member = $this->MailChimp->put(
+                                    '/lists/' . $event_list . '/members/' . $this->MailChimp->subscriberHash(
+                                        $att_email
+                                    ),
+                                    $subscribe_args
+                                );
                                 // Log error.
                                 if (! $this->MailChimp->success()) {
                                     $this->set_error($put_member);
@@ -285,8 +310,10 @@ class EE_MCI_Controller
                                         foreach ($put_member['errors'] as $err) {
                                             $err_msg = isset($err['field'])
                                                 ? sprintf(
-                                                    esc_html__('MailChimp field tagged %1$s had the error: ',
-                                                        'event_espresso'),
+                                                    esc_html__(
+                                                        'MailChimp field tagged %1$s had the error: ',
+                                                        'event_espresso'
+                                                    ),
                                                     $err['field']
                                                 )
                                                 : '';
@@ -300,9 +327,12 @@ class EE_MCI_Controller
                                     $evt_obj = $registration->event();
                                     $evt_permalink = ($evt_obj instanceof EE_Event) ? $evt_obj->get_permalink() : '#';
                                     $notice_msg = sprintf(
-                                        __('This registration could not be subscribed to a MailChimp List with ID: %1$s. There were errors regarding the following: %2$s. 
+                                        __(
+                                            'This registration could not be subscribed to a MailChimp List with ID: %1$s. There were errors regarding the following: %2$s. 
 											Any mandatory or multi-choice fields that are in this MailChimp list require to be paired with Event questions (in this case %3$s event) that correspond by type and possibly by having the same answer values. 
-											If you have further problems please contact support.', 'event_espresso'),
+											If you have further problems please contact support.',
+                                            'event_espresso'
+                                        ),
                                         $event_list,
                                         $errors,
                                         '<a href="' . $evt_permalink . '">' . $registration->event_name() . '</a>'
@@ -380,6 +410,7 @@ class EE_MCI_Controller
         return $subscribe_args;
     }
 
+
     /**
      * _add_registration_question_answers_to_subscribe_args
      *
@@ -423,8 +454,11 @@ class EE_MCI_Controller
     public function mci_get_users_lists()
     {
         do_action('AHEE__EE_MCI_Controller__mci_get_users_lists__start');
-        $parameters = apply_filters('FHEE__EE_MCI_Controller__mci_get_users_lists__list_params',
-            array('fields' => 'lists.id,lists.name', 'count' => 100, 'apikey' => $this->_api_key), $this);
+        $parameters = apply_filters(
+            'FHEE__EE_MCI_Controller__mci_get_users_lists__list_params',
+            array('fields' => 'lists.id,lists.name', 'count' => 100, 'apikey' => $this->_api_key),
+            $this
+        );
 
         try {
             $reply = $this->MailChimp->get('lists', $parameters);
@@ -455,8 +489,10 @@ class EE_MCI_Controller
     public function mci_get_users_groups($list_id)
     {
         do_action('AHEE__EE_MCI_Controller__mci_get_users_groups__start');
-        $parameters = apply_filters('AHEE__EE_MCI_Controller__mci_get_users_groups__parameters',
-            array('exclude_fields' => '_links,categories._links', 'count' => 50));
+        $parameters = apply_filters(
+            'AHEE__EE_MCI_Controller__mci_get_users_groups__parameters',
+            array('exclude_fields' => '_links,categories._links', 'count' => 50)
+        );
 
         if ($list_id == null) {
             $list_id = $this->list_id;
@@ -491,8 +527,10 @@ class EE_MCI_Controller
     public function mci_get_interests($list_id, $category_id)
     {
         do_action('AHEE__EE_MCI_Controller__mci_get_interests__start');
-        $parameters = apply_filters('AHEE__EE_MCI_Controller__mci_get_interests__parameters',
-            array('fields' => 'interests', 'exclude_fields' => 'interests._links', 'count' => 100));
+        $parameters = apply_filters(
+            'AHEE__EE_MCI_Controller__mci_get_interests__parameters',
+            array('fields' => 'interests', 'exclude_fields' => 'interests._links', 'count' => 100)
+        );
 
         if ($list_id == null) {
             $list_id = $this->list_id;
@@ -502,8 +540,10 @@ class EE_MCI_Controller
         }
 
         try {
-            $reply = $this->MailChimp->get('lists/' . $list_id . '/interest-categories/' . $category_id . '/interests',
-                $parameters);
+            $reply = $this->MailChimp->get(
+                'lists/' . $list_id . '/interest-categories/' . $category_id . '/interests',
+                $parameters
+            );
         } catch (Exception $e) {
             $this->set_error($e);
             return array();
@@ -530,8 +570,10 @@ class EE_MCI_Controller
     public function mci_get_list_merge_vars($list_id)
     {
         do_action('AHEE__EE_MCI_Controller__mci_get_list_merge_vars__start');
-        $parameters = apply_filters('AHEE__EE_MCI_Controller__mci_get_list_merge_vars__parameters',
-            array('fields' => 'merge_fields', 'exclude_fields' => '_links,merge_fields._links', 'count' => 50));
+        $parameters = apply_filters(
+            'AHEE__EE_MCI_Controller__mci_get_list_merge_vars__parameters',
+            array('fields' => 'merge_fields', 'exclude_fields' => '_links,merge_fields._links', 'count' => 50)
+        );
         if ($list_id == null) {
             $list_id = $this->list_id;
         }
@@ -575,18 +617,25 @@ class EE_MCI_Controller
             return $metabox_obj->get_html_and_js();
         } else {
             $error_section = new EE_Form_Section_HTML(
-                EEH_HTML::div(EEH_HTML::span(esc_html__('Invalid MailChimp API.', 'event_espresso'),
-                        'important_mc_notice', 'important-notice') .
-                              EEH_HTML::br() .
-                              esc_html__('Please visit the ', 'event_espresso') .
-                              EEH_HTML::link(admin_url('admin.php?page=mailchimp'),
-                                  esc_html__('MailChimp Admin Page ', 'event_espresso')) .
-                              esc_html__('to correct the issue.', 'event_espresso'),
-                    'no-lists-found-notice', 'espresso_mailchimp_integration_metabox')
+                EEH_HTML::div(
+                    EEH_HTML::span(
+                        esc_html__('Invalid MailChimp API.', 'event_espresso'),
+                        'important_mc_notice',
+                        'important-notice'
+                    ) .
+                    EEH_HTML::br() .
+                    esc_html__('Please visit the ', 'event_espresso') .
+                    EEH_HTML::link(
+                        admin_url('admin.php?page=mailchimp'),
+                        esc_html__('MailChimp Admin Page ', 'event_espresso')
+                    ) .
+                    esc_html__('to correct the issue.', 'event_espresso'),
+                    'no-lists-found-notice',
+                    'espresso_mailchimp_integration_metabox'
+                )
             );
             return $error_section->get_html_and_js();
         }
-
     }
 
 
@@ -658,7 +707,9 @@ class EE_MCI_Controller
 
         $qf_exists = EEM_Question_Mailchimp_Field::instance()->get_all(array(array('EVT_ID' => $event_id)));
         // Question Fields
-        if (isset($_POST['ee_mailchimp_qfields']) && is_array($_POST['ee_mailchimp_qfields']) && ! empty($_POST['ee_mailchimp_qfields'])) {
+        if (isset($_POST['ee_mailchimp_qfields']) && is_array(
+            $_POST['ee_mailchimp_qfields']
+        ) && ! empty($_POST['ee_mailchimp_qfields'])) {
             $qfields_list = $_POST['ee_mailchimp_qfields'];
             $list_form_rel = array();
             foreach ($qfields_list as $mc_question) {
@@ -670,7 +721,8 @@ class EE_MCI_Controller
                     $q_found = false;
                     // Update already present Q fields.
                     foreach ($qf_exists as $question_field) {
-                        $mc_field = $question_field instanceof EE_Question_Mailchimp_Field ? $question_field->mc_field() : '';
+                        $mc_field = $question_field instanceof EE_Question_Mailchimp_Field ? $question_field->mc_field()
+                            : '';
                         if ($mc_field == $mc_question) {
                             EEM_Question_Mailchimp_Field::instance()->update(
                                 array('QST_ID' => $ev_question),
@@ -691,12 +743,14 @@ class EE_MCI_Controller
                         $new_qfield->save();
                     }
                 } else {
-                    $mcqe = EEM_Question_Mailchimp_Field::instance()->get_one(array(
+                    $mcqe = EEM_Question_Mailchimp_Field::instance()->get_one(
                         array(
-                            'EVT_ID'                 => $event_id,
-                            'QMC_mailchimp_field_id' => $mc_question,
-                        ),
-                    ));
+                            array(
+                                'EVT_ID'                 => $event_id,
+                                'QMC_mailchimp_field_id' => $mc_question,
+                            ),
+                        )
+                    );
                     if ($mcqe != null) {
                         $mcqe->delete();
                     }
@@ -849,10 +903,12 @@ class EE_MCI_Controller
     public function mci_event_list($EVT_ID)
     {
         EE_Registry::instance()->load_model('Event_Mailchimp_List_Group');
-        $event_list = EEM_Event_Mailchimp_List_Group::instance()->get_all(array(
-            array('EVT_ID' => $EVT_ID),
-            'limit' => 1,
-        ));
+        $event_list = EEM_Event_Mailchimp_List_Group::instance()->get_all(
+            array(
+                array('EVT_ID' => $EVT_ID),
+                'limit' => 1,
+            )
+        );
         $event_list = reset($event_list);
         return $event_list instanceof EE_Event_Mailchimp_List_Group ? $event_list->mc_list() : null;
     }
@@ -925,7 +981,7 @@ class EE_MCI_Controller
      * Get MailChimp list or groups or question fields relationships, set for given event.
      *
      * @access public
-     * @param int $EVT_ID The ID of the Event.
+     * @param int $EVT_ID    The ID of the Event.
      * @return array/string  Id of a group/list or an array of 'List fields - Event questions' relationships, or all in
      *                       an array.
      */
@@ -1012,11 +1068,13 @@ class EE_MCI_Controller
                     $list_and_interest = explode('-', $event_interest);
                     // Double check just in case we do get one already updated field.
                     if (isset($list_and_interest[3]) && ($list_and_interest[3] === 'true' || $list_and_interest[3] === 'false')) {
-                        $new_list_interest = EE_Event_Mailchimp_List_Group::new_instance(array(
-                            'EVT_ID'                 => $EVT_ID,
-                            'AMC_mailchimp_list_id'  => $list_id,
-                            'AMC_mailchimp_group_id' => $event_interest,
-                        ));
+                        $new_list_interest = EE_Event_Mailchimp_List_Group::new_instance(
+                            array(
+                                'EVT_ID'                 => $EVT_ID,
+                                'AMC_mailchimp_list_id'  => $list_id,
+                                'AMC_mailchimp_group_id' => $event_interest,
+                            )
+                        );
                         $new_list_interest->save();
                         continue;
                     }
@@ -1025,14 +1083,16 @@ class EE_MCI_Controller
                     if (! empty($interest_data) && is_array($interest_data)) {
                         // Update current row data.
                         $list_group_id = $interest_data['id']
-                            . '-' . $interest_data['category_id']
-                            . '-' . base64_encode($interest_data['name'])
-                            . '-true';
-                        $new_list_interest = EE_Event_Mailchimp_List_Group::new_instance(array(
-                            'EVT_ID'                 => $EVT_ID,
-                            'AMC_mailchimp_list_id'  => $list_id,
-                            'AMC_mailchimp_group_id' => $list_group_id,
-                        ));
+                                         . '-' . $interest_data['category_id']
+                                         . '-' . base64_encode($interest_data['name'])
+                                         . '-true';
+                        $new_list_interest = EE_Event_Mailchimp_List_Group::new_instance(
+                            array(
+                                'EVT_ID'                 => $EVT_ID,
+                                'AMC_mailchimp_list_id'  => $list_id,
+                                'AMC_mailchimp_group_id' => $list_group_id,
+                            )
+                        );
                         $new_list_interest->save();
                         $saved_interests[] = $interest_data['id'];
                     }
@@ -1046,14 +1106,16 @@ class EE_MCI_Controller
                         }
                         // Add these as not selected.
                         $lg_id = $mss_interest['id']
-                            . '-' . $mss_interest['category_id']
-                            . '-' . base64_encode($mss_interest['name'])
-                            . '-false';
-                        $new_list_interest = EE_Event_Mailchimp_List_Group::new_instance(array(
-                            'EVT_ID'                 => $EVT_ID,
-                            'AMC_mailchimp_list_id'  => $list_id,
-                            'AMC_mailchimp_group_id' => $lg_id,
-                        ));
+                                 . '-' . $mss_interest['category_id']
+                                 . '-' . base64_encode($mss_interest['name'])
+                                 . '-false';
+                        $new_list_interest = EE_Event_Mailchimp_List_Group::new_instance(
+                            array(
+                                'EVT_ID'                 => $EVT_ID,
+                                'AMC_mailchimp_list_id'  => $list_id,
+                                'AMC_mailchimp_group_id' => $lg_id,
+                            )
+                        );
                         $new_list_interest->save();
                         $saved_interests[] = $mss_interest['id'];
                     }
@@ -1061,11 +1123,13 @@ class EE_MCI_Controller
             } else {
                 // Looks like there are no interests for this list.
                 // So we should just add the Event List relation with no interests.
-                $new_list_interest = EE_Event_Mailchimp_List_Group::new_instance(array(
-                    'EVT_ID'                 => $EVT_ID,
-                    'AMC_mailchimp_list_id'  => $list_id,
-                    'AMC_mailchimp_group_id' => '-1',
-                ));
+                $new_list_interest = EE_Event_Mailchimp_List_Group::new_instance(
+                    array(
+                        'EVT_ID'                 => $EVT_ID,
+                        'AMC_mailchimp_list_id'  => $list_id,
+                        'AMC_mailchimp_group_id' => '-1',
+                    )
+                );
                 $new_list_interest->save();
             }
         }
@@ -1089,8 +1153,12 @@ class EE_MCI_Controller
             $error['body'] = $reply->getTraceAsString();
         } elseif (is_array($reply)) {
             $error['code'] = (isset($reply['status'])) ? $reply['status'] : 0;
-            $error['msg'] = (isset($reply['title'])) ? $reply['title'] : __('Unknown MailChimp Error.',
-                'event_espresso');
+            $error['msg'] = (isset($reply['title']))
+                ? $reply['title']
+                : __(
+                    'Unknown MailChimp Error.',
+                    'event_espresso'
+                );
             $error['body'] = (isset($reply['detail'])) ? $reply['detail'] : '';
         } else {
             $error['code'] = 0;
