@@ -2,7 +2,6 @@
 	"versionFile": "ee4-mailchimp.php",
 	"slug": "eea-mailchimp",
 	"name": "EE4 Mailchimp",
-	"jsBuildDirectory": ".\/",
 	"wpi18nJsPotFilePath": ".\/languages\/ee-js.pot",
 	"releaseFilesRemove": [
 		"src\/tests\/**",
