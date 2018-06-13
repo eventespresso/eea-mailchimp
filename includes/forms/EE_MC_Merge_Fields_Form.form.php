@@ -56,7 +56,7 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper
      * @param string            $list_id
      * @return EE_Form_Section_Proper
      */
-    function __construct(EE_MCI_Controller $mc_controller, $event_id, $list_id)
+    public function __construct(EE_MCI_Controller $mc_controller, $event_id, $list_id)
     {
         $this->_mc_controller = $mc_controller;
         $this->_list_id = $list_id;
@@ -94,8 +94,16 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper
                 // This is new event so no data.
                 $m_fields['no_data'] = new EE_Form_Section_HTML('');
             } else {
-                $m_fields['no_lists'] = new EE_Form_Section_HTML(EEH_HTML::p(esc_html__('Sorry, no merge fields found!',
-                    'event_espresso'), 'no-lists-found-notice', 'important-notice'));
+                $m_fields['no_lists'] = new EE_Form_Section_HTML(
+                    EEH_HTML::p(
+                        esc_html__(
+                            'Sorry, no merge fields found!',
+                            'event_espresso'
+                        ),
+                        'no-lists-found-notice',
+                        'important-notice'
+                    )
+                );
             }
             $options['subsections'] = $m_fields;
         } else {
@@ -141,15 +149,20 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper
                 $fields_list[ $q_field['QST_ID'] ] = $q_field['QST_name'];
 
                 // Default to main fields if exist.
-                if (
-                    (isset($l_field['tag'], $selected_fields[ $l_field['tag'] ])
+                if ((isset($l_field['tag'], $selected_fields[ $l_field['tag'] ])
                      && ($selected_fields[ $l_field['tag'] ] == $q_field['QST_ID'] || $selected_fields[ $l_field['tag'] ] == $q_field['QST_system']))
-                    || (($q_field['QST_system'] == 'email' || $q_field['QST_ID'] == 3) && $l_field['tag'] == 'EMAIL' && ! array_key_exists('EMAIL',
-                            $selected_fields))
-                    || (($q_field['QST_system'] == 'lname' || $q_field['QST_ID'] == 2) && $l_field['tag'] == 'LNAME' && ! array_key_exists('LNAME',
-                            $selected_fields))
-                    || (($q_field['QST_system'] == 'fname' || $q_field['QST_ID'] == 1) && $l_field['tag'] == 'FNAME' && ! array_key_exists('FNAME',
-                            $selected_fields))
+                    || (($q_field['QST_system'] == 'email' || $q_field['QST_ID'] == 3) && $l_field['tag'] == 'EMAIL' && ! array_key_exists(
+                        'EMAIL',
+                        $selected_fields
+                    ))
+                    || (($q_field['QST_system'] == 'lname' || $q_field['QST_ID'] == 2) && $l_field['tag'] == 'LNAME' && ! array_key_exists(
+                        'LNAME',
+                        $selected_fields
+                    ))
+                    || (($q_field['QST_system'] == 'fname' || $q_field['QST_ID'] == 1) && $l_field['tag'] == 'FNAME' && ! array_key_exists(
+                        'FNAME',
+                        $selected_fields
+                    ))
                 ) {
                     $selected = $q_field['QST_ID'];
                 }
@@ -170,11 +183,13 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper
             );
 
             // Need to pass all fields that are available.
-            $subsactions[ 'hdn-qf-' . $l_field['tag'] ] = new EE_Hidden_Input(array(
-                'html_name' => 'ee_mailchimp_qfields[]',
-                'html_id'   => 'ee-mc-qf-' . $l_field['tag'],
-                'default'   => $l_field['tag'],
-            ));
+            $subsactions[ 'hdn-qf-' . $l_field['tag'] ] = new EE_Hidden_Input(
+                array(
+                    'html_name' => 'ee_mailchimp_qfields[]',
+                    'html_id'   => 'ee-mc-qf-' . $l_field['tag'],
+                    'default'   => $l_field['tag'],
+                )
+            );
         }
 
         return $subsactions;
