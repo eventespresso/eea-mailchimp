@@ -329,8 +329,8 @@ class EE_MCI_Controller
                                     $notice_msg = sprintf(
                                         __(
                                             'This registration could not be subscribed to a MailChimp List with ID: %1$s. There were errors regarding the following: %2$s. 
-											Any mandatory or multi-choice fields that are in this MailChimp list require to be paired with Event questions (in this case %3$s event) that correspond by type and possibly by having the same answer values. 
-											If you have further problems please contact support.',
+                                            Any mandatory or multi-choice fields that are in this MailChimp list require to be paired with Event questions (in this case %3$s event) that correspond by type and possibly by having the same answer values. 
+                                            If you have further problems please contact support.',
                                             'event_espresso'
                                         ),
                                         $event_list,
@@ -1133,6 +1133,24 @@ class EE_MCI_Controller
                 $new_list_interest->save();
             }
         }
+
+        // Check the list question fields.
+        // If the MC email (MERGE0) field was mapped to a different form input, remove that override.
+        $mc_field_to_ee_q_map = $this->mci_event_list_question_fields($EVT_ID);
+        if (array_key_exists('EMAIL', $mc_field_to_ee_q_map)) {
+            $mcqe = EEM_Question_Mailchimp_Field::instance()->get_one(
+                array(
+                    array(
+                        'EVT_ID'                 => $EVT_ID,
+                        'QMC_mailchimp_field_id' => 'EMAIL',
+                    ),
+                )
+            );
+            if ($mcqe != null) {
+                $mcqe->delete();
+            }
+        }
+
         // Remember this event's MailChimp list data has been verified. No need to do it again
         $event->update_extra_meta(EE_MCI_Controller::UPDATED_TO_API_V3, true);
     }
