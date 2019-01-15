@@ -1138,7 +1138,7 @@ class EE_MCI_Controller
         // If the MC email (MERGE0) field was mapped to a different form input, remove that override.
         $mc_field_to_ee_q_map = $this->mci_event_list_question_fields($EVT_ID);
         if (array_key_exists('EMAIL', $mc_field_to_ee_q_map)) {
-            $mcqe = EEM_Question_Mailchimp_Field::instance()->get_one(
+            $mcqe_deleted = EEM_Question_Mailchimp_Field::instance()->delete(
                 array(
                     array(
                         'EVT_ID'                 => $EVT_ID,
@@ -1146,9 +1146,6 @@ class EE_MCI_Controller
                     ),
                 )
             );
-            if ($mcqe != null) {
-                $mcqe->delete();
-            }
         }
 
         // Remember this event's MailChimp list data has been verified. No need to do it again
