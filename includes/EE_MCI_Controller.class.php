@@ -234,6 +234,7 @@ class EE_MCI_Controller
                         if(! $attendee instanceof EE_Attendee) {
                             continue;
                         }
+                        $att_email = $attendee->email();
                         if (! in_array(
                             $att_email,
                             $registered_attendees
