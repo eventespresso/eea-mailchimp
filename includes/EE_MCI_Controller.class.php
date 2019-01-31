@@ -228,10 +228,13 @@ class EE_MCI_Controller
                                 $reg_approved = true;
                             }
                         }
-
+                        // Pull the EE_Attendee object for the registration
                         $attendee = $registration->attendee();
-                        $att_email = $attendee->email();
-                        if (($attendee instanceof EE_Attendee) && ! in_array(
+                        // If no EE_Attendee object, skip the subcribe call to MailChimp.
+                        if(! $attendee instanceof EE_Attendee) {
+                            continue;
+                        }
+                        if (! in_array(
                             $att_email,
                             $registered_attendees
                         ) && (! $need_reg_status || $need_reg_status && $reg_approved)) {
