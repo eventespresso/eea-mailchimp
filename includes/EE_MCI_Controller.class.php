@@ -231,7 +231,7 @@ class EE_MCI_Controller
                         // Pull the EE_Attendee object for the registration
                         $attendee = $registration->attendee();
                         // If no EE_Attendee object, skip the subcribe call to MailChimp.
-                        if(! $attendee instanceof EE_Attendee) {
+                        if (! $attendee instanceof EE_Attendee) {
                             continue;
                         }
                         $att_email = $attendee->email();
