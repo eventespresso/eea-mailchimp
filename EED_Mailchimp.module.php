@@ -47,6 +47,7 @@ class EED_Mailchimp extends EED_Module
 // 'MailChimp List' option
         add_action('add_meta_boxes', array('EED_Mailchimp', 'espresso_mailchimp_list_metabox'));
         add_action('save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event'));
+        add_action('AHEE__Extend_Events_Admin_Page___duplicate_event__after', array('EED_Mailchimp', 'espresso_mailchimp_duplicate_event'), 10, 2);
 // Ajax for MailChimp groups refresh
         add_action('wp_ajax_espresso_mailchimp_update_groups', array('EED_Mailchimp', 'espresso_mailchimp_update_groups'));
 // Ajax for MailChimp list fields refresh
