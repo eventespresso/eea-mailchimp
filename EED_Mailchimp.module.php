@@ -235,6 +235,45 @@ class EED_Mailchimp extends EED_Module
     }
 
     /**
+     * Duplicate the meta when the post is duplicated.
+     *
+     * @param EE_Event $new_event The new EE Event object.
+     * @param EE_Event $orig_event The original EE Event object.
+     * @return void
+     */
+    public static function espresso_mailchimp_duplicate_event($new_event, $orig_event)
+    {
+        // Pull the original event's MailChimp relationships
+        $mci_controller = new EE_MCI_Controller();
+        $mci_event_subscriptions = $mci_controller->mci_event_subscriptions( $orig_event->ID() );
+        // Check if the original event is linked to a list
+        if(!empty($mci_event_subscriptions['list'])){
+            // Event is linked to a list, duplicate the mailchimp selected groups.
+            foreach($mci_event_subscriptions['groups'] as $group) {
+                $dupe_list_interest = EE_Event_Mailchimp_List_Group::new_instance(
+                    array(
+                        'EVT_ID'                 => $new_event->ID(),
+                        'AMC_mailchimp_list_id'  => $mci_event_subscriptions['list'],
+                        'AMC_mailchimp_group_id' => $group,
+                    )
+                );
+                $dupe_list_interest->save();
+            }
+            // Duplicate the mailchimp and event question relationships.
+            foreach($mci_event_subscriptions['qfields'] as $mailchimp_question => $event_question_id) {
+                $dupe_qfield = EE_Question_Mailchimp_Field::new_instance(
+                    array(
+                        'EVT_ID'                 => $new_event->ID(),
+                        'QST_ID'                 => $event_question_id,
+                        'QMC_mailchimp_field_id' => $mailchimp_question,
+                    )
+                );
+                $dupe_qfield->save();
+            }
+        }
+    }
+
+    /**
      * Add 'MailChimp List' option (metabox) to events admin (add/edit) page (if the API Key is valid).
      *
      * @access public
