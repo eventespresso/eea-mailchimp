@@ -245,11 +245,11 @@ class EED_Mailchimp extends EED_Module
     {
         // Pull the original event's MailChimp relationships
         $mci_controller = new EE_MCI_Controller();
-        $mci_event_subscriptions = $mci_controller->mci_event_subscriptions( $orig_event->ID() );
+        $mci_event_subscriptions = $mci_controller->mci_event_subscriptions($orig_event->ID());
         // Check if the original event is linked to a list
-        if(!empty($mci_event_subscriptions['list'])){
+        if (!empty($mci_event_subscriptions['list'])) {
             // Event is linked to a list, duplicate the mailchimp selected groups.
-            foreach($mci_event_subscriptions['groups'] as $group) {
+            foreach ($mci_event_subscriptions['groups'] as $group) {
                 $dupe_list_interest = EE_Event_Mailchimp_List_Group::new_instance(
                     array(
                         'EVT_ID'                 => $new_event->ID(),
@@ -260,7 +260,7 @@ class EED_Mailchimp extends EED_Module
                 $dupe_list_interest->save();
             }
             // Duplicate the mailchimp and event question relationships.
-            foreach($mci_event_subscriptions['qfields'] as $mailchimp_question => $event_question_id) {
+            foreach ($mci_event_subscriptions['qfields'] as $mailchimp_question => $event_question_id) {
                 $dupe_qfield = EE_Question_Mailchimp_Field::new_instance(
                     array(
                         'EVT_ID'                 => $new_event->ID(),
