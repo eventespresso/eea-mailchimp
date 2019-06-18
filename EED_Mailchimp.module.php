@@ -47,6 +47,7 @@ class EED_Mailchimp extends EED_Module
 // 'MailChimp List' option
         add_action('add_meta_boxes', array('EED_Mailchimp', 'espresso_mailchimp_list_metabox'));
         add_action('save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event'));
+        add_action('AHEE__Extend_Events_Admin_Page___duplicate_event__after', array('EED_Mailchimp', 'espresso_mailchimp_duplicate_event'), 10, 2);
 // Ajax for MailChimp groups refresh
         add_action('wp_ajax_espresso_mailchimp_update_groups', array('EED_Mailchimp', 'espresso_mailchimp_update_groups'));
 // Ajax for MailChimp list fields refresh
@@ -231,6 +232,56 @@ class EED_Mailchimp extends EED_Module
         $mci_controller = new EE_MCI_Controller();
         $mci_controller->mci_save_metabox_contents($event_id);
         return $event_id;
+    }
+
+    /**
+     * Duplicate the meta when the post is duplicated.
+     *
+     * @param EE_Event $new_event The new EE Event object.
+     * @param EE_Event $orig_event The original EE Event object.
+     * @return void
+     */
+    public static function espresso_mailchimp_duplicate_event($new_event, $orig_event)
+    {
+        // Pull the original event's MailChimp relationships
+        $mci_controller = new EE_MCI_Controller();
+        $mci_event_subscriptions = $mci_controller->mci_event_subscriptions($orig_event->ID());
+        // Check if the original event is linked to a list
+        if (!empty($mci_event_subscriptions['list'])) {
+            if (!empty($mci_event_subscriptions['groups'])) {
+                // Event is linked to a list, duplicate the mailchimp selected groups.
+                foreach ($mci_event_subscriptions['groups'] as $group) {
+                    $dupe_list_interest = EE_Event_Mailchimp_List_Group::new_instance(
+                        array(
+                            'EVT_ID'                 => $new_event->ID(),
+                            'AMC_mailchimp_list_id'  => $mci_event_subscriptions['list'],
+                            'AMC_mailchimp_group_id' => $group,
+                        )
+                    );
+                    $dupe_list_interest->save();
+                }
+            } else {
+                $dupe_list_group = EE_Event_Mailchimp_List_Group::new_instance(
+                    array(
+                        'EVT_ID'                 => $new_event->ID(),
+                        'AMC_mailchimp_list_id'  => $mci_event_subscriptions['list'],
+                        'AMC_mailchimp_group_id' => -1,
+                    )
+                );
+                $dupe_list_group->save();
+            }
+            // Duplicate the mailchimp and event question relationships.
+            foreach ($mci_event_subscriptions['qfields'] as $mailchimp_question => $event_question_id) {
+                $dupe_qfield = EE_Question_Mailchimp_Field::new_instance(
+                    array(
+                        'EVT_ID'                 => $new_event->ID(),
+                        'QST_ID'                 => $event_question_id,
+                        'QMC_mailchimp_field_id' => $mailchimp_question,
+                    )
+                );
+                $dupe_qfield->save();
+            }
+        }
     }
 
     /**
