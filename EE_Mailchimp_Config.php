@@ -98,6 +98,7 @@ class EE_Mailchimp_Config_Api_Settings extends EE_Config_Base
         $this->skip_double_optin = true;
         $this->mc_active = false;
         $this->submit_to_mc_when = 'reg-step-approved';
+        $this->subscribe_att_choice = 'mc_always_subscribe';
         $this->emails_type = 'html';
     }
 }
