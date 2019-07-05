@@ -69,6 +69,13 @@ class EED_Mailchimp extends EED_Module
         }
         // add a different log type
         add_filter('FHEE__EE_Enum_Text_Field___allowed_enum_options', array( 'EED_Mailchimp', 'add_log_type' ), 10, 2);
+
+        // Add Opt-in question. 
+        if ($mc_config->api_settings->subscribe_att_choice === 'mc_att_choice_subscribe' ) { 
+            add_filter('FHEE__EEM_Question__system_questions_allowed_in_system_question_group__return', array('EED_Mailchimp', 'allow_mc_extra_in_system'), 10, 2 ); 
+            add_filter('FHEE__EE_SPCO_Reg_Step_Attendee_Information___save_registration_form_input', array('EED_Mailchimp', 'save_registration_mc_optin_form_input'), 10, 5);
+            EED_Mailchimp::add_mc_extra_question(); 
+        }
     }
 
 
@@ -79,9 +86,19 @@ class EED_Mailchimp extends EED_Module
      */
     public static function setup_mc_defaults()
     {
+        $config_changed = false;
         $mc_config = EED_Mailchimp::get_config();
+        // Set the default value for when subscribe the registrant to when the registrations has been approved. 
         if (! isset($mc_config->api_settings->submit_to_mc_when) || empty($mc_config->api_settings->submit_to_mc_when)) {
             $mc_config->api_settings->submit_to_mc_when = 'reg-step-approved';
+            $config_changed = true;
+        }
+        // Set the default for the "subscribe me" MC option. 
+        if (! isset($mc_config->api_settings->subscribe_att_choice) ) { 
+            $mc_config->api_settings->subscribe_att_choice = 'mc_always_subscribe'; 
+            $config_changed = true;
+        }
+        if ($config_changed) {
             EED_Mailchimp::update_config($mc_config);
         }
         return $mc_config;
