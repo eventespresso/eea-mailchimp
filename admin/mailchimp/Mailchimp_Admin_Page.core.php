@@ -136,6 +136,18 @@ class Mailchimp_Admin_Page extends EE_Admin_Page
         $config = EED_Mailchimp::get_config();
         // d( $config );
         $this->_template_args['mailchimp_double_opt_check'] =  isset($config->api_settings->skip_double_optin) && $config->api_settings->skip_double_optin === false ? 'checked="checked"' : '';
+        $this->_template_args['mc_att_choice_subscribe'] = $this->_template_args['mc_always_subscribe'] = '';
+        switch ($config->api_settings->subscribe_att_choice) {
+            case 'mc_att_choice_subscribe':
+                $this->_template_args['mc_att_choice_subscribe'] = 'selected';
+                break;
+            case 'mc_always_subscribe':
+                $this->_template_args['mc_always_subscribe'] = 'selected';
+                break;
+            default:
+                $this->_template_args['mc_always_subscribe'] = 'selected';
+                break;
+        }
         // When do we want to submit the registrant to the MC.
         $this->_template_args['submit_to_mc_end'] = $this->_template_args['submit_to_mc_complete'] = $this->_template_args['submit_to_mc_approved'] = '';
         switch ($config->api_settings->submit_to_mc_when) {
