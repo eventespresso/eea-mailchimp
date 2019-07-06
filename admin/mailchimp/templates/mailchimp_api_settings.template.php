@@ -41,6 +41,21 @@
                 </td>
             </tr>
             <tr valign="top">
+                <th><?php _e('Subscribe opt-in:', 'event_espresso'); ?></th>
+                <td>
+                    <select name="subscribe_att_choice">
+                        <option value="mc_always_subscribe" <?php echo $mc_always_subscribe; ?> >Always subscribe all registrations</option>
+                        <option value="mc_att_choice_subscribe" <?php echo $mc_att_choice_subscribe; ?> >Use 'Subscribe me' opt-in question</option>
+                    </select>
+
+                    <p class="description">
+                        <?php
+                            _e('Always subscribe registrations to MailChimp on registration or use an opt-in question?', 'event_espresso');
+                        ?>
+                    </p>
+                </td>
+            </tr>
+            <tr valign="top">
                 <th><?php _e('Email content type:', 'event_espresso'); ?></th>
                 <td>
                     <select name="emails_type">
@@ -59,9 +74,9 @@
                 <th><?php _e('Submit to MailChimp when ...', 'event_espresso'); ?></th>
                 <td>
                     <select name="submit_to_mc_when">
-                        <option value="attendee-information-end" <?php echo $submit_to_mc_end; ?> >subscriber submits information.</option>
-                        <option value="reg-step-completed" <?php echo $submit_to_mc_complete; ?> >registration is completed (payment status does not matter).</option>
-                        <option value="reg-step-approved" <?php echo $submit_to_mc_approved; ?> >registration is completed with an approved status.</option>
+                        <option value="attendee-information-end" <?php echo $submit_to_mc_end; ?> >Subscriber submits information.</option>
+                        <option value="reg-step-completed" <?php echo $submit_to_mc_complete; ?> >Registration is completed (payment status does not matter).</option>
+                        <option value="reg-step-approved" <?php echo $submit_to_mc_approved; ?> >Registration is completed with an approved status.</option>
                     </select>
 
                     <p class="description">
