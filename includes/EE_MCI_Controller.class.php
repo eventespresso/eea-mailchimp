@@ -206,6 +206,7 @@ class EE_MCI_Controller
             $registered_attendees = array();
             // now loop through registrations to get the related attendee objects
             if (! empty($registrations)) {
+                $prime_answers = array();
                 foreach ($registrations as $registration) {
                     if ($registration instanceof EE_Registration) {
                         $EVT_ID = $registration->event_ID();
@@ -218,7 +219,7 @@ class EE_MCI_Controller
                         // Check if the DB data can be safely used with current API.
                         $this->is_db_data_api_compatible($EVT_ID, $event_list);
 
-                        $need_reg_status = $reg_approved = false;
+                        $need_reg_status = $reg_approved = $need_att_choice = $subscribe_att = false;
                         /** @type EE_Mailchimp_Config $mc_config */
                         $mc_config = EED_Mailchimp::get_config();
                         if ($mc_config->api_settings->submit_to_mc_when === 'reg-step-approved') {
@@ -226,6 +227,29 @@ class EE_MCI_Controller
                             $reg_status = $registration->status_ID();
                             if ($reg_status === EEM_Registration::status_id_approved) {
                                 $reg_approved = true;
+                            }
+                        }
+
+                        // Get registration form answers. If secondary registrants have none, then just use the ones the primary registrant has.
+                        if (! empty($registration->answers())) {
+                            $answers = $prime_answers = $registration->answers();
+                        } else {
+                            $answers = $prime_answers;
+                        }
+                        // Check if attendee wants to be subscribed.
+                        if ($mc_config->api_settings->subscribe_att_choice === 'mc_att_choice_subscribe') {
+                            // Opt-in question in use so its up to the attendee if they subscribe.
+                            $need_att_choice = true;
+                            foreach ($answers as $reg_answer) {
+                                $ans_question = $reg_answer->question();
+                                // Check if this is an opt-in question, if so see if its checked.
+                                if ( $ans_question->system_ID() == 'mc-optin' ) {
+                                    // Pull the options for the opt-in question with answer values and compare the two.
+                                    $optin_question_option = EEM_Question_Option::instance()->get_one( array( array( 'QSO_system' => 'mc-optin-me-ok' ) ) );
+                                    $regq_val = $reg_answer->value();
+                                    $checked = ( is_array($regq_val) && ! empty($regq_val) ) ? in_array( $optin_question_option->value(), $regq_val ) : false;
+                                    $subscribe_att = $checked ? true : false;
+                                }
                             }
                         }
                         // Pull the EE_Attendee object for the registration
@@ -238,7 +262,8 @@ class EE_MCI_Controller
                         if (! in_array(
                             $att_email,
                             $registered_attendees
-                        ) && (! $need_reg_status || $need_reg_status && $reg_approved)) {
+                        ) && (! $need_reg_status || $need_reg_status && $reg_approved)
+                        && (! $need_att_choice || ($need_att_choice && $subscribe_att))) {
                             $opt_in = isset($this->_config->api_settings->skip_double_optin)
                                 ? $this->_config->api_settings->skip_double_optin : true;
                             $emails_type = isset($this->_config->api_settings->emails_type)
