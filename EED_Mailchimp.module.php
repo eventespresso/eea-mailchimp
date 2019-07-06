@@ -44,13 +44,13 @@ class EED_Mailchimp extends EED_Module
     {
         EED_Mailchimp::set_eemc_hooks();
         add_action('admin_enqueue_scripts', array( 'EED_Mailchimp', 'mailchimp_link_scripts_styles' ));
-// 'MailChimp List' option
+        // 'MailChimp List' option
         add_action('add_meta_boxes', array('EED_Mailchimp', 'espresso_mailchimp_list_metabox'));
         add_action('save_post', array('EED_Mailchimp', 'espresso_mailchimp_save_event'));
         add_action('AHEE__Extend_Events_Admin_Page___duplicate_event__after', array('EED_Mailchimp', 'espresso_mailchimp_duplicate_event'), 10, 2);
-// Ajax for MailChimp groups refresh
+        // Ajax for MailChimp groups refresh
         add_action('wp_ajax_espresso_mailchimp_update_groups', array('EED_Mailchimp', 'espresso_mailchimp_update_groups'));
-// Ajax for MailChimp list fields refresh
+        // Ajax for MailChimp list fields refresh
         add_action('wp_ajax_espresso_mailchimp_update_list_fields', array('EED_Mailchimp', 'espresso_mailchimp_update_list_fields'));
     }
 
@@ -59,7 +59,7 @@ class EED_Mailchimp extends EED_Module
     {
         // Set defaults.
         $mc_config = EED_Mailchimp::setup_mc_defaults();
-// Hook into the EE _process_attendee_information.
+        // Hook into the EE _process_attendee_information.
         if ($mc_config->api_settings->submit_to_mc_when == 'attendee-information-end') {
             add_action('AHEE__EE_Single_Page_Checkout__process_attendee_information__end', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'), 10, 2);
             remove_action('AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed', array('EED_Mailchimp', 'espresso_mailchimp_submit_to_mc'));
@@ -104,6 +104,99 @@ class EED_Mailchimp extends EED_Module
         return $mc_config;
     }
 
+    /** 
+     * Add MC opt-in question to EE question list. 
+     * 
+     * @return void 
+     */ 
+    public static function add_mc_extra_question() {
+        // Check if there is already an mc-optin question in the system.
+        $question = EEM_Question::instance()->get_one( 
+            array( 
+                array( 
+                    'QST_system' => 'mc-optin' 
+                ), 
+               'default_where_conditions' => 'none'
+            )
+        );
+        // If we already have a question then this option was set before and the question should be in trash.
+        if ( $question instanceof EE_Question ) {
+            $question->set_deleted(false); 
+        } else { 
+            // Create the MailChimp 'Opt-in' question.
+            $question = EE_Question::new_instance( array( 
+                'QST_display_text' => esc_html__('Subscribe to newsletter', 'event_espresso'), 
+                'QST_system' => 'mc-optin', 
+                'QST_admin_label' => esc_html__('Opt-in - System Question', 'event_espresso'), 
+                'QST_type' => EEM_Question::QST_type_checkbox, 
+                'QST_required' => false, 
+                'QST_order' => 12 
+            ));
+            // Add an option to the question. 
+            $qst_answer = EE_Question_Option::new_instance( 
+                array( 'QSO_value' => esc_html__('Subscribe to newsletter', 'event_espresso'), 
+                'QSO_system' => 'mc-optin-me-ok', 
+                'QSO_deleted' => false ) 
+            ); 
+            $question->add_option( $qst_answer );
+        }
+        // A new question would have been created, or set_deleted would have been set to false so we need to save
+        $question->save();
+    }
+ 
+ 
+    /** 
+     * Remove MC opt-in question from EE question list. 
+     * 
+     * @return void 
+     */ 
+    public static function remove_mc_extra_question() {
+        $question = EEM_Question::instance()->get_one(array(array('QST_system' => 'mc-optin')));
+        if ($question instanceof EE_Question) {
+            $question->set_deleted(true);
+            $question->save();
+        }
+    }
+
+ 
+    /** 
+     * Allow MC opt-in question in the system QTS Group. 
+     * 
+     * @param $question_system_ids 
+     * @param $system_question_group_id 
+     * @return void 
+     */ 
+    public static function allow_mc_extra_in_system( $question_system_ids, $system_question_group_id ) { 
+        $question_system_ids[] = 'mc-optin'; 
+        return $question_system_ids; 
+    } 
+
+
+    /** 
+     * Add a default option for Opt-in form question. 
+     * 
+     * @param $processed
+     * @param $registration
+     * @param $form_input
+     * @param $input_value
+     * @param $attendee_info_step
+     * @return bool
+     */ 
+    public static function save_registration_mc_optin_form_input( $processed, $registration, $form_input, $input_value, $attendee_info_step) {
+        //Only process the mc-optin form intput
+        if($form_input == 'mc-optin') {
+            $answers = $registration->answers();
+            $answer_cahce_id = $form_input . '-' . $registration->reg_url_link();
+            if(isset($answers[$answer_cahce_id])){
+                $answer = $answers[$answer_cahce_id];
+                $answer->set_value($input_value);
+                $answer->save();
+            }
+            //Don't prevent registrations regardless of issues with this field.
+            return true;
+        }
+        return $processed;
+    }
 
 
     /**
