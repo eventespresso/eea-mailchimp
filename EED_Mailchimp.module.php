@@ -182,7 +182,7 @@ class EED_Mailchimp extends EED_Module
      * @param $attendee_info_step
      * @return bool
      */ 
-    public static function save_registration_mc_optin_form_input( $processed, $registration, $form_input, $input_value, $attendee_info_step) {
+    public static function save_registration_mc_optin_form_input($processed, $registration, $form_input, $input_value, $attendee_info_step) {
         //Only process the mc-optin form intput
         if ($form_input === 'mc-optin') {
             $answers = $registration->answers();
