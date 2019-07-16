@@ -264,7 +264,7 @@ class EE_MCI_Controller
                         if (! in_array(
                             $att_email,
                             $registered_attendees
-                        ) && (! $need_reg_status || $need_reg_status && $reg_approved)
+                        ) && (! $need_reg_status || ($need_reg_status && $reg_approved))
                         && (! $need_att_choice || ($need_att_choice && $subscribe_att))) {
                             $opt_in = isset($this->_config->api_settings->skip_double_optin)
                                 ? $this->_config->api_settings->skip_double_optin : true;
