@@ -247,7 +247,7 @@ class EE_MCI_Controller
                                     // Pull the options for the opt-in question with answer values and compare the two.
                                     $optin_question_option = EEM_Question_Option::instance()->get_one( array( array( 'QSO_system' => 'mc-optin-me-ok' ) ) );
                                     $regq_val = $reg_answer->value();
-                                    $checked = ( is_array($regq_val) && ! empty($regq_val) ) ? in_array( $optin_question_option->value(), $regq_val ) : false;
+                                    $checked = (is_array($regq_val) && ! empty($regq_val)) ? in_array($optin_question_option->value(), $regq_val) : false;
                                     $subscribe_att = $checked ? true : false;
                                 }
                             }
