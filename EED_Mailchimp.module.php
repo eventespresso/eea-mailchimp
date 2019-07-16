@@ -133,10 +133,12 @@ class EED_Mailchimp extends EED_Module
                 'QST_order' => 12 
             ));
             // Add an option to the question. 
-            $qst_answer = EE_Question_Option::new_instance( 
-                array( 'QSO_value' => esc_html__('Subscribe to newsletter', 'event_espresso'), 
-                'QSO_system' => 'mc-optin-me-ok', 
-                'QSO_deleted' => false ) 
+            $qst_answer = EE_Question_Option::new_instance(
+                array( 
+                    'QSO_value' => esc_html__('Subscribe to newsletter', 'event_espresso'),
+                    'QSO_system' => 'mc-optin-me-ok',
+                    'QSO_deleted' => false
+                )
             ); 
             $question->add_option( $qst_answer );
         }
