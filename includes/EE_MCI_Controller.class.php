@@ -243,7 +243,7 @@ class EE_MCI_Controller
                             foreach ($answers as $reg_answer) {
                                 $ans_question = $reg_answer->question();
                                 // Check if this is an opt-in question, if so see if its checked.
-                                if ( $ans_question->system_ID() == 'mc-optin' ) {
+                                if ($ans_question->system_ID() === 'mc-optin') {
                                     // Pull the options for the opt-in question with answer values and compare the two.
                                     $optin_question_option = EEM_Question_Option::instance()->get_one( array( array( 'QSO_system' => 'mc-optin-me-ok' ) ) );
                                     $regq_val = $reg_answer->value();
