@@ -187,7 +187,7 @@ class EED_Mailchimp extends EED_Module
         if ($form_input === 'mc-optin') {
             $answers = $registration->answers();
             $answer_cahce_id = $form_input . '-' . $registration->reg_url_link();
-            if(isset($answers[$answer_cahce_id])){
+            if (isset($answers[$answer_cahce_id])) {
                 $answer = $answers[$answer_cahce_id];
                 $answer->set_value($input_value);
                 $answer->save();
