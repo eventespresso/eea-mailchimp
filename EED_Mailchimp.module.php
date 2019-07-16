@@ -166,7 +166,7 @@ class EED_Mailchimp extends EED_Module
      * @param $system_question_group_id 
      * @return void 
      */ 
-    public static function allow_mc_extra_in_system( $question_system_ids, $system_question_group_id ) { 
+    public static function allow_mc_extra_in_system($question_system_ids, $system_question_group_id) { 
         $question_system_ids[] = 'mc-optin'; 
         return $question_system_ids; 
     } 
