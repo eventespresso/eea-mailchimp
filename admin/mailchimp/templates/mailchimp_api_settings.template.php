@@ -41,7 +41,7 @@
                 </td>
             </tr>
             <tr valign="top">
-                <th><?php _e('Subscribe opt-in:', 'event_espresso'); ?></th>
+                <th><?php esc_html_e('Subscribe opt-in:', 'event_espresso'); ?></th>
                 <td>
                     <select name="subscribe_att_choice">
                         <option value="mc_always_subscribe" <?php echo $mc_always_subscribe; ?> >Always subscribe all registrations</option>
