@@ -50,7 +50,7 @@
 
                     <p class="description">
                         <?php
-                            _e('Always subscribe registrations to MailChimp on registration or use an opt-in question?', 'event_espresso');
+                            esc_html_e('Always subscribe registrations to MailChimp on registration or use an opt-in question?', 'event_espresso');
                         ?>
                     </p>
                 </td>
