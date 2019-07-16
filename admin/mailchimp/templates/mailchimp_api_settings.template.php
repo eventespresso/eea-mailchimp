@@ -44,8 +44,8 @@
                 <th><?php esc_html_e('Subscribe opt-in:', 'event_espresso'); ?></th>
                 <td>
                     <select name="subscribe_att_choice">
-                        <option value="mc_always_subscribe" <?php echo $mc_always_subscribe; ?> >Always subscribe all registrations</option>
-                        <option value="mc_att_choice_subscribe" <?php echo $mc_att_choice_subscribe; ?> >Use 'Subscribe me' opt-in question</option>
+                        <option value="mc_always_subscribe" <?php echo $mc_always_subscribe; ?>><?php esc_html_e('Always subscribe all registrations', 'event_espresso'); ?></option>
+                        <option value="mc_att_choice_subscribe" <?php echo $mc_att_choice_subscribe; ?>><?php esc_html_e('Use a "Subscribe me" opt-in question', 'event_espresso'); ?></option>
                     </select>
 
                     <p class="description">
