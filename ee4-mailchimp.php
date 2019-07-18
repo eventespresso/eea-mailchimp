@@ -4,7 +4,7 @@
   Plugin URI: http://www.eventespresso.com/
   Description: A MailChimp addon for Event Espresso.
 
-  Version: 2.4.2.rc.002
+  Version: 2.4.2.p
 
   Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp. When creating/updating an event, select the Mail Chimp list you would like to integrate with.
   Author: Event Espresso
@@ -29,7 +29,7 @@
 
 
 // Define our plugin version and other base stuff.
-define('ESPRESSO_MAILCHIMP_VERSION', '2.4.2.rc.002');
+define('ESPRESSO_MAILCHIMP_VERSION', '2.4.2.p');
 define('ESPRESSO_MAILCHIMP_MAIN_FILE', __FILE__);
 define('ESPRESSO_MAILCHIMP_DIR', plugin_dir_path(__FILE__));
 define('ESPRESSO_MAILCHIMP_BASE_NAME', plugin_basename(__FILE__));
