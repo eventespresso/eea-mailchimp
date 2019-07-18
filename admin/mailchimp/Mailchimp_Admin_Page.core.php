@@ -223,12 +223,12 @@ class Mailchimp_Admin_Page extends EE_Admin_Page
                 $config->api_settings->subscribe_att_choice = empty($_POST['subscribe_att_choice']) ? 'mc_always_subscribe' : $_POST['subscribe_att_choice'];
                 $config->api_settings->emails_type = empty($_POST['emails_type']) ? 'html' : $_POST['emails_type'];
                 $config->api_settings->submit_to_mc_when = empty($_POST['submit_to_mc_when']) ? 'reg-step-approved' : $_POST['submit_to_mc_when'];
-                // Opt-in question. 
-                if ($_POST['subscribe_att_choice'] === 'mc_att_choice_subscribe') { 
-                    EED_Mailchimp::add_mc_extra_question(); 
-                } else { 
-                    EED_Mailchimp::remove_mc_extra_question(); 
-                } 
+                // Opt-in question.
+                if ($_POST['subscribe_att_choice'] === 'mc_att_choice_subscribe') {
+                    EED_Mailchimp::add_mc_extra_question();
+                } else {
+                    EED_Mailchimp::remove_mc_extra_question();
+                }
             } else {
                 $key_valid = false;
                 $mcapi_error = $mci_controller->mci_get_response_error();
