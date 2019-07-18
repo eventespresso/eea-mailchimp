@@ -108,11 +108,7 @@ class EE_MC_Interest_Categories_Form extends EE_Form_Section_Proper
             $interests = $selected_intr = array();
             $category_interests = $this->_mc_controller->mci_get_interests($this->_list_id, $category['id']);
             $type = $category['type'];
-            // Do not display if set as hidden.
-            if ($type === 'hidden') {
-                continue;
-            }
-            
+
             foreach ($category_interests as $interest) {
                 $this->_all_interests[] = $interest_id = $interest['id'] . '-' . $interest['category_id'] . '-' . base64_encode($interest['name']);
                 $interests[ $interest_id ] = $interest['name'];
