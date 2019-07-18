@@ -170,11 +170,10 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper
                 $fields_list,
                 array(
                     'default'         => $selected,
-                    'html_label_text' => $l_field['name'],
+                    'html_label_text' => $l_field['required'] ? $l_field['name'] . '*' : $l_field['name'],
                     'html_id'         => 'event-question-' . base64_encode($l_field['name']),
                     'html_name'       => base64_encode($l_field['tag']),
                     'html_class'      => 'ee_event_fields_selects',
-                    'required'        => $l_field['required'],
                 )
             );
 
