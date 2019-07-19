@@ -140,10 +140,6 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper
         foreach ($list_fields as $l_field) {
             $selected = '-1';
             $fields_list = array();
-            // Skip if field is not public.
-            if ($l_field['public'] === false) {
-                continue;
-            }
 
             foreach ($evt_questions as $q_field) {
                 $fields_list[ $q_field['QST_ID'] ] = $q_field['QST_name'];
