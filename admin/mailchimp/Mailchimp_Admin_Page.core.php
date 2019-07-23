@@ -251,6 +251,10 @@ class Mailchimp_Admin_Page extends EE_Admin_Page
             $config->api_settings->submit_to_mc_when = empty($_POST['submit_to_mc_when']) ? 'reg-step-approved' : $_POST['submit_to_mc_when'];
         }
         EED_Mailchimp::update_config($config);
+        if (!$key_valid) {
+            // If there are any issues with the MailChimp key, remove the MailChimp opt-in question.
+            EED_Mailchimp::remove_mc_extra_question();
+        }
         if (isset($query_args['mcapi_error'])) {
             $query_args['mcapi_error'] = urlencode($query_args['mcapi_error']);
         }
