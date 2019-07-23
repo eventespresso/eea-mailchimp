@@ -127,9 +127,11 @@ class EED_Mailchimp extends EED_Module
             // Create the MailChimp 'Opt-in' question.
             $question = EE_Question::new_instance(array(
                 'QST_display_text' => esc_html__('Subscribe to newsletter', 'event_espresso'),
+                'QST_admin_label' => esc_html__('Opt-in - System Question', 'event_espresso'),
                 'QST_system' => 'mc-optin',
                 'QST_admin_label' => esc_html__('Opt-in - System Question', 'event_espresso'),
                 'QST_type' => EEM_Question::QST_type_checkbox,
+                'QST_required_text' => __('This field is required', 'event_espresso'),
                 'QST_required' => false,
                 'QST_order' => 12
             ));
