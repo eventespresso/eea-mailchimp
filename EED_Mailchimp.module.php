@@ -133,6 +133,8 @@ class EED_Mailchimp extends EED_Module
                 'QST_required' => false,
                 'QST_order' => 12
             ));
+            // Save the question to the DB so we can add question options.
+            $question->save();
             // Add an option to the question.
             $qst_answer = EE_Question_Option::new_instance(
                 array(
