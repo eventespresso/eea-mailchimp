@@ -31,9 +31,7 @@ class EED_Mailchimp extends EED_Module
      */
     public static function set_hooks()
     {
-        if (EE_Maintenance_Mode::instance()->models_can_query()) {
-            EED_Mailchimp::set_eemc_hooks();
-        }
+        EED_Mailchimp::set_eemc_hooks();
     }
 
     /**
@@ -76,7 +74,6 @@ class EED_Mailchimp extends EED_Module
         if ($mc_config->api_settings->subscribe_att_choice === 'mc_att_choice_subscribe') {
             add_filter('FHEE__EEM_Question__system_questions_allowed_in_system_question_group__return', array('EED_Mailchimp', 'allow_mc_extra_in_system'), 10, 2);
             add_filter('FHEE__EE_SPCO_Reg_Step_Attendee_Information___save_registration_form_input', array('EED_Mailchimp', 'save_registration_mc_optin_form_input'), 10, 5);
-            EED_Mailchimp::add_mc_extra_question();
         }
     }
 
