@@ -123,13 +123,13 @@ class EED_Mailchimp extends EED_Module
         // If we already have a question then this option was set before and the question should be in trash.
         if ($question instanceof EE_Question) {
             $question->set_deleted(false);
+            $question->save();
         } else {
             // Create the MailChimp 'Opt-in' question.
             $question = EE_Question::new_instance(array(
                 'QST_display_text' => esc_html__('Subscribe to newsletter', 'event_espresso'),
                 'QST_admin_label' => esc_html__('Opt-in - System Question', 'event_espresso'),
                 'QST_system' => 'mc-optin',
-                'QST_admin_label' => esc_html__('Opt-in - System Question', 'event_espresso'),
                 'QST_type' => EEM_Question::QST_type_checkbox,
                 'QST_required_text' => __('This field is required', 'event_espresso'),
                 'QST_required' => false,
@@ -146,9 +146,9 @@ class EED_Mailchimp extends EED_Module
                 )
             );
             $question->add_option($qst_answer);
+            // Save again to save the question option to the database.
+            $question->save();
         }
-        // A new question would have been created, or set_deleted would have been set to false so we need to save
-        $question->save();
     }
  
  
