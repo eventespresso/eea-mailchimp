@@ -31,7 +31,9 @@ class EED_Mailchimp extends EED_Module
      */
     public static function set_hooks()
     {
-        EED_Mailchimp::set_eemc_hooks();
+        if (EE_Maintenance_Mode::instance()->models_can_query()) {
+            EED_Mailchimp::set_eemc_hooks();
+        }
     }
 
     /**
