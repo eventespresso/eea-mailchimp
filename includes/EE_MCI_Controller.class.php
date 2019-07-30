@@ -395,22 +395,18 @@ class EE_MCI_Controller
      */
     protected function _process_event_group_subscribe_args($event_group = '', $subscribe_args = array())
     {
-        $grouping = explode('-', $event_group);
-        // Is this interest selected.
-        $selected = false;
-        if (isset($grouping[3]) && $grouping[3] === 'true') {
-            $selected = true;
-        }
+        // Initialise the interests array if it hasn't been already.
         if (! isset($subscribe_args['interests']) || empty($subscribe_args['interests'])) {
             $subscribe_args['interests'] = array();
-            $subscribe_args['interests'][ $grouping[0] ] = $selected;
-        } else {
-            foreach ($subscribe_args['interests'] as $interest => $value) {
-                if ($interest != $grouping[0]) {
-                    $subscribe_args['interests'][ $grouping[0] ] = $selected;
-                }
-            }
         }
+
+        $grouping = explode('-', $event_group);
+        
+        // Add selected interests to the subscribe_args.
+        if (isset($grouping[3]) && $grouping[3] === 'true') {
+            $subscribe_args['interests'][ $grouping[0] ] = true;
+        }
+        
         return $subscribe_args;
     }
 
