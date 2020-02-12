@@ -1181,11 +1181,15 @@ class EE_MCI_Controller
             $error['body'] = '';
         }
         $this->mcapi_error = apply_filters('FHEE__EE_MCI_Controller__mci_throw_error__mcapi_error', $error);
-        EEM_Change_Log::instance()->log(
-            EED_Mailchimp::log_type,
-            $error,
-            null
-        );
+
+        // Only save a log entry if not in maintenance mode
+        if (EE_Maintenance_Mode::instance()->models_can_query()) {
+            EEM_Change_Log::instance()->log(
+                EED_Mailchimp::log_type,
+                $error,
+                null
+            );
+        }
     }
 
 
