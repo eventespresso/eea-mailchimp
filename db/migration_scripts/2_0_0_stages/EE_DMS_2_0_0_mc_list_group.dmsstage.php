@@ -25,6 +25,7 @@ class EE_DMS_2_0_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table
         $this->_pretty_name = __("Mailchimp List Group", "event_espresso");
         $this->_old_table = $wpdb->prefix . "events_mailchimp_event_rel";
         $this->_new_table = $wpdb->prefix . "esp_event_mailchimp_list_group";
+        $this->_extra_where_sql = "WHERE mailchimp_list_id IS NOT NULL OR  mailchimp_list_id != ''";
         parent::__construct();
     }
 
