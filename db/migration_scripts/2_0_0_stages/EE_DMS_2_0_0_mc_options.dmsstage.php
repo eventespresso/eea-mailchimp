@@ -41,11 +41,13 @@ class EE_DMS_2_0_0_mc_options extends EE_Data_Migration_Script_Stage
             $this->add_error(EE_Error::get_notices());
         }
         // Activate MC if the API Key is valid.
-        $mci_controller = new EE_MCI_Controller();
-        $key_ok = $mci_controller->mci_is_api_key_valid($config->api_settings->api_key);
-        if ($key_ok) {
-            $config->api_settings->mc_active = true;
-            EE_Config::instance()->update_config('addons', 'EE_Mailchimp', $config);
+        if (isset($config->api_settings->api_key) && $config->api_settings->api_key) {
+            $mci_controller = new EE_MCI_Controller();
+            $key_ok = $mci_controller->mci_is_api_key_valid($config->api_settings->api_key);
+            if ($key_ok) {
+                $config->api_settings->mc_active = true;
+                EE_Config::instance()->update_config('addons', 'EE_Mailchimp', $config);
+            }
         }
         if ($this->count_records_migrated() + $items_actually_migrated >= $this->_count_records_to_migrate()) {
             $this->set_completed();
