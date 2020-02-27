@@ -48,9 +48,9 @@ class EE_DMS_2_0_0_mc_options extends EE_Data_Migration_Script_Stage
                 $config->api_settings->mc_active = true;
                 EE_Config::instance()->update_config('addons', 'EE_Mailchimp', $config);
             }
-            if ($this->count_records_migrated() + $items_actually_migrated >= $this->_count_records_to_migrate()) {
-                $this->set_completed();
-            }
+        }
+        if ($this->count_records_migrated() + $items_actually_migrated >= $this->_count_records_to_migrate()) {
+            $this->set_completed();
         }
         return $items_actually_migrated;
     }
