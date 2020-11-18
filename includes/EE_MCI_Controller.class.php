@@ -250,7 +250,8 @@ class EE_MCI_Controller
                                 $EVT_ID
                             );
                             // Old version used 'merge_vars' but API v3 calls them 'merge_fields'
-                            $subscribe_args['merge_fields'] = array_filter($subscribe_args['merge_vars']);
+                            // Remove any merge_vars with a null value as the API rejects them.
+                            $subscribe_args['merge_fields'] = array_filter($subscribe_args['merge_vars'], function($merge_var) { return !is_null($merge_var); });
                             unset($subscribe_args['merge_vars']);
 
                             // Verify merge_fields and interests aren't empty, and if they are they need to be stdClasses so that they become JSON objects still
