@@ -19,7 +19,6 @@ class EE_MailChimp extends EE_Addon
 {
 
 
-
     /**
      *  For registering the activation hook.
      */
