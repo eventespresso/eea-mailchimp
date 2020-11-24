@@ -50,7 +50,7 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base
 
         if (( ( version_compare($version_string, '2.1.0', '>=') && version_compare($version_string, '2.2.0', '<') )
             || ( version_compare($version_string, '2.2.0', '>=') && version_compare($version_string, '2.3.0', '<') && empty($mc_new_config->api_settings->api_key) ) )
-            && version_compare($core_version, '4.4.0', '>=') && isset($mc_old_config->api_settings) && ! empty($mc_old_config->api_settings->api_key) ) {
+            && version_compare($core_version, '4.4.0', '>=') && isset($mc_old_config->api_settings) && ! empty($mc_old_config->api_settings->api_key)) {
             // Can be migrated.
             return true;
         } elseif (! $version_string) {
