@@ -102,9 +102,17 @@ jobs:
         run: php -v
 
       - name: Install WP Tests
-        run: |
-          bash tests/bin/install-wp-tests.sh wordpress_test root root localhost latest
-          bash tests/bin/setup-addon-tests.sh
+        uses: eventespresso/actions/packages/install-wp-tests@wp-test-and-ee-addon-actions
+        with:
+          database: wordpress_test
+          username: root
+          password: root
+          host: localhost
+
+      - name: Set up EE addon tests
+        uses: eventespresso/actions/packages/setup-ee-addon-tests@wp-test-and-ee-addon-actions
+        with:
+          ee-version: master
 
       - name: Run PHP Unit Tests
         run: phpunit --configuration tests/phpunit.xml
