@@ -102,7 +102,7 @@ jobs:
         run: php -v
 
       - name: Install WP Tests
-        uses: eventespresso/actions/packages/install-wp-tests@wp-test-and-ee-addon-actions
+        uses: eventespresso/actions/packages/install-wp-tests@main
         with:
           database: wordpress_test
           username: root
@@ -110,7 +110,7 @@ jobs:
           host: localhost
 
       - name: Set up EE addon tests
-        uses: eventespresso/actions/packages/setup-ee-addon-tests@wp-test-and-ee-addon-actions
+        uses: eventespresso/actions/packages/setup-ee-addon-tests@main
         with:
           ee-version: master
 
