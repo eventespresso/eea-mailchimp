@@ -10,32 +10,31 @@
  * @package     Registration_Form_Questions_Admin_List_Table
  * @subpackage  includes/core/admin/events/Registration_Form_Questions_Admin_List_Table.class.php
  * @author      Darren Ethier
- *
- * ------------------------------------------------------------------------
  */
 class Mailchimp_Log_Admin_List_Table extends EE_Admin_List_Table
 {
 
     /**
-     * @param \EE_Admin_Page $admin_page
+     * @param EE_Admin_Page $admin_page
      * @return Mailchimp_Log_Admin_List_Table
      */
-    public function __construct($admin_page)
+    public function __construct(EE_Admin_Page $admin_page)
     {
         parent::__construct($admin_page);
     }
 
 
-
     /**
      * _setup_data
+     *
      * @return void
      */
     protected function _setup_data()
     {
-        $this->_data = $this->_admin_page->get_logs($this->_per_page, $this->_current_page);
+        $this->_data           = $this->_admin_page->get_logs($this->_per_page, $this->_current_page);
         $this->_all_data_count = $this->_admin_page->get_logs($this->_per_page, $this->_current_page, true);
     }
+
 
     protected function _get_table_filters()
     {
@@ -43,45 +42,45 @@ class Mailchimp_Log_Admin_List_Table extends EE_Admin_List_Table
     }
 
 
-
     /**
      * _set_properties
+     *
      * @return void
      */
     protected function _set_properties()
     {
-        $this->_wp_list_args = array(
-            'singular' => __('MailChimp Log', 'event_espresso'),
-            'plural' => __('MailChimp Logs', 'event_espresso'),
-            'ajax' => true, // for now,
-            'screen' => $this->_admin_page->get_current_screen()->id
-            );
+        $this->_wp_list_args = [
+            'singular' => esc_html__('MailChimp Log', 'event_espresso'),
+            'plural'   => esc_html__('MailChimp Logs', 'event_espresso'),
+            'ajax'     => true, // for now,
+            'screen'   => $this->_admin_page->get_current_screen()->id,
+        ];
 
-        $this->_columns = array(
-            'cb' => '<input type="checkbox" />',
-            'id' => __('ID', 'event_espresso'),
-            'LOG_time' => __('Time', 'event_espresso'),
-            'REG_ID' => __('Registration', 'event_espresso'),
-            'LOG_message' => __('Log Message', 'event_espresso'),
-            );
+        $this->_columns = [
+            'cb'          => '<input type="checkbox" />',
+            'id'          => esc_html__('ID', 'event_espresso'),
+            'LOG_time'    => esc_html__('Time', 'event_espresso'),
+            'REG_ID'      => esc_html__('Registration', 'event_espresso'),
+            'LOG_message' => esc_html__('Log Message', 'event_espresso'),
+        ];
 
-        $this->_sortable_columns = array(
-            'LOG_time' => array( 'LOG_time' => true ),
-            );
+        $this->_sortable_columns = [
+            'LOG_time' => ['LOG_time' => true],
+        ];
 
-        $this->_hidden_columns = array(
-            );
-        $this->_bottom_buttons = array(
-                'clear_logs' => array(
-                        'route' => 'clear_logs',
-                )
-        );
+        $this->_hidden_columns = [
+        ];
+        $this->_bottom_buttons = [
+            'clear_logs' => [
+                'route' => 'clear_logs',
+            ],
+        ];
     }
-
 
 
     /**
      * _add_view_counts
+     *
      * @return void
      */
     protected function _add_view_counts()
@@ -90,10 +89,10 @@ class Mailchimp_Log_Admin_List_Table extends EE_Admin_List_Table
     }
 
 
-
     /**
      * column_cb
-     * @param \EE_Change_Log $item
+     *
+     * @param EE_Change_Log $item
      * @return string
      */
     public function column_cb($item)
@@ -102,11 +101,13 @@ class Mailchimp_Log_Admin_List_Table extends EE_Admin_List_Table
     }
 
 
-
     /**
      * column_id
-     * @param \EE_Change_Log $item
+     *
+     * @param EE_Change_Log $item
      * @return string
+     * @throws EE_Error
+     * @throws ReflectionException
      */
     public function column_id(EE_Change_Log $item)
     {
@@ -114,11 +115,13 @@ class Mailchimp_Log_Admin_List_Table extends EE_Admin_List_Table
     }
 
 
-
     /**
      * column_LOG_time
-     * @param \EE_Change_Log $item
+     *
+     * @param EE_Change_Log $item
      * @return string
+     * @throws EE_Error
+     * @throws ReflectionException
      */
     public function column_LOG_time(EE_Change_Log $item)
     {
@@ -126,11 +129,12 @@ class Mailchimp_Log_Admin_List_Table extends EE_Admin_List_Table
     }
 
 
-
     /**
      * column_PMD_ID
-     * @param \EE_Change_Log $item
+     *
+     * @param EE_Change_Log $item
      * @return string
+     * @throws EE_Error
      */
     public function column_REG_ID(EE_Change_Log $item)
     {
@@ -144,19 +148,21 @@ class Mailchimp_Log_Admin_List_Table extends EE_Admin_List_Table
             }
             return '<a href="' . $reg->get_admin_details_link() . '">' . $name . '</a>';
         } else {
-            return __("No longer exists", 'event_espresso');
+            return esc_html__("No longer exists", 'event_espresso');
         }
     }
 
 
-
     /**
      * column_TXN_ID
-     * @param \EE_Change_Log $item
+     *
+     * @param EE_Change_Log $item
      * @return string
+     * @throws EE_Error
+     * @throws ReflectionException
      */
     public function column_LOG_message(EE_Change_Log $item)
     {
         return $item->get_pretty('LOG_message', 'as_table');
     }
-} //end class Registration_Form_Questions_Admin_List_Table
+}
