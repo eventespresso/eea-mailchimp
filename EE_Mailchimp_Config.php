@@ -21,12 +21,13 @@ class EE_Mailchimp_Config extends EE_Config_Base
 
 
     /**
-     * @return EE_Mailchimp_Config
+     * EE_Mailchimp_Config constructor.
      */
     public function __construct()
     {
         $this->api_settings = new EE_Mailchimp_Config_Api_Settings();
     }
+
 
     /**
      *
@@ -36,8 +37,8 @@ class EE_Mailchimp_Config extends EE_Config_Base
      */
     public function to_flat_array()
     {
-        $flattened_vars = array();
-        $properties = get_object_vars($this);
+        $flattened_vars = [];
+        $properties     = get_object_vars($this);
         foreach ($properties as $name => $property) {
             if ($property instanceof EE_Config_Base) {
                 $sub_config_properties = get_object_vars($property);
@@ -49,55 +50,5 @@ class EE_Mailchimp_Config extends EE_Config_Base
             }
         }
         return $flattened_vars;
-    }
-}
-
-
-/**
- * Class EE_Mailchimp_Config_Api_Settings
- *
- * Description
- *
- * @package               Event Espresso
- * @subpackage            eea-mailchimp
- * @author                Nazar Kolivoshka
- * @since                 1.0
- *
- */
-class EE_Mailchimp_Config_Api_Settings extends EE_Config_Base
-{
-
-    /**
-     * @var string $api_key
-     */
-    public $api_key;
-    /**
-     * @var bool $skip_double_optin
-     */
-    public $skip_double_optin;
-    /**
-     * @var bool $mc_active
-     */
-    public $mc_active;
-    /**
-     * @var string $submit_to_mc_when
-     */
-    public $submit_to_mc_when;
-    /**
-     * @var string $emails_type
-     */
-    public $emails_type;
-
-
-    /**
-     * @return EE_Mailchimp_Config_Api_Settings
-     */
-    public function __construct()
-    {
-        $this->api_key = '';
-        $this->skip_double_optin = true;
-        $this->mc_active = false;
-        $this->submit_to_mc_when = 'reg-step-approved';
-        $this->emails_type = 'html';
     }
 }
