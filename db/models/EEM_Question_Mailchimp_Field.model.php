@@ -66,7 +66,8 @@ class EEM_Question_Mailchimp_Field extends EEM_Base
                 ),
                 'QST_ID'                 => new EE_Plain_Text_Field(
                     'QST_ID',
-                    esc_html__('Question ID', 'event_espresso'), false
+                    esc_html__('Question ID', 'event_espresso'),
+                    false
                 ),
                 'QMC_mailchimp_field_id' => new EE_Plain_Text_Field(
                     'QMC_mailchimp_field_id',

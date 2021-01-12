@@ -17,6 +17,7 @@
 
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
         <exclude-pattern>EE_Mailchimp_Config.php</exclude-pattern>
+        <exclude-pattern>EE_Mailchimp_Config_Api_Settings.php</exclude-pattern>
         <exclude-pattern>Mailchimp_Admin_Page_Init.core.php</exclude-pattern>
     </rule>
 </ruleset>
