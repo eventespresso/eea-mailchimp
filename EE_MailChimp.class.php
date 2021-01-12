@@ -59,6 +59,8 @@ class EE_MailChimp extends EE_Addon
                 'config_class'     => EE_MailChimp::CONFIG_CLASS,
                 'config_name'      => EE_MailChimp::CONFIG_NAME,
                 'autoloader_paths' => [
+                    'EE_Mailchimp_Config_Api_Settings' => ESPRESSO_MAILCHIMP_DIR
+                                                          . 'EE_Mailchimp_Config_Api_Settings.php',
                     'EE_MCI_Controller'                => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS
                                                           . 'EE_MCI_Controller.class.php',
                     'Mailchimp_Admin_Page'             => ESPRESSO_MAILCHIMP_ADMIN_DIR
