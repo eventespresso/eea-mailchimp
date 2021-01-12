@@ -21,7 +21,7 @@ class EEM_Question_Mailchimp_Field extends EEM_Base
     /**
      * This function is a singleton method used to instantiate the EEM_Question_Mailchimp_Field object
      *
-     * @param null $timezone
+     * @param string|null $timezone
      * @return EEM_Question_Mailchimp_Field instance
      * @throws EE_Error
      */
@@ -41,7 +41,7 @@ class EEM_Question_Mailchimp_Field extends EEM_Base
     /**
      * EEM_Question_Mailchimp_Field constructor.
      *
-     * @param null $timezone
+     * @param string|null $timezone
      * @throws EE_Error
      */
     protected function __construct($timezone = null)
@@ -54,7 +54,8 @@ class EEM_Question_Mailchimp_Field extends EEM_Base
         $this->_fields          = [
             'Event_Mailchimp_List_Group' => [
                 'QMC_ID'                 => new EE_Primary_Key_Int_Field(
-                    'QMC_ID', esc_html__('MailChimp Question ID', 'event_espresso')
+                    'QMC_ID',
+                    esc_html__('MailChimp Question ID', 'event_espresso')
                 ),
                 'EVT_ID'                 => new EE_Foreign_Key_Int_Field(
                     'EVT_ID',
@@ -64,7 +65,8 @@ class EEM_Question_Mailchimp_Field extends EEM_Base
                     'Event'
                 ),
                 'QST_ID'                 => new EE_Plain_Text_Field(
-                    'QST_ID', esc_html__('Question ID', 'event_espresso'), false
+                    'QST_ID',
+                    esc_html__('Question ID', 'event_espresso'), false
                 ),
                 'QMC_mailchimp_field_id' => new EE_Plain_Text_Field(
                     'QMC_mailchimp_field_id',
@@ -83,12 +85,13 @@ class EEM_Question_Mailchimp_Field extends EEM_Base
     /**
      * resets the model and returns it
      *
+     * @param string|null $timezone
      * @return EEM_Question_Mailchimp_Field
      * @throws EE_Error
      */
     public static function reset($timezone = null)
     {
         self::$_instance = null;
-        return self::instance();
+        return self::instance($timezone);
     }
 }

@@ -203,7 +203,7 @@ class EE_MCI_Controller
                         $this->is_db_data_api_compatible($EVT_ID, $event_list);
 
                         $need_reg_status = $reg_approved = false;
-                        $mc_config = EED_Mailchimp::get_config();
+                        $mc_config       = EED_Mailchimp::get_config();
                         if ($mc_config->api_settings->submit_to_mc_when === 'reg-step-approved') {
                             $need_reg_status = true;
                             $reg_status      = $registration->status_ID();
@@ -218,10 +218,7 @@ class EE_MCI_Controller
                             continue;
                         }
                         $att_email = $attendee->email();
-                        if (! in_array(
-                                $att_email,
-                                $registered_attendees
-                            )
+                        if (! in_array($att_email, $registered_attendees)
                             && (! $need_reg_status || $reg_approved)
                         ) {
                             $opt_in         = isset($this->_config->api_settings->skip_double_optin)
@@ -501,15 +498,14 @@ class EE_MCI_Controller
      */
     private function get_list($method, array $parameters, $key)
     {
-
         try {
             $reply = $this->MailChimp->get($method, $parameters);
         } catch (Exception $e) {
             $this->set_error($e);
             return [];
         }
-        if ($this->MailChimp->success() && isset($reply[ $key])) {
-            return (array) $reply[ $key];
+        if ($this->MailChimp->success() && isset($reply[ $key ])) {
+            return (array) $reply[ $key ];
         }
         // The list of requested items might just be empty or there might be an error response.
         if (! $this->MailChimp->success()) {
@@ -648,15 +644,15 @@ class EE_MCI_Controller
         }
 
         // Lists and Groups
-        $list_id = sanitize_text_field($_POST['ee_mailchimp_lists']);
+        $list_id          = sanitize_text_field($_POST['ee_mailchimp_lists']);
         $mailchimp_groups = array_key_exists('ee_mailchimp_groups', $_POST)
             ? $_POST['ee_mailchimp_groups']
             : [];
-        $all_interests = array_key_exists('ee_mc_list_all_interests', $_POST)
+        $all_interests    = array_key_exists('ee_mc_list_all_interests', $_POST)
             ? $_POST['ee_mc_list_all_interests']
             : [];
         if (! empty($mailchimp_groups) && ! empty($all_interests)) {
-            $group_ids     = [];
+            $group_ids = [];
             // Multidimensional array ? Straighten it up.
             foreach ($mailchimp_groups as $g_id) {
                 if (is_array($g_id)) {
@@ -713,7 +709,7 @@ class EE_MCI_Controller
                 $encoded = base64_encode($mc_question_id);
                 if (isset($_POST[ $encoded ]) && $_POST[ $encoded ] != '-1') {
                     $ev_question = $_POST[ $encoded ];
-                    $q_found = false;
+                    $q_found     = false;
                     // Update already present Q fields.
                     foreach ($qf_exists as $question_field) {
                         $mc_field = $question_field instanceof EE_Question_Mailchimp_Field
@@ -724,9 +720,9 @@ class EE_MCI_Controller
                                 ['QST_ID' => $ev_question],
                                 [
                                     [
-                                        'EVT_ID' => $event_id,
-                                        'QMC_mailchimp_field_id' => $mc_question_id
-                                    ]
+                                        'EVT_ID'                 => $event_id,
+                                        'QMC_mailchimp_field_id' => $mc_question_id,
+                                    ],
                                 ]
                             );
                             $q_found = true;

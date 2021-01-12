@@ -5,10 +5,10 @@
  *
  * Settings for the MailChimp
  *
- * @package               Event Espresso
- * @subpackage            eea-mailchimp
- * @author                Nazar Kolivoshka
- * @since                 1.0
+ * @package     Event Espresso
+ * @subpackage  eea-mailchimp
+ * @author      Nazar Kolivoshka
+ * @since       1.0
  *
  */
 class EE_Mailchimp_Config extends EE_Config_Base

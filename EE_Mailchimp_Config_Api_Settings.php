@@ -3,12 +3,8 @@
 /**
  * Class EE_Mailchimp_Config_Api_Settings
  *
- * Description
- *
- * @package               Event Espresso
- * @subpackage            eea-mailchimp
- * @author                Nazar Kolivoshka
- * @since                 1.0
+ * @author Nazar Kolivoshka
+ * @since 1.0
  *
  */
 class EE_Mailchimp_Config_Api_Settings extends EE_Config_Base

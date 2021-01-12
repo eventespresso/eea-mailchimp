@@ -14,23 +14,44 @@ use Exception;
  */
 class MailChimp
 {
-    private $api_key;
-
+    /**
+     * @var string
+     */
     private $api_endpoint = 'https://<dc>.api.mailchimp.com/3.0';
 
-    /*  SSL Verification
-        Read before disabling:
-        http://snippets.webaware.com.au/howto/stop-turning-off-curlopt_ssl_verifypeer-and-fix-your-php-config/
-    */
-    public  $verify_ssl         = false;
+    /**
+     * @var string
+     */
+    private $api_key;
 
+    /**
+     * @var string
+     */
+    private $last_error = '';
+
+    /**
+     * @var array
+     */
+    private $last_response = [];
+
+    /**
+     * @var array
+     */
+    private $last_request = [];
+
+    /**
+     * @var bool
+     */
     private $request_successful = false;
 
-    private $last_error         = '';
-
-    private $last_response      = [];
-
-    private $last_request       = [];
+    /**
+     * SSL Verification
+     * Read before disabling:
+     * http://snippets.webaware.com.au/howto/stop-turning-off-curlopt_ssl_verifypeer-and-fix-your-php-config/
+     *
+     * @var bool
+     */
+    public $verify_ssl = false;
 
 
     /**

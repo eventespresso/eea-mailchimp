@@ -239,13 +239,9 @@ class Mailchimp_Admin_Page extends EE_Admin_Page
             } else {
                 $key_valid   = false;
                 $mcapi_error = $mci_controller->mci_get_response_error();
-                $error_msg   =
-                    isset($mcapi_error['msg'])
-                        ? $mcapi_error['msg']
-                        : esc_html__(
-                        'Unknown MailChimp API Error.',
-                        'event_espresso'
-                    );
+                $error_msg   = isset($mcapi_error['msg'])
+                    ? $mcapi_error['msg']
+                    : esc_html__('Unknown MailChimp API Error.', 'event_espresso');
                 EE_Error::add_error($error_msg, __FILE__, __FUNCTION__, __LINE__);
                 $query_args['mcapi_error']               = $error_msg;
                 $config->api_settings->mc_active         = false;
