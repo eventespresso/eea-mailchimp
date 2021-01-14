@@ -2,6 +2,7 @@
 /**
  *  Meant to convert DBs between MailChimp 2.1.0 and MC 2.3.0.
  */
+
 /**
  * Make sure we have all the stages loaded too
  * unfortunately, this needs to be done upon INCLUSION of this file,
@@ -9,10 +10,10 @@
  * (all other times it gets resurrected from a wordpress option).
  */
 
-$stages = glob(ESPRESSO_MAILCHIMP_DIR . 'db/migration_scripts/2_3_0_stages/*');
-$class_to_filepath = array();
+$stages            = glob(ESPRESSO_MAILCHIMP_DIR . 'db/migration_scripts/2_3_0_stages/*');
+$class_to_filepath = [];
 foreach ($stages as $filepath) {
-    $matches = array();
+    $matches = [];
     preg_match('~2_3_0_stages/(.*).dmsstage.php~', $filepath, $matches);
     $class_to_filepath[ $matches[1] ] = $filepath;
 }
@@ -26,13 +27,20 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base
 
     public function __construct()
     {
-        $this->_pretty_name = __("EE4 MailChimp data Migration to 2.2.0", "event_espresso");
-        $this->_migration_stages = array(
-            new EE_DMS_2_3_0_mc_options()
-        );
+        $this->_pretty_name      = esc_html__("EE4 MailChimp data Migration to 2.2.0", "event_espresso");
+        $this->_migration_stages = [
+            new EE_DMS_2_3_0_mc_options(),
+        ];
         parent::__construct();
     }
 
+
+    /**
+     * @param array $version_array
+     * @return bool
+     * @throws EE_Error
+     * @throws ReflectionException
+     */
     public function can_migrate_from_version($version_array)
     {
         $version_string = false;
@@ -48,9 +56,14 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base
             $mc_old_config = EE_Config::instance()->get_config('addons', 'EE_Mailchimp', 'EE_Mailchimp_Config');
         }
 
-        if (( ( version_compare($version_string, '2.1.0', '>=') && version_compare($version_string, '2.2.0', '<') )
-            || ( version_compare($version_string, '2.2.0', '>=') && version_compare($version_string, '2.3.0', '<') && empty($mc_new_config->api_settings->api_key) ) )
-            && version_compare($core_version, '4.4.0', '>=') && isset($mc_old_config->api_settings) && ! empty($mc_old_config->api_settings->api_key)) {
+        if (((version_compare($version_string, '2.1.0', '>=') && version_compare($version_string, '2.2.0', '<'))
+             || (version_compare($version_string, '2.2.0', '>=')
+                 && version_compare($version_string, '2.3.0', '<')
+                 && empty($mc_new_config->api_settings->api_key)))
+            && version_compare($core_version, '4.4.0', '>=')
+            && isset($mc_old_config->api_settings)
+            && ! empty($mc_old_config->api_settings->api_key)
+        ) {
             // Can be migrated.
             return true;
         } elseif (! $version_string) {
@@ -62,17 +75,25 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base
         }
     }
 
+
+    /**
+     * @return string|null
+     */
     public function pretty_name()
     {
-        return __("EE4 MailChimp data Migration to 2.3.0", "event_espresso");
+        return esc_html__("EE4 MailChimp data Migration to 2.3.0", "event_espresso");
     }
 
+
+    /**
+     * @return bool
+     */
     public function schema_changes_before_migration()
     {
-         require_once(EE_HELPERS . 'EEH_Activation.helper.php');
+        require_once(EE_HELPERS . 'EEH_Activation.helper.php');
 
         $table_name = 'esp_event_mailchimp_list_group';
-        $sql = " EMC_ID INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+        $sql        = " EMC_ID INT UNSIGNED NOT NULL AUTO_INCREMENT ,
                 EVT_ID INT UNSIGNED NOT NULL ,
                 AMC_mailchimp_list_id TEXT NOT NULL ,
                 AMC_mailchimp_group_id TEXT NOT NULL ,
@@ -80,7 +101,7 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base
         $this->_table_should_exist_previously($table_name, $sql, 'ENGINE=InnoDB');
 
         $table_name = 'esp_event_question_mailchimp_field';
-        $sql = " QMC_ID INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+        $sql        = " QMC_ID INT UNSIGNED NOT NULL AUTO_INCREMENT ,
                 EVT_ID INT UNSIGNED NOT NULL ,
                 QST_ID TEXT NOT NULL ,
                 QMC_mailchimp_field_id TEXT NOT NULL ,
@@ -89,6 +110,7 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base
 
         return true;
     }
+
 
     /**
      * Yes we could have cleaned up the EE3 MailChimp tables here. But just in case someone
@@ -105,6 +127,7 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base
         EE_Config::instance()->update_espresso_config(false, true);
         return true;
     }
+
 
     public function migration_page_hooks()
     {
