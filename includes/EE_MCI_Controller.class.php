@@ -291,8 +291,15 @@ class EE_MCI_Controller
                                     ),
                                     $subscribe_args
                                 );
-                                // Log error.
-                                if (! $this->MailChimp->success()) {
+                                if( $this->MailChimp->success() ) {
+                                    do_action('AHEE__EE_MCI_Controller__mci_submit_to_mailchimp__success', 
+                                        $this,
+                                        $att_email, 
+                                        $registration,
+                                        $attendee
+                                    );
+                                } else {
+                                    // Log error.
                                     $this->set_error($put_member);
                                     $errors = '';
                                     if (isset($put_member['errors']) && is_array($put_member['errors'])) {
@@ -340,7 +347,7 @@ class EE_MCI_Controller
                             $registered_attendees[] = $att_email;
                         }
                     }
-                }
+                } // END foreach()
             }
         }
     }
