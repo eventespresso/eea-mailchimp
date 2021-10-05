@@ -665,7 +665,7 @@ class EE_MCI_Controller
             }
             // We need to save the list of all interests for the current MC List.
             foreach ($all_interests as $interest) {
-                $interest = sanitize_key($interest);
+                $interest = sanitize_text_field($interest);
                 // Mark what lists were selected and not.
                 if (in_array($interest, $group_ids)) {
                     $interest .= '-true';
