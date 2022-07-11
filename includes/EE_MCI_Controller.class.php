@@ -250,7 +250,8 @@ class EE_MCI_Controller
                                 $EVT_ID
                             );
                             // Old version used 'merge_vars' but API v3 calls them 'merge_fields'
-                            $subscribe_args['merge_fields'] = $subscribe_args['merge_vars'];
+                            // Remove any merge_vars with a null value as the API rejects them.
+                            $subscribe_args['merge_fields'] = array_filter($subscribe_args['merge_vars'], function($merge_var) { return !is_null($merge_var); });
                             unset($subscribe_args['merge_vars']);
 
                             // Verify merge_fields and interests aren't empty, and if they are they need to be stdClasses so that they become JSON objects still
@@ -291,8 +292,15 @@ class EE_MCI_Controller
                                     ),
                                     $subscribe_args
                                 );
-                                // Log error.
-                                if (! $this->MailChimp->success()) {
+                                if ($this->MailChimp->success()) {
+                                    do_action(
+                                        'FHEE__EE_MCI_Controller__mci_submit_to_mailchimp__success',
+                                        $registration,
+                                        $att_email,
+                                        $this->MailChimp,
+                                        $subscribe_args
+                                    );
+                                } else {
                                     $this->set_error($put_member);
                                     $errors = '';
                                     if (isset($put_member['errors']) && is_array($put_member['errors'])) {
