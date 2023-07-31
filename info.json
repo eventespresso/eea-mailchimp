@@ -20,8 +20,6 @@
   ],
   "srcBuildFolderName": "eea-mailchimp",
   "textDomain": "event_espresso",
-  "remoteNamesToPushTo": [
-    "demoee"
-  ],
+  "remoteNamesToPushTo": [],
   "wpOrgRelease": "2.4.5.p"
 }
