@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A child class for initialising the MailChimp Settings Page in the list of EE settings pages
  *
@@ -6,7 +7,6 @@
 
 class Mailchimp_Admin_Page_Init extends EE_Admin_Page_Init
 {
-
     public function __construct()
     {
         define('EE_MAILCHIMP_LABEL', esc_html__('MailChimp', 'event_espresso'));

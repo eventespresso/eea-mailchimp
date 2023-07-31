@@ -1,11 +1,11 @@
 <?php
+
 /**
  * This contains the logic for setting up the Custom MailChimp Settings Page.
  *
  */
 class Mailchimp_Admin_Page extends EE_Admin_Page
 {
-
     public function __construct($routing = true)
     {
         parent::__construct($routing);
@@ -205,7 +205,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page
             $this->_template_args['mailchimp_api_key_img']   = '';
         }
 
-        $this->_set_publish_post_box_vars('id', 1, false, null, false);
+        $this->_set_publish_post_box_vars('id', 1);
         $this->_set_add_edit_form_tags('update_mailchimp');
         // the details template wrapper
         $this->display_admin_page_with_sidebar();
@@ -220,7 +220,7 @@ class Mailchimp_Admin_Page extends EE_Admin_Page
     {
         $query_args = ['action' => 'default'];
         $config = EED_Mailchimp::get_config();
-        if (isset($_POST['mailchimp_api_key']) && ! empty($_POST['mailchimp_api_key'])) {
+        if (! empty($_POST['mailchimp_api_key'])) {
             $mailchimp_api_key = sanitize_text_field($_POST['mailchimp_api_key']);
             $mci_controller    = new EE_MCI_Controller($mailchimp_api_key);
             // Validate the MailChimp API Key

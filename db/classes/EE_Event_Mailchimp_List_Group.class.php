@@ -8,7 +8,6 @@
  */
 class EE_Event_Mailchimp_List_Group extends EE_Base_Class
 {
-
     /**
      *
      * @param array $props_n_values

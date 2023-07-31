@@ -13,7 +13,6 @@ use EventEspresso\core\exceptions\InvalidInterfaceException;
  */
 class EE_MCI_Controller
 {
-
     /**
      * Key of the extra meta row that stores whether or not the event has been verified to work with MC API v3.
      *
@@ -139,7 +138,8 @@ class EE_MCI_Controller
         // what kind of SPCO object did we receive?
         if ($spco_obj instanceof EE_SPCO_Reg_Step_Attendee_Information) {
             // for EE versions > 4.6
-            if ($spco_obj->checkout instanceof EE_Checkout
+            if (
+                $spco_obj->checkout instanceof EE_Checkout
                 && $spco_obj->checkout->transaction
                    instanceof
                    EE_Transaction
@@ -218,7 +218,8 @@ class EE_MCI_Controller
                             continue;
                         }
                         $att_email = $attendee->email();
-                        if (! in_array($att_email, $registered_attendees)
+                        if (
+                            ! in_array($att_email, $registered_attendees)
                             && (! $need_reg_status || $reg_approved)
                         ) {
                             $opt_in         = isset($this->_config->api_settings->skip_double_optin)
@@ -251,7 +252,9 @@ class EE_MCI_Controller
                             );
                             // Old version used 'merge_vars' but API v3 calls them 'merge_fields'
                             // Remove any merge_vars with a null value as the API rejects them.
-                            $subscribe_args['merge_fields'] = array_filter($subscribe_args['merge_vars'], function($merge_var) { return !is_null($merge_var); });
+                            $subscribe_args['merge_fields'] = array_filter($subscribe_args['merge_vars'], function ($merge_var) {
+                                return !is_null($merge_var);
+                            });
                             unset($subscribe_args['merge_vars']);
 
                             // Verify merge_fields and interests aren't empty, and if they are they need to be stdClasses so that they become JSON objects still
@@ -269,7 +272,8 @@ class EE_MCI_Controller
                                     ),
                                     ['fields' => 'id,email_address,status']
                                 );
-                                if (isset($member_subscribed['email_address']) && isset($member_subscribed['status'])
+                                if (
+                                    isset($member_subscribed['email_address']) && isset($member_subscribed['status'])
                                     && ! preg_match(
                                         '/^(4|5)\d{2}$/',
                                         $member_subscribed['status']
@@ -769,7 +773,7 @@ class EE_MCI_Controller
      * Display the MailChimp user Lists for given event.
      *
      * @param int $list_id
-     * @return string (HTML)
+     * @return string|EE_Form_Section_HTML (HTML)
      * @throws EE_Error
      */
     public function mci_list_mailchimp_lists($list_id = 0)
@@ -791,7 +795,7 @@ class EE_MCI_Controller
      *
      * @param int $event_id The ID of the Event.
      * @param int $list_id
-     * @return string (HTML)
+     * @return string|EE_Form_Section_HTML (HTML)
      * @throws EE_Error
      */
     public function mci_list_mailchimp_groups($event_id = 0, $list_id = 0)
@@ -933,7 +937,8 @@ class EE_MCI_Controller
         $mc_list_groups    = EEM_Event_Mailchimp_List_Group::instance()->get_all([['EVT_ID' => $EVT_ID]]);
         $event_list_groups = [];
         foreach ($mc_list_groups as $mc_list_group) {
-            if ($mc_list_group instanceof EE_Event_Mailchimp_List_Group
+            if (
+                $mc_list_group instanceof EE_Event_Mailchimp_List_Group
                 && $mc_list_group->mc_group() !== '-1'
             ) {
                 $event_list_groups[] = $mc_list_group->mc_group();
@@ -1078,7 +1083,8 @@ class EE_MCI_Controller
                 foreach ($event_groups as $event_interest) {
                     $list_and_interest = explode('-', $event_interest);
                     // Double check just in case we do get one already updated field.
-                    if (isset($list_and_interest[3])
+                    if (
+                        isset($list_and_interest[3])
                         && ($list_and_interest[3] === 'true' || $list_and_interest[3] === 'false')
                     ) {
                         $new_list_interest = EE_Event_Mailchimp_List_Group::new_instance(

@@ -5,7 +5,6 @@
  */
 class EE_DMS_2_0_0_mc_options extends EE_Data_Migration_Script_Stage
 {
-
     protected $_mc_options_to_migrate = [
         'apikey',
     ];
@@ -30,7 +29,8 @@ class EE_DMS_2_0_0_mc_options extends EE_Data_Migration_Script_Stage
     public function _migration_step($num_items = 1)
     {
         // Get MailChimp's config.
-        if (isset(EE_Config::instance()->addons->EE_Mailchimp)
+        if (
+            isset(EE_Config::instance()->addons->EE_Mailchimp)
             && EE_Config::instance()->addons->EE_Mailchimp instanceof EE_Mailchimp_Config
         ) {
             $config = EE_Config::instance()->addons->EE_Mailchimp;

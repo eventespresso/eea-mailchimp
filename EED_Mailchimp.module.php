@@ -8,8 +8,6 @@
  */
 class EED_Mailchimp extends EED_Module
 {
-
-
     /**
      * Constant used in EEM_Change_Log for the value of LOG_type for mailchimp logs
      */
@@ -87,7 +85,8 @@ class EED_Mailchimp extends EED_Module
                 'AHEE__EE_SPCO_Reg_Step_Finalize_Registration__process_reg_step__completed',
                 ['EED_Mailchimp', 'espresso_mailchimp_submit_to_mc']
             );
-        } elseif ($mc_config->api_settings->submit_to_mc_when == 'reg-step-completed'
+        } elseif (
+            $mc_config->api_settings->submit_to_mc_when == 'reg-step-completed'
                   || $mc_config->api_settings->submit_to_mc_when == 'reg-step-approved'
         ) {
             add_action(
@@ -115,7 +114,8 @@ class EED_Mailchimp extends EED_Module
     public static function setup_mc_defaults()
     {
         $mc_config = EED_Mailchimp::get_config();
-        if (! isset($mc_config->api_settings->submit_to_mc_when)
+        if (
+            ! isset($mc_config->api_settings->submit_to_mc_when)
             || empty($mc_config->api_settings->submit_to_mc_when)
         ) {
             $mc_config->api_settings->submit_to_mc_when = 'reg-step-approved';
@@ -411,9 +411,7 @@ class EED_Mailchimp extends EED_Module
      */
     public static function add_log_type($enum_options, EE_Model_Field_Base $field_obj)
     {
-        if ($field_obj instanceof EE_Enum_Text_Field
-            && $field_obj->get_name() === 'LOG_type'
-        ) {
+        if ($field_obj instanceof EE_Enum_Text_Field && $field_obj->get_name() === 'LOG_type') {
             $enum_options[ EED_Mailchimp::log_type ] = esc_html__('MailChimp', 'event_espresso');
         }
         return $enum_options;

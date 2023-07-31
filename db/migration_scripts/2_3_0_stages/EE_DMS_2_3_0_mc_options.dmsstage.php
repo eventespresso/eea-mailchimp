@@ -5,7 +5,6 @@
  */
 class EE_DMS_2_3_0_mc_options extends EE_Data_Migration_Script_Stage
 {
-
     protected $_mc_options_to_migrate = [
         'MailChimp',
     ];

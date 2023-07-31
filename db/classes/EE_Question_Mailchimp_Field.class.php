@@ -8,7 +8,6 @@
  */
 class EE_Question_Mailchimp_Field extends EE_Base_Class
 {
-
     /**
      *
      * @param array $props_n_values

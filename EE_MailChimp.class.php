@@ -19,8 +19,6 @@ define('ESPRESSO_MAILCHIMP_API_OPTIONS', 'ee_mailchimp_user_settings');
  */
 class EE_MailChimp extends EE_Addon
 {
-
-
     /**
      *  For registering the activation hook.
      */

@@ -8,7 +8,6 @@
  */
 class EEM_Event_Mailchimp_List_Group extends EEM_Base
 {
-
     /**
      * Instance of the EEM_Event_Mailchimp_List_Group object
      */
@@ -18,12 +17,11 @@ class EEM_Event_Mailchimp_List_Group extends EEM_Base
     /**
      * This function is a singleton method used to instantiate the EEM_Event_Mailchimp_List_Group object
      *
-     * @access public
-     * @param string $timezone
+     * @param string|null $timezone
      * @return EEM_Event_Mailchimp_List_Group
      * @throws EE_Error
      */
-    public static function instance($timezone = null)
+    public static function instance(?string $timezone = '')
     {
         // Check if instance of EEM_Event_Mailchimp_List_Group already exists.
         if (self::$_instance === null) {
@@ -37,10 +35,10 @@ class EEM_Event_Mailchimp_List_Group extends EEM_Base
 
 
     /**
-     * @param null $timezone
+     * @param string|null $timezone
      * @throws EE_Error
      */
-    protected function __construct($timezone = null)
+    protected function __construct(?string $timezone = '')
     {
         $this->singular_item    = esc_html__('MailChimp List Group', 'event_espresso');
         $this->plural_item      = esc_html__('MailChimp List Groups', 'event_espresso');
@@ -84,11 +82,11 @@ class EEM_Event_Mailchimp_List_Group extends EEM_Base
     /**
      * resets the model and returns it
      *
-     * @param string $timezone
+     * @param string|null $timezone
      * @return EEM_Event_Mailchimp_List_Group
      * @throws EE_Error
      */
-    public static function reset($timezone = null)
+    public static function reset(?string $timezone = '')
     {
         self::$_instance = null;
         return self::instance($timezone);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  Meant to convert DBs between MailChimp for EE3 to MC for EE4.
  */
@@ -23,7 +24,6 @@ EEH_Autoloader::register_autoloader($class_to_filepath);
 
 class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base
 {
-
     public function __construct()
     {
         $this->_pretty_name      = esc_html__("Data Migration to EE4 MailChimp.", "event_espresso");
@@ -61,7 +61,8 @@ class EE_DMS_MailChimp_2_0_0 extends EE_Data_Migration_Script_Base
         if (isset($version_array['MailChimp'])) {
             $version_string = $version_array['MailChimp'];
         }
-        if (version_compare($version_string, '2.0.0', '<')
+        if (
+            version_compare($version_string, '2.0.0', '<')
             && version_compare($core_version, '4.1.0', '>=')
             && $old_table_exists
             && $core_4_1_0_migration_ran

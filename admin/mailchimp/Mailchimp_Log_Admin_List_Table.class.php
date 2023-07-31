@@ -13,7 +13,6 @@
  */
 class Mailchimp_Log_Admin_List_Table extends EE_Admin_List_Table
 {
-
     /**
      * @param EE_Admin_Page $admin_page
      * @return Mailchimp_Log_Admin_List_Table

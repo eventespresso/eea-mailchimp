@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  Meant to convert DBs between MailChimp 2.1.0 and MC 2.3.0.
  */
@@ -24,7 +25,6 @@ EEH_Autoloader::register_autoloader($class_to_filepath);
 
 class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base
 {
-
     public function __construct()
     {
         $this->_pretty_name      = esc_html__("EE4 MailChimp data Migration to 2.2.0", "event_espresso");
@@ -56,7 +56,8 @@ class EE_DMS_MailChimp_2_3_0 extends EE_Data_Migration_Script_Base
             $mc_old_config = EE_Config::instance()->get_config('addons', 'EE_Mailchimp', 'EE_Mailchimp_Config');
         }
 
-        if (((version_compare($version_string, '2.1.0', '>=') && version_compare($version_string, '2.2.0', '<'))
+        if (
+            ((version_compare($version_string, '2.1.0', '>=') && version_compare($version_string, '2.2.0', '<'))
              || (version_compare($version_string, '2.2.0', '>=')
                  && version_compare($version_string, '2.3.0', '<')
                  && empty($mc_new_config->api_settings->api_key)))

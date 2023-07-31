@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class EE_Div_Per_Section_Layout
  *
@@ -11,7 +12,6 @@
  */
 class EE_Div_Per_Section_Spaced_Layout extends EE_Form_Section_Layout_Base
 {
-
     /**
      *
      * @return string
@@ -30,7 +30,8 @@ class EE_Div_Per_Section_Spaced_Layout extends EE_Form_Section_Layout_Base
      */
     public function layout_input($input)
     {
-        if ($input->get_display_strategy() instanceof EE_Text_Area_Display_Strategy ||
+        if (
+            $input->get_display_strategy() instanceof EE_Text_Area_Display_Strategy ||
             $input->get_display_strategy() instanceof EE_Text_Input_Display_Strategy ||
             $input->get_display_strategy() instanceof EE_Admin_File_Uploader_Display_Strategy
         ) {

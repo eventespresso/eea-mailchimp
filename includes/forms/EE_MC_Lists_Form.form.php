@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class EE_MC_Lists_Form.
  *
@@ -12,7 +13,6 @@
  */
 class EE_MC_Lists_Form extends EE_Form_Section_Proper
 {
-
     /**
      * @access protected
      * @var object $_mc_controller

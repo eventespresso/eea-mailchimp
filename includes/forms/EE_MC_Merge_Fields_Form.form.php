@@ -10,7 +10,6 @@
  */
 class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper
 {
-
     /**
      * @var object $_mc_controller
      */
@@ -134,7 +133,8 @@ class EE_MC_Merge_Fields_Form extends EE_Form_Section_Proper
                 $fields_list[ $q_field['QST_ID'] ] = $q_field['QST_name'];
 
                 // Default to main fields if exist.
-                if ((isset($l_field['tag'], $selected_fields[ $l_field['tag'] ])
+                if (
+                    (isset($l_field['tag'], $selected_fields[ $l_field['tag'] ])
                      && ($selected_fields[ $l_field['tag'] ] == $q_field['QST_ID']
                          || $selected_fields[ $l_field['tag'] ] == $q_field['QST_system']))
                     || (($q_field['QST_system'] == 'email' || $q_field['QST_ID'] == 3) && $l_field['tag'] == 'EMAIL'

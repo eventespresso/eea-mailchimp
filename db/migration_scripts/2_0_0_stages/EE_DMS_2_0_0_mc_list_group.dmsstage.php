@@ -6,7 +6,6 @@
 
 class EE_DMS_2_0_0_mc_list_group extends EE_Data_Migration_Script_Stage_Table
 {
-
     /**
      * Old table name.
      *

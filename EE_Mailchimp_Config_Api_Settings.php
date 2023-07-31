@@ -9,7 +9,6 @@
  */
 class EE_Mailchimp_Config_Api_Settings extends EE_Config_Base
 {
-
     /**
      * @var string $api_key
      */

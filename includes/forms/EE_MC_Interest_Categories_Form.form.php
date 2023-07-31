@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class EE_MC_Interest_Categories_Form.
  *
@@ -12,7 +13,6 @@
  */
 class EE_MC_Interest_Categories_Form extends EE_Form_Section_Proper
 {
-
     /**
      * @access protected
      * @var array $_all_interests
@@ -126,28 +126,28 @@ class EE_MC_Interest_Categories_Form extends EE_Form_Section_Proper
             // List the interests by their type.
             switch ($type) {
                 case 'checkboxes':
-                    $subsactions[ $interest['id'].'_'.$interest['category_id'] ] = new EE_Checkbox_Multi_Input(
+                    $subsactions[ $interest['id'] . '_' . $interest['category_id'] ] = new EE_Checkbox_Multi_Input(
                         $interests,
                         $section_params
                     );
                     break;
                 case 'radio':
-                    $section_params['html_name'] = 'ee_mailchimp_groups['.$category['id'].']';
+                    $section_params['html_name'] = 'ee_mailchimp_groups[' . $category['id'] . ']';
                     $section_params['default'] = ( isset($selected_intr[0]) ) ? $selected_intr[0] : '';
-                    $subsactions[ $interest['id'].'_'.$interest['category_id'] ] = new EE_Radio_Button_Input(
+                    $subsactions[ $interest['id'] . '_' . $interest['category_id'] ] = new EE_Radio_Button_Input(
                         $interests,
                         $section_params
                     );
                     break;
                 case 'dropdown':
                     $section_params['default'] = ( isset($selected_intr[0]) ) ? $selected_intr[0] : '';
-                    $subsactions[ $interest['id'].'_'.$interest['category_id'] ] = new EE_Select_Input(
+                    $subsactions[ $interest['id'] . '_' . $interest['category_id'] ] = new EE_Select_Input(
                         $interests,
                         $section_params
                     );
                     break;
                 default:
-                    $subsactions[ $interest['id'].'_'.$interest['category_id'] ] = new EE_Checkbox_Multi_Input(
+                    $subsactions[ $interest['id'] . '_' . $interest['category_id'] ] = new EE_Checkbox_Multi_Input(
                         $interests,
                         $section_params
                     );

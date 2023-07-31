@@ -13,7 +13,6 @@
  */
 class EE_Mailchimp_Config extends EE_Config_Base
 {
-
     /**
      * @var EE_Mailchimp_Config_Api_Settings
      */
