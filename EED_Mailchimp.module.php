@@ -189,7 +189,7 @@ class EED_Mailchimp extends EED_Module
      * @access public
      * @return void
      */
-    public static function mailchimp_link_scripts_styles()
+    public static function mailchimp_link_scripts_styles(): void
     {
         wp_enqueue_style(
             'espresso_mailchimp_gen_styles',
@@ -213,7 +213,7 @@ class EED_Mailchimp extends EED_Module
      * @return void
      * @throws EE_Error
      */
-    public static function espresso_mailchimp_update_groups()
+    public static function espresso_mailchimp_update_groups(): void
     {
         $mci_controller = new EE_MCI_Controller();
         $mci_data       = $_POST['mci_data'];
@@ -228,7 +228,7 @@ class EED_Mailchimp extends EED_Module
      * @return void
      * @throws EE_Error
      */
-    public static function espresso_mailchimp_update_list_fields()
+    public static function espresso_mailchimp_update_list_fields(): void
     {
         $mci_controller = new EE_MCI_Controller();
         $mci_data       = $_POST['mci_data'];
@@ -246,12 +246,12 @@ class EED_Mailchimp extends EED_Module
      * @throws EE_Error
      * @throws ReflectionException
      */
-    public static function espresso_mailchimp_submit_to_mc($spc_obj, $spc_data)
+    public static function espresso_mailchimp_submit_to_mc($spc_obj, $spc_data): void
     {
         $mc_config = EED_Mailchimp::instance()->config();
         if ($mc_config->api_settings->mc_active) {
             $mci_controller = new EE_MCI_Controller();
-            $mci_controller->mci_submit_to_mailchimp($spc_obj, $spc_data);
+            $mci_controller->mci_submit_to_mailchimp($spc_obj);
         }
     }
 
@@ -259,12 +259,12 @@ class EED_Mailchimp extends EED_Module
     /**
      * Save the meta when the post is saved.
      *
-     * @param int $event_id The ID of the event being saved.
+     * @param int $EVT_ID The ID of the event being saved.
      * @return int
      * @throws EE_Error
      * @throws ReflectionException
      */
-    public static function espresso_mailchimp_save_event($event_id)
+    public static function espresso_mailchimp_save_event(int $EVT_ID): int
     {
         // Nonce checks.
         $is_ok =
@@ -274,15 +274,15 @@ class EED_Mailchimp extends EED_Module
             );
         // Auto-save? ...do nothing.
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-            return $event_id;
+            return $EVT_ID;
         }
         if (! $is_ok) {
-            return $event_id;
+            return $EVT_ID;
         }
         // Got here so let's save the data.
         $mci_controller = new EE_MCI_Controller();
-        $mci_controller->mci_save_metabox_contents($event_id);
-        return $event_id;
+        $mci_controller->mci_save_metabox_contents($EVT_ID);
+        return $EVT_ID;
     }
 
 
@@ -295,7 +295,7 @@ class EED_Mailchimp extends EED_Module
      * @throws EE_Error
      * @throws ReflectionException
      */
-    public static function espresso_mailchimp_duplicate_event($new_event, $orig_event)
+    public static function espresso_mailchimp_duplicate_event($new_event, $orig_event): void
     {
         // Pull the original event's MailChimp relationships
         $mci_controller          = new EE_MCI_Controller();
@@ -346,7 +346,7 @@ class EED_Mailchimp extends EED_Module
      * @param string $post_type Type of the post.
      * @return void
      */
-    public static function espresso_mailchimp_list_metabox($post_type)
+    public static function espresso_mailchimp_list_metabox($post_type): void
     {
         $mc_config = EED_Mailchimp::instance()->config();
         // Is MC integration active and is espresso event page.
@@ -371,7 +371,7 @@ class EED_Mailchimp extends EED_Module
      * @throws EE_Error
      * @throws ReflectionException
      */
-    public static function espresso_mailchimp_render_box_content($event)
+    public static function espresso_mailchimp_render_box_content($event): void
     {
         $mci_controller = new EE_MCI_Controller();
         // Add an nonce field.
@@ -388,7 +388,7 @@ class EED_Mailchimp extends EED_Module
      * @param string $nonce_name   Nonce to verify.
      * @return bool  Is authorization OK.
      */
-    public static function espresso_mailchimp_authorization_checks($nonce_action, $nonce_name)
+    public static function espresso_mailchimp_authorization_checks($nonce_action, $nonce_name): bool
     {
         // Check if our nonce is set.
         if (! isset($_POST[ $nonce_name ])) {

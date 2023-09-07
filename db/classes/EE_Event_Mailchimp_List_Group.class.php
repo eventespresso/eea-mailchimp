@@ -51,12 +51,12 @@ class EE_Event_Mailchimp_List_Group extends EE_Base_Class
     /**
      * Get the MailChimp List ID.
      *
-     * @return int
+     * @return string
      * @throws EE_Error
      * @throws ReflectionException
      */
     public function mc_list()
     {
-        return $this->get('AMC_mailchimp_list_id');
+        return (string) $this->get('AMC_mailchimp_list_id');
     }
 }

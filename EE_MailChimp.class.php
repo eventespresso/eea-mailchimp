@@ -59,7 +59,7 @@ class EE_MailChimp extends EE_Addon
                 'autoloader_paths' => [
                     'EE_Mailchimp_Config_Api_Settings' => ESPRESSO_MAILCHIMP_DIR
                                                           . 'EE_Mailchimp_Config_Api_Settings.php',
-                    'EE_MCI_Controller'                => ESPRESSO_MAILCHIMP_DIR . 'includes' . DS
+                    'EE_MCI_Controller'                => ESPRESSO_MAILCHIMP_DIR . 'lib' . DS
                                                           . 'EE_MCI_Controller.class.php',
                     'Mailchimp_Admin_Page'             => ESPRESSO_MAILCHIMP_ADMIN_DIR
                                                           . 'Mailchimp_Admin_Page.core.php',
@@ -96,7 +96,7 @@ class EE_MailChimp extends EE_Addon
      */
     public function after_registration()
     {
-        require_once(ESPRESSO_MAILCHIMP_DIR . 'includes' . DS . 'MailChimp.class.php');
+        require_once(ESPRESSO_MAILCHIMP_DIR . 'lib' . DS . 'sdk' . DS . 'vendor' . DS . 'autoload.php');
     }
 
 

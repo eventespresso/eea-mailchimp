@@ -24,7 +24,7 @@ class EEM_Question_Mailchimp_Field extends EEM_Base
      * @return EEM_Question_Mailchimp_Field instance
      * @throws EE_Error
      */
-    public static function instance(?string $timezone = '')
+    public static function instance($timezone = '')
     {
         // Check if instance of EEM_Question_Mailchimp_Field already exists.
         if (self::$_instance === null) {
@@ -43,7 +43,7 @@ class EEM_Question_Mailchimp_Field extends EEM_Base
      * @param string|null $timezone
      * @throws EE_Error
      */
-    protected function __construct(?string $timezone = '')
+    protected function __construct($timezone = '')
     {
         $this->singular_item    = esc_html__('MailChimp List Group', 'event_espresso');
         $this->plural_item      = esc_html__('MailChimp List Groups', 'event_espresso');
@@ -89,7 +89,7 @@ class EEM_Question_Mailchimp_Field extends EEM_Base
      * @return EEM_Question_Mailchimp_Field
      * @throws EE_Error
      */
-    public static function reset(?string $timezone = '')
+    public static function reset($timezone = '')
     {
         self::$_instance = null;
         return self::instance($timezone);

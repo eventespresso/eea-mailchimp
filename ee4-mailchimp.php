@@ -37,11 +37,43 @@ define('ESPRESSO_MAILCHIMP_BASE_NAME', plugin_basename(__FILE__));
 // Register and run MC Integration if EE4 is Active.
 function load_ee4_espresso_mailchimp_class()
 {
-    if (class_exists('EE_Addon')) {
-        // ...and register our add-on.
-        require_once(plugin_dir_path(__FILE__) . 'EE_MailChimp.class.php');
-        EE_MailChimp::register_addon();
+    // Check the PHP version. MC SDK requires PHP 7.2 and up.
+    if (version_compare(PHP_VERSION, '7.2', '>=')) {
+        if (class_exists('EE_Addon')) {
+            // ...and register our add-on.
+            require_once(plugin_dir_path(__FILE__) . 'EE_MailChimp.class.php');
+            EE_MailChimp::register_addon();
+        }
+    } else {
+        // Incompatible PHP version, disable the plugin.
+        add_action('admin_init', 'eeaDisableMailChimp');
     }
 }
-
 add_action('AHEE__EE_System__load_espresso_addons', 'load_ee4_espresso_mailchimp_class', 11);
+
+
+// Disable MailChimp.
+function eeaDisableMailChimp()
+{
+    unset($_GET['activate'], $_REQUEST['activate']);
+    if (! function_exists('deactivate_plugins')) {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    }
+    deactivate_plugins(plugin_basename(ESPRESSO_MAILCHIMP_MAIN_FILE));
+    add_action('admin_notices', 'eeaMailChimpDisableNotice');
+}
+
+// Show deactivation notice.
+function eeaMailChimpDisableNotice()
+{
+    echo '<div class="error"><p>'
+         . sprintf(
+             esc_html__(
+                 '%1$s Event Espresso - MailChimp %2$s was deactivated! This plugin requires a %1$sPHP version 7.2 or higher%2$s.',
+                 'event_espresso'
+             ),
+             '<strong>',
+             '</strong>'
+         )
+         . '</p></div>';
+}

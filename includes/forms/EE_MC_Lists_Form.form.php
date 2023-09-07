@@ -37,9 +37,7 @@ class EE_MC_Lists_Form extends EE_Form_Section_Proper
     {
         $this->_mc_controller = $mc_controller;
         $this->_list_id = $list_id;
-
         $options = $this->_template_setup();
-
         parent::__construct($options);
     }
 
@@ -54,14 +52,12 @@ class EE_MC_Lists_Form extends EE_Form_Section_Proper
     {
         // Get MC lists.
         $mc_lists = $this->_mc_controller->mci_get_users_lists();
-
-        $lists = array();
+        $lists = [];
         if (! empty($mc_lists)) {
             $lists = $this->_mc_lists($mc_lists);
         } else {
             $lists['no_lists'] = new EE_Form_Section_HTML(EEH_HTML::p(esc_html__('No lists found! Please log into your MailChimp account and create at least one mailing list.', 'event_espresso'), 'no-lists-found-notice', 'important-notice'));
         }
-
         $options = array(
             'html_id' => 'ee-mailchimp-groups-list',
             'html_class' => 'eea_mailchimp_groups_list',
@@ -82,20 +78,20 @@ class EE_MC_Lists_Form extends EE_Form_Section_Proper
     protected function _mc_lists($mc_lists)
     {
         $selected_found = false;
-        $subsactions = $l_list = array();
+        $subsections = $l_list = [];
         $selected = '-1';
         // Add a default value.
         $l_list['-1'] = esc_html__('Do not send to MailChimp', 'event_espresso');
         foreach ($mc_lists as $list) {
             // Find selected.
-            if ($this->_list_id === $list['id'] || ( ! $selected_found && $list['id'] === '-1')) {
-                $selected = $list['id'];
+            if ($this->_list_id === $list->id || (! $selected_found && $list->id === '-1')) {
+                $selected = $list->id;
                 $selected_found = true;
             }
-            $l_list[ $list['id'] ] = $list['name'];
+            $l_list[ $list->id ] = $list->name;
         }
 
-        $subsactions['mc_lists'] = new EE_Select_Input(
+        $subsections['mc_lists'] = new EE_Select_Input(
             $l_list,
             array(
                 'html_label_text' => esc_html__('Please select a List:', 'event_espresso'),
@@ -105,7 +101,6 @@ class EE_MC_Lists_Form extends EE_Form_Section_Proper
                 'default'         => $selected
             )
         );
-
-        return $subsactions;
+        return $subsections;
     }
 }
